@@ -68,23 +68,28 @@ vetsa2Dat$zafqtbxpcttran_v2 = scale(vetsa2Dat$afqtbxpcttran_v2,
                     center=scaleValues$Mean[scaleValues$Variable=="afqtbxpcttran"],
                     scale=scaleValues$SD[scaleValues$Variable=="afqtbxpcttran"])
 
-
-
-
-
-
-
 #-------------------#
 #  Save out datset  #
 #-------------------#
 
-# Select cognitive domain variables
-vetsa2afqt = vetsa2Dat %>%
+# Select all afqt variables
+vetsa2afqtAll = vetsa2Dat %>%
+  dplyr::select(vetsaid,zafqtpcttran_v2,zafqtvocpcttran_v2,zafqtarpcttran_v2,
+                zafqttlpcttran_v2,zafqtbxpcttran_v2,afqtpcttran_v2,
+                afqtvocpcttran_v2,afqtarpcttran_v2,afqttlpcttran_v2,afqtbxpcttran_v2) 
+
+# Save out z-scored and raw data
+write.csv(vetsa2afqtAll, 
+          "K:/Projects/PracticeEffects/data/V2_AFQTscores_All.csv",
+          row.names = F)
+
+
+# Select z-scored variables
+vetsa2afqtZ = vetsa2Dat %>%
   dplyr::select(vetsaid,zafqtpcttran_v2,zafqtvocpcttran_v2,zafqtarpcttran_v2,
                 zafqttlpcttran_v2,zafqtbxpcttran_v2) 
 
-# Save out data
-write.csv(vetsa2afqt, 
-          "K:/Projects/PracticeEffects/data/V2_AFQTscores.csv",
+# Save out z-scored data only
+write.csv(vetsa2afqtZ, 
+          "K:/Projects/PracticeEffects/data/V2_AFQTscores_Zscored.csv",
           row.names = F)
-

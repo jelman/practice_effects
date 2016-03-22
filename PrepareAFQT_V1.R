@@ -74,14 +74,24 @@ scaleValues = addScaleVals(scaleValues, "afqtbxpcttran", vetsa1Dat$zafqtbxpcttra
 #  Save out datset  #
 #-------------------#
 
-# Select cognitive domain variables
-vetsa1afqt = vetsa1Dat %>%
+# Select all afqt variables
+vetsa1afqtAll = vetsa1Dat %>%
+  dplyr::select(vetsaid,zafqtpcttran,zafqtvocpcttran,zafqtarpcttran,
+                zafqttlpcttran,zafqtbxpcttran,afqtpcttran,afqtvocpcttran,
+                afqtarpcttran,afqttlpcttran,afqtbxpcttran) 
+
+# Save out z-scored and raw data
+write.csv(vetsa1afqtAll, 
+          "K:/Projects/PracticeEffects/data/V1_AFQTscores_All.csv",
+          row.names = F)
+
+vetsa1afqtZ = vetsa1Dat %>%
   dplyr::select(vetsaid,zafqtpcttran,zafqtvocpcttran,zafqtarpcttran,
                 zafqttlpcttran,zafqtbxpcttran) 
 
-# Save out data
-write.csv(vetsa1afqt, 
-          "K:/Projects/PracticeEffects/data/V1_AFQTscores.csv",
+# Save out z-scored data only
+write.csv(vetsa1afqtZ, 
+          "K:/Projects/PracticeEffects/data/V1_AFQTscores_Zscored.csv",
           row.names = F)
 
 # Save out Means and SDs for use in scaling Vetsa 2 data
