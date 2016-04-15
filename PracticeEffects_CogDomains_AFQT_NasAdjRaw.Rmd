@@ -1,5 +1,5 @@
 ---
-title: "Practice Effects on Cognitive Domain and AFQT Tests"
+title: "Practice Effects on Cognitive Domain and AFQT Tests: Adjusted raw scores"
 author: "Jeremy Elman"
 date: '`r Sys.Date()`'
 output:
@@ -23,7 +23,7 @@ library(permute)
 
 ```{r, include=F}
 # Load data
-allDat = read.csv("K:/Projects/PracticeEffects/data/PracEffectData_nas201tranAdj.csv")
+allDat = read.csv("K:/Projects/PracticeEffects/data/PracEffectData_nas201tran_RawAdj.csv")
 
 # Select subjects from groups of interest
 allDat = allDat %>%
@@ -31,25 +31,25 @@ allDat = allDat %>%
 
 ```
 
+## Adjustment for Age 20 AFQT  
 
+The scores have been adjusted for age 20 AFQT by regressing the nas201tran variable from each raw test score. VETSA 1 and VETSA 2 scores are then standardized (z-scored) using the mean and SD of VETSA 1 scores. Cognitive domain composites are created by averaging these standardized score within domain.
+
+## Calculation of practice effects  
 
 The difference (D) between time 2 scores of longitudinal returnees (S1T2) and time 2 attrition replacements (S2T2) is the sum of attrition effects (A) and practice effects (P). The attrition effect is calculated as the difference in time 1 scores of returnees (S1T1ret) compared to the entire group (S1T1all). The practice effect is therefore the difference D minus the attrition effect.
 
-**Practice effects calculated as:**
 
-$D = A + P$
-
-*Difference score*
-
-$D = S1T2 - S2T2$
-
-*Attrition effect*
-
-$A = S1T1ret - S1T1all$
-
-*Practice effect*
-
-$P = D - A$
+> $D = A + P$  
+> 
+> *Difference score*:
+> $D = S1T2 - S2T2$  
+>  
+> *Attrition effect*:
+> $A = S1T1ret - S1T1all$  
+> 
+> *Practice effect*:
+> $P = D - A$  
 
 
 ```{r, include=F}

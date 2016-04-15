@@ -1,5 +1,5 @@
 ---
-title: "Practice Effects on Cognitive Domain and AFQT Tests"
+title: "Practice Effects on Cognitive Domain and AFQT Tests: Unadjusted scores"
 author: "Jeremy Elman"
 date: '`r Sys.Date()`'
 output:
@@ -31,10 +31,10 @@ vetsa1CogDomains = dplyr::rename(vetsa1CogDomains, zrsatottran=zrsatotrevtran)
 # Load VETSA 2 Cognitive Domain data
 vetsa2CogDomains = read.csv("K:/Projects/PracticeEffects/data/V2_CognitiveDomains.csv", stringsAsFactors = F)
 # Load VETSA 1 AFQT data
-vetsa1afqt = read.csv("K:/Projects/PracticeEffects/data/V1_AFQTscores.csv",
+vetsa1afqt = read.csv("K:/Projects/PracticeEffects/data/V1_AFQTscores_Zscored.csv",
                       stringsAsFactors = F)
 # Load VETSA 2 AFQT data
-vetsa2afqt = read.csv("K:/Projects/PracticeEffects/data/V2_AFQTscores.csv",
+vetsa2afqt = read.csv("K:/Projects/PracticeEffects/data/V2_AFQTscores_Zscored.csv",
                       stringsAsFactors = F)
 
 # Join demographic data with VETSA1 & VETSA2 datasets
@@ -50,25 +50,20 @@ allDat = allDat %>%
 
 ```
 
-
+## Calculation of practice effects  
 
 The difference (D) between time 2 scores of longitudinal returnees (S1T2) and time 2 attrition replacements (S2T2) is the sum of attrition effects (A) and practice effects (P). The attrition effect is calculated as the difference in time 1 scores of returnees (S1T1ret) compared to the entire group (S1T1all). The practice effect is therefore the difference D minus the attrition effect.
 
-**Practice effects calculated as:**
-
-$D = A + P$
-
-*Difference score*
-
-$D = S1T2 - S2T2$
-
-*Attrition effect*
-
-$A = S1T1ret - S1T1all$
-
-*Practice effect*
-
-$P = D - A$
+> $D = A + P$  
+> 
+> *Difference score*:
+> $D = S1T2 - S2T2$  
+>  
+> *Attrition effect*:
+> $A = S1T1ret - S1T1all$  
+> 
+> *Practice effect*:
+> $P = D - A$  
 
 
 ```{r, include=F}
