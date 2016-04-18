@@ -55,7 +55,7 @@ vetsa2Dat = vetsa2Dat %>%
 
 
 #  Load in administrative data
-vetsaAdminDat = read.csv("K:/data/VETSA_demo_vars2.csv", stringsAsFactors = F)
+vetsaAdminDat = read.csv("K:/data/VETSA_demo_vars.csv", stringsAsFactors = F)
 adminCols = c("vetsaid","apoe2014","nas201tran","ETHNALL","RACEALL","TEDALL",
               "AGE_IN","AGE_FU1","VETSAGRP","twin","zygos")
 vetsaAdminDat = select(vetsaAdminDat, one_of(adminCols))
