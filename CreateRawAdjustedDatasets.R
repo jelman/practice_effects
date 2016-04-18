@@ -126,13 +126,13 @@ adjustDataset = function(regVars,adjVars,nDemoVars=16,data){
   
   # fitting models
   models <- lapply(adjVars, function(x) {
-    fmla = as.formula(paste0(x," ~ 0 + ",regVars," + (1|case)"))
-    lmer(formula=fmla, data = data, na.action=na.exclude)
+    fmla = as.formula(paste0(x," ~ 0 + ",regVars))
+    lm(formula=fmla, data = data, na.action=na.exclude)
   })
   
   # storing residuals from each model into data frame
   for(v in 1:nVars){
-    data[,tot+v] <- residuals(models[[v]], scale=TRUE)
+    data[,tot+v] <- residuals(models[[v]])
   }
   
   #dataR is now your residualized parameters
@@ -161,7 +161,7 @@ nDemoVars = 16
 data = subset(allData, !is.na(allData$nas201tran))
 
 # Specify nas201tran (Age 20 AFQT as variable to regress out)
-regVars = paste("nas201tran", sep=" + ")
+regVars = paste("scale(nas201tran)", sep=" + ")
 
 # Regress nas201tran out of dataset
 nasAdjZscoreData = adjustDataset(regVars, adjVars, nDemoVars, data)
@@ -190,7 +190,7 @@ nDemoVars = 16
 data = subset(allData, !is.na(allData$nas201tran))
 
 # Specify nas201tran (Age 20 AFQT as variable to regress out)
-regVars = paste("nas201tran", sep=" + ")
+regVars = paste("scale(nas201tran)", sep=" + ")
 
 # Regress nas201tran out of dataset
 nasAdjRawScoresData = adjustDataset(regVars, adjVars, nDemoVars, data)
