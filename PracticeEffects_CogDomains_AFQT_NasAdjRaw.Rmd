@@ -1,13 +1,13 @@
 ---
-title: "Practice Effects on Cognitive Domain and AFQT Tests: Adjusted raw scores"
+title: "Practice Effects on Cognitive Domain and AFQT Tests: Raw scores adjusted for Age 20  AFQT"
 author: "Jeremy Elman"
 date: '`r Sys.Date()`'
 output:
-  pdf_document:
-    latex_engine: xelatex
+  pdf_document: 
+    keep_tex: yes
+  word_document: default
   html_document:
     theme: readable
-  word_document: default
 ---
 
 ```{r global_options, include=FALSE}
@@ -23,7 +23,7 @@ library(permute)
 
 ```{r, include=F}
 # Load data
-allDat = read.csv("K:/Projects/PracticeEffects/data/PracEffectData_nas201tran_RawAdj.csv")
+allDat = read.csv("/home/jelman/netshare/K/Projects/PracticeEffects/data/PracEffectData_nas201tran_RawAdj.csv")
 
 # Select subjects from groups of interest
 allDat = allDat %>%
@@ -33,7 +33,7 @@ allDat = allDat %>%
 
 ## Adjustment for Age 20 AFQT  
 
-The scores have been adjusted for age 20 AFQT by regressing the nas201tran variable from each raw test score. VETSA 1 and VETSA 2 scores are then standardized (z-scored) using the mean and SD of VETSA 1 scores. Cognitive domain composites are created by averaging these standardized score within domain.
+The scores have been adjusted for age 20 AFQT by regressing the (scaled) nas201tran variable from each raw test score. VETSA 1 and VETSA 2 scores are then standardized (z-scored) using the mean and SD of VETSA 1 scores. Cognitive domain composites are created by averaging these standardized score within domain.
 
 ## Calculation of practice effects  
 
