@@ -1,0 +1,6 @@
+# Ignore knitted files and figures
+*.html
+*.doc
+*.docx
+*.pdf
+*.txt
