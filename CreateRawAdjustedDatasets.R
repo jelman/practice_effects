@@ -12,8 +12,6 @@
 
 # Import libraries
 library(dplyr)
-library(lme4)
-
 
 # Create vector of all variable names for which  practice effects are 
 # calculated. These variables will be adjusted
@@ -28,13 +26,19 @@ zVarsV1 = c("zVisSpat","zMR1COR","zHFTOTCOR","zSTWKMem","zdsfraw","zdsbraw",
 zVarsV1
 zVarsV2 = paste0(zVarsV1,"_v2")
 
-rawVarsV1 = c("MR1COR","HFTOTCOR","MTXTRAN","dsfraw","dsbraw","lntot","sspfraw",
-            "sspbraw","RSATOTTRAN","cvatot","CVSDFR","CVLDFR","lmitot","lmdtot",
-            "vritot","vrdtot","LFCOR","CFCOR","strwraw","strcraw","TRL2TRAN","TRL3TRAN",
-            "TRL4ADJTRAN","CSSACCADJ","strit","afqtpcttran","afqtvocpcttran",
-            "afqtarpcttran","afqttlpcttran","afqtbxpcttran")
+rawVarsV1 = c("MR1COR","HFTOTCOR","MTXTRAN","dsfraw","dsbraw","lntot","sspfraw","sspbraw",
+              "RSATOTTRAN","cvatot","CVSDFR","CVLDFR","lmitot","lmdtot","vritot","vrdtot",
+              "LFCOR","CFCOR","strwraw","strcraw","TRL2TRAN","TRL3TRAN","TRL4ADJTRAN",
+              "CSSACCADJ","strit","afqtpcttran","afqtvocpcttran","afqtarpcttran","afqttlpcttran",
+              "afqtbxpcttran")
 rawVarsV1
 rawVarsV2 = paste0(rawVarsV1,"_v2")
+rawVarsV2
+rawCogDomainsV1 = c("VisSpat","STWKMem","AbsReason","EpsMem","VerbFlu", "ExecTrailsSwitch",
+                    "ProcSpeed","ExecCategorySwitch","ExecInhibit")
+rawCogDomainsV1
+rawCogDomainsV2 = paste0(rawCogDomainsV1,"_v2")
+rawCogDomainsV2
 
 #---------------------------#
 # Create unadjusted dataset #
@@ -187,20 +191,20 @@ createV1CogDomains = function(df){
   # df = Dataframe containing variables to be renamed                     #
   #########################################################################
   
-  df$zVisSpat_adj = rowMeans(df[c("zMR1COR_adj","zHFTOTCOR_adj")],na.rm=T)
-  df$zAbsReason_adj = df$zMTXTRAN_adj
-  df$zSTWKMem_adj = rowMeans(df[,c("zdsfraw_adj","zdsbraw_adj","zlntot_adj",
+  df$VisSpat_adj = rowMeans(df[c("zMR1COR_adj","zHFTOTCOR_adj")],na.rm=T)
+  df$AbsReason_adj = df$zMTXTRAN_adj
+  df$STWKMem_adj = rowMeans(df[,c("zdsfraw_adj","zdsbraw_adj","zlntot_adj",
                                    "zsspfraw_adj","zsspbraw_adj","zrsatottran_adj")], 
                              na.rm=T)
-  df$zEpsMem_adj = rowMeans(df[,c("zcvatot_adj","zcvsdfr_adj","zcvldfr_adj",
+  df$EpsMem_adj = rowMeans(df[,c("zcvatot_adj","zcvsdfr_adj","zcvldfr_adj",
                                   "zlmitot_adj","zlmdtot_adj","zvritot_adj","zvrdtot_adj")], 
                             na.rm=T)
-  df$zVerbFlu_adj = rowMeans(df[,c("zlfcor_adj","zcfcor_adj")], na.rm=T)
-  df$zProcSpeed_adj = rowMeans(df[,c("zstrwraw_adj","zstrcraw_adj","ztrl2tran_adj",
+  df$VerbFlu_adj = rowMeans(df[,c("zlfcor_adj","zcfcor_adj")], na.rm=T)
+  df$ProcSpeed_adj = rowMeans(df[,c("zstrwraw_adj","zstrcraw_adj","ztrl2tran_adj",
                                      "ztrl3tran_adj")],na.rm=T)
-  df$zExecTrailsSwitch_adj = df$ztrl4adjtran_adj 
-  df$zExecCategorySwitch_adj = df$zCSSACCADJ_adj
-  df$zExecInhibit_adj = df$zstrit_adj
+  df$ExecTrailsSwitch_adj = df$ztrl4adjtran_adj 
+  df$ExecCategorySwitch_adj = df$zCSSACCADJ_adj
+  df$ExecInhibit_adj = df$zstrit_adj
   df
 }
 
@@ -214,21 +218,21 @@ createV2CogDomains = function(df){
   # df = Dataframe containing variables to be renamed                     #
   #########################################################################
   
-  df$zVisSpat_v2_adj = rowMeans(df[c("zMR1COR_v2_adj","zHFTOTCOR_v2_adj")],na.rm=T)
-  df$zAbsReason_v2_adj = df$zMTXTRAN_v2_adj
-  df$zSTWKMem_v2_adj = rowMeans(df[,c("zdsfraw_v2_adj", "zdsbraw_v2_adj",
+  df$VisSpat_v2_adj = rowMeans(df[c("zMR1COR_v2_adj","zHFTOTCOR_v2_adj")],na.rm=T)
+  df$AbsReason_v2_adj = df$zMTXTRAN_v2_adj
+  df$STWKMem_v2_adj = rowMeans(df[,c("zdsfraw_v2_adj", "zdsbraw_v2_adj",
                                       "zlntot_v2_adj","zsspfraw_v2_adj",
                                       "zsspbraw_v2_adj","zrsatottran_v2_adj")], na.rm=T)
-  df$zEpsMem_v2_adj = rowMeans(df[,c("zcvatot_v2_adj","zcvsdfr_v2_adj",
+  df$EpsMem_v2_adj = rowMeans(df[,c("zcvatot_v2_adj","zcvsdfr_v2_adj",
                                      "zcvldfr_v2_adj","zlmitot_v2_adj",
                                      "zlmdtot_v2_adj","zvritot_v2_adj","zvrdtot_v2_adj")], 
                                na.rm=T)
-  df$zVerbFlu_v2_adj = rowMeans(df[,c("zlfcor_v2_adj","zcfcor_v2_adj")],na.rm=T)
-  df$zProcSpeed_v2_adj = rowMeans(df[,c("zstrwraw_v2_adj","zstrcraw_v2_adj",
+  df$VerbFlu_v2_adj = rowMeans(df[,c("zlfcor_v2_adj","zcfcor_v2_adj")],na.rm=T)
+  df$ProcSpeed_v2_adj = rowMeans(df[,c("zstrwraw_v2_adj","zstrcraw_v2_adj",
                                         "ztrl2tran_v2_adj","ztrl3tran_v2_adj")],na.rm=T)
-  df$zExecTrailsSwitch_v2_adj = df$ztrl4adjtran_v2_adj 
-  df$zExecCategorySwitch_v2_adj = df$zCSSACCADJ_v2_adj
-  df$zExecInhibit_v2_adj = df$zstrit_v2_adj
+  df$ExecTrailsSwitch_v2_adj = df$ztrl4adjtran_v2_adj 
+  df$ExecCategorySwitch_v2_adj = df$zCSSACCADJ_v2_adj
+  df$ExecInhibit_v2_adj = df$zstrit_v2_adj
   df
 }
   
@@ -301,10 +305,6 @@ for(i in rawVarsV1){
   nasAdjRawScoresData[[varname]] = NULL
 }
 
-# Save out dataset
-write.csv(scaleValues, "/home/jelman/netshare/K/Projects/PracticeEffects/data/V1_nas201tranAdjustedRaw_Means_SDs.csv",
-          row.names = FALSE)
-
 # Scale VETSA 2 variables that have been adjusted for nas201tran using VETSA 1 mean and SD
 # Delete adjusted raw variable from dataset
 for(i in rawVarsV2){
@@ -326,11 +326,38 @@ nasAdjRawScoresData = createV1CogDomains(nasAdjRawScoresData)
 # Create VETSA 2 cognitive domain scores
 nasAdjRawScoresData = createV2CogDomains(nasAdjRawScoresData)
 
+# Scale VETSA 1 cognitive domain variables that have been adjusted for nas201tran
+# Adds mean and SD to dataframe and deletes adjusted raw variables from dataset. 
+# This is necessary to make composite scores actual z-scores
+for(i in rawCogDomainsV1){
+  varname = paste0(i, "_adj")
+  zvarname = paste0("z", varname)
+  nasAdjRawScoresData[[zvarname]] = scale(nasAdjRawScoresData[[varname]])
+  scaleValues = addScaleVals(scaleValues, varname, nasAdjRawScoresData[[zvarname]])
+  nasAdjRawScoresData[[varname]] = NULL
+}
+
+# Scale VETSA 2 cognitive domain variables that have been adjusted for nas201tran using VETSA 1 mean and SD
+# Delete adjusted raw variable from dataset
+# This is necessary to make composite scores actual z-scores
+for(i in rawCogDomainsV2){
+  varnameV2 = paste0(i, "_adj")
+  zvarname = paste0("z", varnameV2)
+  varnameV1 = gsub("_v2","",varnameV2)
+  nasAdjRawScoresData[[zvarname]] = scale(nasAdjRawScoresData[[varnameV2]],
+                                          center=scaleValues$Mean[scaleValues$Variable==varnameV1],
+                                          scale=scaleValues$SD[scaleValues$Variable==varnameV1])
+  nasAdjRawScoresData[[varnameV2]] = NULL
+}
+
 # Save out adjusted dataset
 write.csv(nasAdjRawScoresData, 
           "/home/jelman/netshare/K/Projects/PracticeEffects/data/PracEffectData_nas201tran_RawAdj.csv",
           row.names = FALSE)
 
+# Save out dataset
+write.csv(scaleValues, "/home/jelman/netshare/K/Projects/PracticeEffects/data/V1_nas201tranAdjustedRaw_Means_SDs.csv",
+          row.names = FALSE)
 #-----------------------------------------------------------------------------------#
 # Create dataset adjusted for TEDALL (Education)                              #
 #                                                                                   #
@@ -353,7 +380,7 @@ data = subset(allData, !is.na(allData$TEDALL))
 regVars = paste("scale(TEDALL)", sep=" + ")
 
 # Regress TEDALL out of dataset
-nasAdjRawScoresData = adjustDataset(regVars, adjVars, nDemoVars, data)
+tedAdjRawScoresData = adjustDataset(regVars, adjVars, nDemoVars, data)
 
 # Initialize dataframe to hold means and SDs
 scaleValues = data.frame()
@@ -363,14 +390,10 @@ scaleValues = data.frame()
 for(i in rawVarsV1){
   varname = paste0(i, "_adj")
   zvarname = paste0("z", varname)
-  nasAdjRawScoresData[[zvarname]] = scale(nasAdjRawScoresData[[varname]])
-  scaleValues = addScaleVals(scaleValues, varname, nasAdjRawScoresData[[zvarname]])
-  nasAdjRawScoresData[[varname]] = NULL
+  tedAdjRawScoresData[[zvarname]] = scale(tedAdjRawScoresData[[varname]])
+  scaleValues = addScaleVals(scaleValues, varname, tedAdjRawScoresData[[zvarname]])
+  tedAdjRawScoresData[[varname]] = NULL
 }
-
-# Save out dataset
-write.csv(scaleValues, "/home/jelman/netshare/K/Projects/PracticeEffects/data/V1_TEDALLAdjustedRaw_Means_SDs.csv",
-          row.names = FALSE)
 
 # Scale VETSA 2 variables that have been adjusted for TEDALL using VETSA 1 mean and SD
 # Delete adjusted raw variable from dataset
@@ -378,22 +401,51 @@ for(i in rawVarsV2){
   varnameV2 = paste0(i, "_adj")
   zvarname = paste0("z", varnameV2)
   varnameV1 = gsub("_v2","",varnameV2)
-  nasAdjRawScoresData[[zvarname]] = scale(nasAdjRawScoresData[[varnameV2]],
+  tedAdjRawScoresData[[zvarname]] = scale(tedAdjRawScoresData[[varnameV2]],
                                           center=scaleValues$Mean[scaleValues$Variable==varnameV1],
                                           scale=scaleValues$SD[scaleValues$Variable==varnameV1])
-  nasAdjRawScoresData[[varnameV2]] = NULL
+  tedAdjRawScoresData[[varnameV2]] = NULL
 }
 
 # Rename variables to be consistent with other unadjusted and unadjusted datasets
-nasAdjRawScoresData = renameVars(nasAdjRawScoresData)
+tedAdjRawScoresData = renameVars(tedAdjRawScoresData)
 
 # Create VETSA 1 cognitive domain scores
-nasAdjRawScoresData = createV1CogDomains(nasAdjRawScoresData)
+tedAdjRawScoresData = createV1CogDomains(tedAdjRawScoresData)
 
 # Create VETSA 2 cognitive domain scores
-nasAdjRawScoresData = createV2CogDomains(nasAdjRawScoresData)
+tedAdjRawScoresData = createV2CogDomains(tedAdjRawScoresData)
+
+# Scale VETSA 1 cognitive domain variables that have been adjusted for TEDALL
+# Adds mean and SD to dataframe and deletes adjusted raw variables from dataset. 
+# This is necessary to make composite scores actual z-scores
+for(i in rawCogDomainsV1){
+  varname = paste0(i, "_adj")
+  zvarname = paste0("z", varname)
+  tedAdjRawScoresData[[zvarname]] = scale(tedAdjRawScoresData[[varname]])
+  scaleValues = addScaleVals(scaleValues, varname, tedAdjRawScoresData[[zvarname]])
+  tedAdjRawScoresData[[varname]] = NULL
+}
+
+# Scale VETSA 2 cognitive domain variables that have been adjusted for TEDALL using VETSA 1 mean and SD
+# Delete adjusted raw variable from dataset
+# This is necessary to make composite scores actual z-scores
+for(i in rawCogDomainsV2){
+  varnameV2 = paste0(i, "_adj")
+  zvarname = paste0("z", varnameV2)
+  varnameV1 = gsub("_v2","",varnameV2)
+  tedAdjRawScoresData[[zvarname]] = scale(tedAdjRawScoresData[[varnameV2]],
+                                          center=scaleValues$Mean[scaleValues$Variable==varnameV1],
+                                          scale=scaleValues$SD[scaleValues$Variable==varnameV1])
+  tedAdjRawScoresData[[varnameV2]] = NULL
+}
+
 
 # Save out adjusted dataset
-write.csv(nasAdjRawScoresData, 
+write.csv(tedAdjRawScoresData, 
           "/home/jelman/netshare/K/Projects/PracticeEffects/data/PracEffectData_TEDALL_RawAdj.csv",
+          row.names = FALSE)
+
+# Save out dataset
+write.csv(scaleValues, "/home/jelman/netshare/K/Projects/PracticeEffects/data/V1_TEDALLAdjustedRaw_Means_SDs.csv",
           row.names = FALSE)
