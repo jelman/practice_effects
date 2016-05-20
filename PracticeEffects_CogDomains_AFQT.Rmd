@@ -1,10 +1,9 @@
 ---
-title: "Practice Effects on Cognitive Domain and AFQT Tests: Unadjusted scores"
+title: 'Practice Effects on Cognitive Domain and AFQT Tests: Unadjusted scores'
 author: "Jeremy Elman"
 date: '`r Sys.Date()`'
 output:
-  pdf_document:
-    latex_engine: xelatex
+  pdf_document: default
   html_document:
     theme: readable
   word_document: default
@@ -22,27 +21,8 @@ library(permute)
 ```
 
 ```{r, include=F}
-# Load demographic data
-demoData = read.csv("K:/data/VETSA_demo_vars.csv", stringsAsFactors = F)
-# Load VETSA 1 Cognitive Domain data
-vetsa1CogDomains = read.csv("K:/Projects/PracticeEffects/data/V1_CognitiveDomains.csv", stringsAsFactors = F)
-# Rename zrsatotrevtran variable in V1 to match variable name in V2
-vetsa1CogDomains = dplyr::rename(vetsa1CogDomains, zrsatottran=zrsatotrevtran)
-# Load VETSA 2 Cognitive Domain data
-vetsa2CogDomains = read.csv("K:/Projects/PracticeEffects/data/V2_CognitiveDomains.csv", stringsAsFactors = F)
-# Load VETSA 1 AFQT data
-vetsa1afqt = read.csv("K:/Projects/PracticeEffects/data/V1_AFQTscores_Zscored.csv",
-                      stringsAsFactors = F)
-# Load VETSA 2 AFQT data
-vetsa2afqt = read.csv("K:/Projects/PracticeEffects/data/V2_AFQTscores_Zscored.csv",
-                      stringsAsFactors = F)
-
-# Join demographic data with VETSA1 & VETSA2 datasets
-allDat = demoData %>%
-  left_join(vetsa1CogDomains, by="vetsaid") %>% 
-  left_join(vetsa2CogDomains, by="vetsaid") %>%
-  left_join(vetsa1afqt, by="vetsaid") %>%
-  left_join(vetsa2afqt, by="vetsaid")
+# Load data
+allDat = read.csv("/home/jelman/netshare/K/Projects/PracticeEffects/data/PracEffectData_Unadj.csv")
 
 # Select subjects from groups of interest
 allDat = allDat %>%
