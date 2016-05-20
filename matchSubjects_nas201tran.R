@@ -37,7 +37,6 @@ m.dataV2 = match.data(m.outV2)
 # Verify no significant group difference on age 20 AFQT
 t.test(nas201tran ~ treat, data=m.dataV2)
 
-
 #-------------------------#
 #   Match Vetsa 1 groups  #
 #-------------------------#
@@ -50,7 +49,7 @@ vetsa1ARData$treat = ifelse(vetsa1ARData$VETSAGRP=="V2AR",1,0)
 # Only include subjects with Age 20 AFQT score
 vetsa1ARData = subset(vetsa1ARData, !is.na(vetsa1ARData$nas201tran))
 # Subset data. MatchIt does not like missing data, even in variables that are not included in model.
-dataV1 = vetsa1ARData[c("treat","nas201tran")]
+dataV1 = vetsa1ARData[c("vetsaid","treat","nas201tran")]
 # Generate match on age 20 AFQT (ages should differ). Match 1 control per each treatment subject
 m.outV1 = matchit(treat ~ nas201tran, data=dataV1, method="optimal", ratio=1)
 # Display matching results
@@ -61,3 +60,15 @@ m.dataV1 = match.data(m.outV1)
 # Verify no significant group difference on age 20 AFQT
 t.test(nas201tran ~ treat, data=m.dataV1)
 
+#--------------------------------------------------------#
+#   Create Cognitive Domain dataset of mathced subjects  #
+#--------------------------------------------------------#
+
+# Load unadjusted practice effects data (cognitive domains and afqt scores)
+peData = read.csv("/home/jelman/netshare/K/Projects/PracticeEffects/data/PracEffectData_Unadj.csv")
+# Subset data for only subjects who were matched
+m.subjects = union(m.dataV2$vetsaid, m.dataV1$vetsaid)
+m.peData = peData[peData$vetsaid %in% m.subjects,]
+# Write out dataset
+write.csv(m.peData, "/home/jelman/netshare/K/Projects/PracticeEffects/data/PracEffectData_Matched_nas201tran.csv",
+          row.names = F)
