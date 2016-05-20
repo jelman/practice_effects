@@ -3,8 +3,6 @@ title: "Practice Effects on Cognitive Domain and AFQT Tests: Raw scores adjusted
 author: "Jeremy Elman"
 date: '`r Sys.Date()`'
 output:
-  pdf_document: 
-    keep_tex: yes
   word_document: default
   html_document:
     theme: readable

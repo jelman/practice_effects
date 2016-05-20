@@ -29,11 +29,11 @@ library(dplyr)
 library(sjPlot)
 
 # Load in VETSA 1 data
-vetsa1Dat = read_sas("K:/data/VETSA1_Aug2014/vetsa1merged_25aug2015_nomiss.sas7bdat")
+vetsa1Dat = read_sas("/home/jelman/netshare/K/data/VETSA1_Aug2014/vetsa1merged_25aug2015_nomiss.sas7bdat")
 
 # Select columns of interest and rename when necessary to be consistent across wave
 vetsa1Dat = vetsa1Dat %>%
-  select(vetsaid,case,afqtpcttran,cesd=dep05,HYPTYN,PRVDYN,DIABYN,
+  dplyr::select(vetsaid,case,afqtpcttran,cesd=dep05,HYPTYN,PRVDYN,DIABYN,
          INCOME=E6,ASTHYN,BRONYN,EMPHYN,SAPNYN,ANGIYN,HATTYN,HRTFYN,THRMYN,
          GASTYN,ULCRYN,IBSYN,PANCYN,HEPAYN,HEPBYN,HEPCYN,ULCOYN,OTHYYN,UNDYYN,
          OARTYN,GOUTYN,RARTYN,GLAUYN,PTSDYN,MIGRYN,SEIZYN,STROYN,AAADYN,DEPRYN,
@@ -41,13 +41,13 @@ vetsa1Dat = vetsa1Dat %>%
 
 
 # Load in VETSA 2 data
-vetsa2Dat = read_sas('K:/data/VETSA2_April2015/vetsa2merged_1dec2015_edits.sas7bdat')
+vetsa2Dat = read_sas('/home/jelman/netshare/K/data/VETSA2_April2015/vetsa2merged_1dec2015_edits.sas7bdat')
 # Strip "v2" parts of variable names for easier selection
 names(vetsa2Dat) = gsub("_?[Vv]2$", "", names(vetsa2Dat))
 
 # Select columns of interest and rename when necessary to be consistent across wave
 vetsa2Dat = vetsa2Dat %>%
-  select(vetsaid,case,afqtpcttran,cesd=CESdep,HYPTYN,PRVDYN,DIABYN,
+  dplyr::select(vetsaid,case,afqtpcttran,cesd=CESdep,HYPTYN,PRVDYN,DIABYN,
          INCOME=E5,ASTHYN,BRONYN,EMPHYN,SAPNYN,ANGIYN,HATTYN,HRTFYN,THRMYN,
          GASTYN,ULCRYN,IBSYN,PANCYN,HEPAYN,HEPBYN,HEPCYN,ULCOYN,OTHYYN,UNDYYN,
          OARTYN,GOUTYN,RARTYN,GLAUYN,PTSDYN,MIGRYN,SEIZYN,STROYN,AAADYN,DEPRYN,
@@ -55,10 +55,10 @@ vetsa2Dat = vetsa2Dat %>%
 
 
 #  Load in administrative data
-vetsaAdminDat = read.csv("K:/data/VETSA_demo_vars.csv", stringsAsFactors = F)
+vetsaAdminDat = read.csv("/home/jelman/netshare/K/data/VETSA_demo_vars.csv", stringsAsFactors = F)
 adminCols = c("vetsaid","apoe2014","nas201tran","ETHNALL","RACEALL","TEDALL",
               "AGE_IN","AGE_FU1","VETSAGRP","twin","zygos")
-vetsaAdminDat = select(vetsaAdminDat, one_of(adminCols))
+vetsaAdminDat = dplyr::select(vetsaAdminDat, one_of(adminCols))
 
 # Join admin data with V1 and V2 datasets
 vetsa1AllDat = vetsaAdminDat %>% 
