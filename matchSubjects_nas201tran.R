@@ -1,5 +1,6 @@
 ###############################################################################
 # Script to generate matched groups used to calculate Practice Effects.       #
+# Variable to match: nas201tran (Age 20 AFQT)                                 #
 #                                                                             #
 # VETSA Attrition Replacements tend to score lower on age 20 AFQT.            #
 # Therefore, practice effects may be contaminated by longstanding             #
