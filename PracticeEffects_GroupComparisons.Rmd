@@ -5,8 +5,6 @@ date: '`r Sys.Date()`'
 output:
   html_document:
     theme: readable
-  pdf_document:
-    latex_engine: xelatex
   word_document: default
 ---
 
@@ -74,375 +72,379 @@ vetsa2AllDat = subset(vetsa2AllDat, (VETSAGRP=="V1V2" | VETSAGRP=="V2AR"))
 vetsa1ARAllDat =  union(vetsa1AllDat[vetsa1AllDat$VETSAGRP=="V1",],
                         vetsa2AllDat[vetsa2AllDat$VETSAGRP=="V2AR",]) 
 
+# Create factor of VETSA group
+vetsa1AllDat$VETSAGRP = factor(vetsa1AllDat$VETSAGRP)
+vetsa2AllDat$VETSAGRP = factor(vetsa2AllDat$VETSAGRP)
+vetsa1ARAllDat$VETSAGRP = factor(vetsa1ARAllDat$VETSAGRP)
 ```
 
 
 **Ethnicity**  
-`r sjt.xtab(vetsa1AllDat$ETHNALL, vetsa1AllDat$VETSAGRP, variableLabels=c("Ethnicity","VETSA 1 Group"),no.output=TRUE)$knitr`  
+`r sjt.xtab(vetsa1AllDat$ETHNALL, vetsa1AllDat$VETSAGRP, var.labels=c("Ethnicity","VETSA 1 Group"),no.output=TRUE)$knitr`  
 <br/>
-`r sjt.xtab(vetsa2AllDat$ETHNALL, vetsa2AllDat$VETSAGRP, variableLabels=c("Ethnicity","VETSA 2 Group"),no.output=TRUE)$knitr`  
+`r sjt.xtab(vetsa2AllDat$ETHNALL, vetsa2AllDat$VETSAGRP, var.labels=c("Ethnicity","VETSA 2 Group"),no.output=TRUE)$knitr`  
 <br/>
-`r sjt.xtab(vetsa1ARAllDat$ETHNALL, vetsa1ARAllDat$VETSAGRP, variableLabels=c("Ethnicity","VETSA Group"),no.output=TRUE)$knitr`  
+`r sjt.xtab(vetsa1ARAllDat$ETHNALL, vetsa1ARAllDat$VETSAGRP, var.labels=c("Ethnicity","VETSA Group"),no.output=TRUE)$knitr`  
 <br/>
 <br/>
 
 **Race**  
-`r sjt.xtab(vetsa1AllDat$RACEALL, vetsa1AllDat$VETSAGRP,  variableLabels=c("Race","VETSA 1 Group"),no.output=TRUE)$knitr`  
+`r sjt.xtab(vetsa1AllDat$RACEALL, vetsa1AllDat$VETSAGRP,  var.labels=c("Race","VETSA 1 Group"),no.output=TRUE)$knitr`  
 <br/>
-`r sjt.xtab(vetsa2AllDat$RACEALL, vetsa2AllDat$VETSAGRP, variableLabels=c("Race","VETSA 2 Group"),no.output=TRUE)$knitr`  
+`r sjt.xtab(vetsa2AllDat$RACEALL, vetsa2AllDat$VETSAGRP, var.labels=c("Race","VETSA 2 Group"),no.output=TRUE)$knitr`  
 <br/>
-`r sjt.xtab(vetsa1ARAllDat$RACEALL, vetsa1ARAllDat$VETSAGRP, variableLabels=c("Race","VETSA Group"),no.output=TRUE)$knitr`  
+`r sjt.xtab(vetsa1ARAllDat$RACEALL, vetsa1ARAllDat$VETSAGRP, var.labels=c("Race","VETSA Group"),no.output=TRUE)$knitr`  
 <br/>
 <br/>
 
 
 **APOE 4**  
 0=No, 1=Yes
-`r sjt.xtab(vetsa1AllDat$apoe4, vetsa1AllDat$VETSAGRP, variableLabels=c("APOE 4","VETSA 1 Group"),no.output=TRUE)$knitr`
+`r sjt.xtab(vetsa1AllDat$apoe4, vetsa1AllDat$VETSAGRP, var.labels=c("APOE 4","VETSA 1 Group"),no.output=TRUE)$knitr`
 <br/>
-`r sjt.xtab(vetsa2AllDat$apoe4, vetsa2AllDat$VETSAGRP, variableLabels=c("APOE 4","VETSA 2 Group"),no.output=TRUE)$knitr`
+`r sjt.xtab(vetsa2AllDat$apoe4, vetsa2AllDat$VETSAGRP, var.labels=c("APOE 4","VETSA 2 Group"),no.output=TRUE)$knitr`
 <br/>
-`r sjt.xtab(vetsa1ARAllDat$apoe4, vetsa1ARAllDat$VETSAGRP, variableLabels=c("APOE 4","VETSA Group"),no.output=TRUE)$knitr`  
+`r sjt.xtab(vetsa1ARAllDat$apoe4, vetsa1ARAllDat$VETSAGRP, var.labels=c("APOE 4","VETSA Group"),no.output=TRUE)$knitr`  
 <br/>
 <br/>
     
 **Hypertension**  
 1=Yes, 2=No, 8=Don't Know
-`r sjt.xtab(vetsa1AllDat$HYPTYN, vetsa1AllDat$VETSAGRP, variableLabels=c("Hypertension","VETSA 1 Group"),no.output=TRUE)$knitr`
+`r sjt.xtab(vetsa1AllDat$HYPTYN, vetsa1AllDat$VETSAGRP, var.labels=c("Hypertension","VETSA 1 Group"),no.output=TRUE)$knitr`
 <br/> 
-`r sjt.xtab(vetsa2AllDat$HYPTYN, vetsa2AllDat$VETSAGRP, variableLabels=c("Hypertension","VETSA 2 Group"),no.output=TRUE)$knitr`
+`r sjt.xtab(vetsa2AllDat$HYPTYN, vetsa2AllDat$VETSAGRP, var.labels=c("Hypertension","VETSA 2 Group"),no.output=TRUE)$knitr`
 <br/>
-`r sjt.xtab(vetsa1ARAllDat$HYPTYN, vetsa1ARAllDat$VETSAGRP, variableLabels=c("Hypertension","VETSA Group"),no.output=TRUE)$knitr`  
+`r sjt.xtab(vetsa1ARAllDat$HYPTYN, vetsa1ARAllDat$VETSAGRP, var.labels=c("Hypertension","VETSA Group"),no.output=TRUE)$knitr`  
 <br/>
 <br/>
 
 **Peripheral Vascular Disease**  
 1=Yes, 2=No, 8=Don't Know
-`r sjt.xtab(vetsa1AllDat$PRVDYN, vetsa1AllDat$VETSAGRP, variableLabels=c("Peripheral Vascular Disease","VETSA 1 Group"),no.output=TRUE)$knitr`
+`r sjt.xtab(vetsa1AllDat$PRVDYN, vetsa1AllDat$VETSAGRP, var.labels=c("Peripheral Vascular Disease","VETSA 1 Group"),no.output=TRUE)$knitr`
 <br/> 
-`r sjt.xtab(vetsa2AllDat$PRVDYN, vetsa2AllDat$VETSAGRP, variableLabels=c("Peripheral Vascular Disease","VETSA 2 Group"),no.output=TRUE)$knitr`
+`r sjt.xtab(vetsa2AllDat$PRVDYN, vetsa2AllDat$VETSAGRP, var.labels=c("Peripheral Vascular Disease","VETSA 2 Group"),no.output=TRUE)$knitr`
 <br/>
-`r sjt.xtab(vetsa1ARAllDat$PRVDYN, vetsa1ARAllDat$VETSAGRP, variableLabels=c("Peripheral Vascular Disease","VETSA Group"),no.output=TRUE)$knitr`  
+`r sjt.xtab(vetsa1ARAllDat$PRVDYN, vetsa1ARAllDat$VETSAGRP, var.labels=c("Peripheral Vascular Disease","VETSA Group"),no.output=TRUE)$knitr`  
 <br/>
 <br/>
 
 **Diabetes**  
 1=Yes, 2=No, 8=Don't Know
-`r sjt.xtab(vetsa1AllDat$DIABYN, vetsa1AllDat$VETSAGRP, variableLabels=c("Diabetes","VETSA 1 Group"),no.output=TRUE)$knitr`
+`r sjt.xtab(vetsa1AllDat$DIABYN, vetsa1AllDat$VETSAGRP, var.labels=c("Diabetes","VETSA 1 Group"),no.output=TRUE)$knitr`
 <br/>
-`r sjt.xtab(vetsa2AllDat$DIABYN, vetsa2AllDat$VETSAGRP, variableLabels=c("Diabetes","VETSA 2 Group"),no.output=TRUE)$knitr`
+`r sjt.xtab(vetsa2AllDat$DIABYN, vetsa2AllDat$VETSAGRP, var.labels=c("Diabetes","VETSA 2 Group"),no.output=TRUE)$knitr`
 <br/>
-`r sjt.xtab(vetsa1ARAllDat$DIABYN, vetsa1ARAllDat$VETSAGRP, variableLabels=c("Diabetes","VETSA Group"),no.output=TRUE)$knitr`  
+`r sjt.xtab(vetsa1ARAllDat$DIABYN, vetsa1ARAllDat$VETSAGRP, var.labels=c("Diabetes","VETSA Group"),no.output=TRUE)$knitr`  
 <br/>
 <br/>
 
 **Asthma**  
 1=Yes, 2=No, 8=Don't Know
-`r sjt.xtab(vetsa1AllDat$ASTHYN, vetsa1AllDat$VETSAGRP, variableLabels=c("Asthma","VETSA 1 Group"),no.output=TRUE)$knitr`  
+`r sjt.xtab(vetsa1AllDat$ASTHYN, vetsa1AllDat$VETSAGRP, var.labels=c("Asthma","VETSA 1 Group"),no.output=TRUE)$knitr`  
 <br/>
-`r sjt.xtab(vetsa2AllDat$ASTHYN, vetsa2AllDat$VETSAGRP, variableLabels=c("Asthma","VETSA 2 Group"),no.output=TRUE)$knitr`  
+`r sjt.xtab(vetsa2AllDat$ASTHYN, vetsa2AllDat$VETSAGRP, var.labels=c("Asthma","VETSA 2 Group"),no.output=TRUE)$knitr`  
 <br/>
-`r sjt.xtab(vetsa1ARAllDat$ASTHYN, vetsa1ARAllDat$VETSAGRP, variableLabels=c("Asthma","VETSA Group"),no.output=TRUE)$knitr`  
+`r sjt.xtab(vetsa1ARAllDat$ASTHYN, vetsa1ARAllDat$VETSAGRP, var.labels=c("Asthma","VETSA Group"),no.output=TRUE)$knitr`  
 <br/>
 <br/>
 
 **Chronic Bronchitis**  
 1=Yes, 2=No, 8=Don't Know
-`r sjt.xtab(vetsa1AllDat$BRONYN, vetsa1AllDat$VETSAGRP, variableLabels=c("Chronic Bronchitis","VETSA 1 Group"),no.output=TRUE)$knitr`  
+`r sjt.xtab(vetsa1AllDat$BRONYN, vetsa1AllDat$VETSAGRP, var.labels=c("Chronic Bronchitis","VETSA 1 Group"),no.output=TRUE)$knitr`  
 <br/>
-`r sjt.xtab(vetsa2AllDat$BRONYN, vetsa2AllDat$VETSAGRP, variableLabels=c("Chronic Bronchitis","VETSA 2 Group"),no.output=TRUE)$knitr`  
+`r sjt.xtab(vetsa2AllDat$BRONYN, vetsa2AllDat$VETSAGRP, var.labels=c("Chronic Bronchitis","VETSA 2 Group"),no.output=TRUE)$knitr`  
 <br/>
-`r sjt.xtab(vetsa1ARAllDat$BRONYN, vetsa1ARAllDat$VETSAGRP, variableLabels=c("Chronic Bronchitis","VETSA Group"),no.output=TRUE)$knitr`  
+`r sjt.xtab(vetsa1ARAllDat$BRONYN, vetsa1ARAllDat$VETSAGRP, var.labels=c("Chronic Bronchitis","VETSA Group"),no.output=TRUE)$knitr`  
 <br/>
 <br/>
 
 **Emphysema**  
 1=Yes, 2=No, 8=Don't Know
-`r sjt.xtab(vetsa1AllDat$EMPHYN, vetsa1AllDat$VETSAGRP, variableLabels=c("Emphysema","VETSA 1 Group"),no.output=TRUE)$knitr`  
+`r sjt.xtab(vetsa1AllDat$EMPHYN, vetsa1AllDat$VETSAGRP, var.labels=c("Emphysema","VETSA 1 Group"),no.output=TRUE)$knitr`  
 <br/>
-`r sjt.xtab(vetsa2AllDat$EMPHYN, vetsa2AllDat$VETSAGRP, variableLabels=c("Emphysema","VETSA 2 Group"),no.output=TRUE)$knitr`  
+`r sjt.xtab(vetsa2AllDat$EMPHYN, vetsa2AllDat$VETSAGRP, var.labels=c("Emphysema","VETSA 2 Group"),no.output=TRUE)$knitr`  
 <br/>
-`r sjt.xtab(vetsa1ARAllDat$EMPHYN, vetsa1ARAllDat$VETSAGRP, variableLabels=c("Emphysema","VETSA Group"),no.output=TRUE)$knitr`  
+`r sjt.xtab(vetsa1ARAllDat$EMPHYN, vetsa1ARAllDat$VETSAGRP, var.labels=c("Emphysema","VETSA Group"),no.output=TRUE)$knitr`  
 <br/>
 <br/>
 
 **Sleep Apnea**  
 1=Yes, 2=No, 8=Don't Know
-`r sjt.xtab(vetsa1AllDat$SAPNYN, vetsa1AllDat$VETSAGRP, variableLabels=c("Sleep Apnea","VETSA 1 Group"),no.output=TRUE)$knitr`  
+`r sjt.xtab(vetsa1AllDat$SAPNYN, vetsa1AllDat$VETSAGRP, var.labels=c("Sleep Apnea","VETSA 1 Group"),no.output=TRUE)$knitr`  
 <br/>
-`r sjt.xtab(vetsa2AllDat$SAPNYN, vetsa2AllDat$VETSAGRP, variableLabels=c("Sleep Apnea","VETSA 2 Group"),no.output=TRUE)$knitr`  
+`r sjt.xtab(vetsa2AllDat$SAPNYN, vetsa2AllDat$VETSAGRP, var.labels=c("Sleep Apnea","VETSA 2 Group"),no.output=TRUE)$knitr`  
 <br/>
-`r sjt.xtab(vetsa1ARAllDat$SAPNYN, vetsa1ARAllDat$VETSAGRP, variableLabels=c("Sleep Apnea","VETSA Group"),no.output=TRUE)$knitr`  
+`r sjt.xtab(vetsa1ARAllDat$SAPNYN, vetsa1ARAllDat$VETSAGRP, var.labels=c("Sleep Apnea","VETSA Group"),no.output=TRUE)$knitr`  
 <br/>
 <br/>
 
 **Angina**  
 1=Yes, 2=No, 8=Don't Know
-`r sjt.xtab(vetsa1AllDat$ANGIYN, vetsa1AllDat$VETSAGRP, variableLabels=c("Angina","VETSA 1 Group"),no.output=TRUE)$knitr`  
+`r sjt.xtab(vetsa1AllDat$ANGIYN, vetsa1AllDat$VETSAGRP, var.labels=c("Angina","VETSA 1 Group"),no.output=TRUE)$knitr`  
 <br/>
-`r sjt.xtab(vetsa2AllDat$ANGIYN, vetsa2AllDat$VETSAGRP, variableLabels=c("Angina","VETSA 2 Group"),no.output=TRUE)$knitr`  
+`r sjt.xtab(vetsa2AllDat$ANGIYN, vetsa2AllDat$VETSAGRP, var.labels=c("Angina","VETSA 2 Group"),no.output=TRUE)$knitr`  
 <br/>
-`r sjt.xtab(vetsa1ARAllDat$ANGIYN, vetsa1ARAllDat$VETSAGRP, variableLabels=c("Angina","VETSA Group"),no.output=TRUE)$knitr`  
+`r sjt.xtab(vetsa1ARAllDat$ANGIYN, vetsa1ARAllDat$VETSAGRP, var.labels=c("Angina","VETSA Group"),no.output=TRUE)$knitr`  
 <br/>
 <br/>
 
 **Heart Attack**  
 1=Yes, 2=No, 8=Don't Know
-`r sjt.xtab(vetsa1AllDat$HATTYN, vetsa1AllDat$VETSAGRP, variableLabels=c("Heart Attack","VETSA 1 Group"),no.output=TRUE)$knitr`  
+`r sjt.xtab(vetsa1AllDat$HATTYN, vetsa1AllDat$VETSAGRP, var.labels=c("Heart Attack","VETSA 1 Group"),no.output=TRUE)$knitr`  
 <br/>
-`r sjt.xtab(vetsa2AllDat$HATTYN, vetsa2AllDat$VETSAGRP, variableLabels=c("Heart Attack","VETSA 2 Group"),no.output=TRUE)$knitr`  
+`r sjt.xtab(vetsa2AllDat$HATTYN, vetsa2AllDat$VETSAGRP, var.labels=c("Heart Attack","VETSA 2 Group"),no.output=TRUE)$knitr`  
 <br/>
-`r sjt.xtab(vetsa1ARAllDat$HATTYN, vetsa1ARAllDat$VETSAGRP, variableLabels=c("Heart Attack","VETSA Group"),no.output=TRUE)$knitr`  
+`r sjt.xtab(vetsa1ARAllDat$HATTYN, vetsa1ARAllDat$VETSAGRP, var.labels=c("Heart Attack","VETSA Group"),no.output=TRUE)$knitr`  
 <br/>
 <br/>
 
 **Heart Failure**  
 1=Yes, 2=No, 8=Don't Know
-`r sjt.xtab(vetsa1AllDat$HRTFYN, vetsa1AllDat$VETSAGRP, variableLabels=c("Heart Failure","VETSA 1 Group"),no.output=TRUE)$knitr`  
+`r sjt.xtab(vetsa1AllDat$HRTFYN, vetsa1AllDat$VETSAGRP, var.labels=c("Heart Failure","VETSA 1 Group"),no.output=TRUE)$knitr`  
 <br/>
-`r sjt.xtab(vetsa2AllDat$HRTFYN, vetsa2AllDat$VETSAGRP, variableLabels=c("Heart Failure","VETSA 2 Group"),no.output=TRUE)$knitr`  
+`r sjt.xtab(vetsa2AllDat$HRTFYN, vetsa2AllDat$VETSAGRP, var.labels=c("Heart Failure","VETSA 2 Group"),no.output=TRUE)$knitr`  
 <br/>
-`r sjt.xtab(vetsa1ARAllDat$HRTFYN, vetsa1ARAllDat$VETSAGRP, variableLabels=c("Heart Failure","VETSA Group"),no.output=TRUE)$knitr`  
+`r sjt.xtab(vetsa1ARAllDat$HRTFYN, vetsa1ARAllDat$VETSAGRP, var.labels=c("Heart Failure","VETSA Group"),no.output=TRUE)$knitr`  
 <br/>
 <br/>
 
 **Thombophlebitis**  
 1=Yes, 2=No, 8=Don't Know
-`r sjt.xtab(vetsa1AllDat$THRMYN, vetsa1AllDat$VETSAGRP, variableLabels=c("Thombophlebitis","VETSA 1 Group"),no.output=TRUE)$knitr`  
+`r sjt.xtab(vetsa1AllDat$THRMYN, vetsa1AllDat$VETSAGRP, var.labels=c("Thombophlebitis","VETSA 1 Group"),no.output=TRUE)$knitr`  
 <br/>
-`r sjt.xtab(vetsa2AllDat$THRMYN, vetsa2AllDat$VETSAGRP, variableLabels=c("Thombophlebitis","VETSA 2 Group"),no.output=TRUE)$knitr`  
+`r sjt.xtab(vetsa2AllDat$THRMYN, vetsa2AllDat$VETSAGRP, var.labels=c("Thombophlebitis","VETSA 2 Group"),no.output=TRUE)$knitr`  
 <br/>
-`r sjt.xtab(vetsa1ARAllDat$THRMYN, vetsa1ARAllDat$VETSAGRP, variableLabels=c("Thombophlebitis","VETSA Group"),no.output=TRUE)$knitr`  
+`r sjt.xtab(vetsa1ARAllDat$THRMYN, vetsa1ARAllDat$VETSAGRP, var.labels=c("Thombophlebitis","VETSA Group"),no.output=TRUE)$knitr`  
 <br/>
 <br/>
 
 **Gastritis**  
 1=Yes, 2=No, 8=Don't Know
-`r sjt.xtab(vetsa1AllDat$GASTYN, vetsa1AllDat$VETSAGRP, variableLabels=c("Gastritis","VETSA 1 Group"),no.output=TRUE)$knitr`  
+`r sjt.xtab(vetsa1AllDat$GASTYN, vetsa1AllDat$VETSAGRP, var.labels=c("Gastritis","VETSA 1 Group"),no.output=TRUE)$knitr`  
 <br/>
-`r sjt.xtab(vetsa2AllDat$GASTYN, vetsa2AllDat$VETSAGRP, variableLabels=c("Gastritis","VETSA 2 Group"),no.output=TRUE)$knitr`  
+`r sjt.xtab(vetsa2AllDat$GASTYN, vetsa2AllDat$VETSAGRP, var.labels=c("Gastritis","VETSA 2 Group"),no.output=TRUE)$knitr`  
 <br/>
-`r sjt.xtab(vetsa1ARAllDat$GASTYN, vetsa1ARAllDat$VETSAGRP, variableLabels=c("Gastritis","VETSA Group"),no.output=TRUE)$knitr`  
+`r sjt.xtab(vetsa1ARAllDat$GASTYN, vetsa1ARAllDat$VETSAGRP, var.labels=c("Gastritis","VETSA Group"),no.output=TRUE)$knitr`  
 <br/>
 <br/>
 
 **Stomach Ulcer**  
 1=Yes, 2=No, 8=Don't Know
-`r sjt.xtab(vetsa1AllDat$ULCRYN, vetsa1AllDat$VETSAGRP, variableLabels=c("Stomach Ulcer","VETSA 1 Group"),no.output=TRUE)$knitr`  
+`r sjt.xtab(vetsa1AllDat$ULCRYN, vetsa1AllDat$VETSAGRP, var.labels=c("Stomach Ulcer","VETSA 1 Group"),no.output=TRUE)$knitr`  
 <br/>
-`r sjt.xtab(vetsa2AllDat$ULCRYN, vetsa2AllDat$VETSAGRP, variableLabels=c("Stomach Ulcer","VETSA 2 Group"),no.output=TRUE)$knitr`  
+`r sjt.xtab(vetsa2AllDat$ULCRYN, vetsa2AllDat$VETSAGRP, var.labels=c("Stomach Ulcer","VETSA 2 Group"),no.output=TRUE)$knitr`  
 <br/>
-`r sjt.xtab(vetsa1ARAllDat$ULCRYN, vetsa1ARAllDat$VETSAGRP, variableLabels=c("Stomach Ulcer","VETSA Group"),no.output=TRUE)$knitr`  
+`r sjt.xtab(vetsa1ARAllDat$ULCRYN, vetsa1ARAllDat$VETSAGRP, var.labels=c("Stomach Ulcer","VETSA Group"),no.output=TRUE)$knitr`  
 <br/>
 <br/>
 
 **Irritable Bowel Syndrome**  
 1=Yes, 2=No, 8=Don't Know
-`r sjt.xtab(vetsa1AllDat$IBSYN, vetsa1AllDat$VETSAGRP, variableLabels=c("Irritable Bowel Syndrome","VETSA 1 Group"),no.output=TRUE)$knitr`  
+`r sjt.xtab(vetsa1AllDat$IBSYN, vetsa1AllDat$VETSAGRP, var.labels=c("Irritable Bowel Syndrome","VETSA 1 Group"),no.output=TRUE)$knitr`  
 <br/>
-`r sjt.xtab(vetsa2AllDat$IBSYN, vetsa2AllDat$VETSAGRP, variableLabels=c("Irritable Bowel Syndrome","VETSA 2 Group"),no.output=TRUE)$knitr`  
+`r sjt.xtab(vetsa2AllDat$IBSYN, vetsa2AllDat$VETSAGRP, var.labels=c("Irritable Bowel Syndrome","VETSA 2 Group"),no.output=TRUE)$knitr`  
 <br/>
-`r sjt.xtab(vetsa1ARAllDat$IBSYN, vetsa1ARAllDat$VETSAGRP, variableLabels=c("Irritable Bowel Syndrome","VETSA Group"),no.output=TRUE)$knitr`  
+`r sjt.xtab(vetsa1ARAllDat$IBSYN, vetsa1ARAllDat$VETSAGRP, var.labels=c("Irritable Bowel Syndrome","VETSA Group"),no.output=TRUE)$knitr`  
 <br/>
 <br/>
 
 **Pancreatitis**  
 1=Yes, 2=No, 8=Don't Know
-`r sjt.xtab(vetsa1AllDat$PANCYN, vetsa1AllDat$VETSAGRP, variableLabels=c("Pancreatitis","VETSA 1 Group"),no.output=TRUE)$knitr`  
+`r sjt.xtab(vetsa1AllDat$PANCYN, vetsa1AllDat$VETSAGRP, var.labels=c("Pancreatitis","VETSA 1 Group"),no.output=TRUE)$knitr`  
 <br/>
-`r sjt.xtab(vetsa2AllDat$PANCYN, vetsa2AllDat$VETSAGRP, variableLabels=c("Pancreatitis","VETSA 2 Group"),no.output=TRUE)$knitr`  
+`r sjt.xtab(vetsa2AllDat$PANCYN, vetsa2AllDat$VETSAGRP, var.labels=c("Pancreatitis","VETSA 2 Group"),no.output=TRUE)$knitr`  
 <br/>
-`r sjt.xtab(vetsa1ARAllDat$PANCYN, vetsa1ARAllDat$VETSAGRP, variableLabels=c("Pancreatitis","VETSA Group"),no.output=TRUE)$knitr`  
+`r sjt.xtab(vetsa1ARAllDat$PANCYN, vetsa1ARAllDat$VETSAGRP, var.labels=c("Pancreatitis","VETSA Group"),no.output=TRUE)$knitr`  
 <br/>
 <br/>
 
 **Hepatitis A**  
 1=Yes, 2=No, 8=Don't Know
-`r sjt.xtab(vetsa1AllDat$HEPAYN, vetsa1AllDat$VETSAGRP, variableLabels=c("Hepatitis A","VETSA 1 Group"),no.output=TRUE)$knitr`  
+`r sjt.xtab(vetsa1AllDat$HEPAYN, vetsa1AllDat$VETSAGRP, var.labels=c("Hepatitis A","VETSA 1 Group"),no.output=TRUE)$knitr`  
 <br/>
-`r sjt.xtab(vetsa2AllDat$HEPAYN, vetsa2AllDat$VETSAGRP, variableLabels=c("Hepatitis A","VETSA 2 Group"),no.output=TRUE)$knitr`  
+`r sjt.xtab(vetsa2AllDat$HEPAYN, vetsa2AllDat$VETSAGRP, var.labels=c("Hepatitis A","VETSA 2 Group"),no.output=TRUE)$knitr`  
 <br/>
-`r sjt.xtab(vetsa1ARAllDat$HEPAYN, vetsa1ARAllDat$VETSAGRP, variableLabels=c("Hepatitis A","VETSA Group"),no.output=TRUE)$knitr`  
+`r sjt.xtab(vetsa1ARAllDat$HEPAYN, vetsa1ARAllDat$VETSAGRP, var.labels=c("Hepatitis A","VETSA Group"),no.output=TRUE)$knitr`  
 <br/>
 <br/>
 
 **Hepatitis B**  
 1=Yes, 2=No, 8=Don't Know
-`r sjt.xtab(vetsa1AllDat$HEPBYN, vetsa1AllDat$VETSAGRP, variableLabels=c("Hepatitis B","VETSA 1 Group"),no.output=TRUE)$knitr`  
+`r sjt.xtab(vetsa1AllDat$HEPBYN, vetsa1AllDat$VETSAGRP, var.labels=c("Hepatitis B","VETSA 1 Group"),no.output=TRUE)$knitr`  
 <br/>
-`r sjt.xtab(vetsa2AllDat$HEPBYN, vetsa2AllDat$VETSAGRP, variableLabels=c("Hepatitis B","VETSA 2 Group"),no.output=TRUE)$knitr`  
+`r sjt.xtab(vetsa2AllDat$HEPBYN, vetsa2AllDat$VETSAGRP, var.labels=c("Hepatitis B","VETSA 2 Group"),no.output=TRUE)$knitr`  
 <br/>
-`r sjt.xtab(vetsa1ARAllDat$HEPBYN, vetsa1ARAllDat$VETSAGRP, variableLabels=c("Hepatitis B","VETSA Group"),no.output=TRUE)$knitr`  
+`r sjt.xtab(vetsa1ARAllDat$HEPBYN, vetsa1ARAllDat$VETSAGRP, var.labels=c("Hepatitis B","VETSA Group"),no.output=TRUE)$knitr`  
 <br/>
 <br/>
 
 **Hepatitis C**  
 1=Yes, 2=No, 8=Don't Know
-`r sjt.xtab(vetsa1AllDat$HEPCYN, vetsa1AllDat$VETSAGRP, variableLabels=c("Hepatitis C","VETSA 1 Group"),no.output=TRUE)$knitr`  
+`r sjt.xtab(vetsa1AllDat$HEPCYN, vetsa1AllDat$VETSAGRP, var.labels=c("Hepatitis C","VETSA 1 Group"),no.output=TRUE)$knitr`  
 <br/>
-`r sjt.xtab(vetsa2AllDat$HEPCYN, vetsa2AllDat$VETSAGRP, variableLabels=c("Hepatitis C","VETSA 2 Group"),no.output=TRUE)$knitr`  
+`r sjt.xtab(vetsa2AllDat$HEPCYN, vetsa2AllDat$VETSAGRP, var.labels=c("Hepatitis C","VETSA 2 Group"),no.output=TRUE)$knitr`  
 <br/>
-`r sjt.xtab(vetsa1ARAllDat$HEPCYN, vetsa1ARAllDat$VETSAGRP, variableLabels=c("Hepatitis C","VETSA Group"),no.output=TRUE)$knitr`  
+`r sjt.xtab(vetsa1ARAllDat$HEPCYN, vetsa1ARAllDat$VETSAGRP, var.labels=c("Hepatitis C","VETSA Group"),no.output=TRUE)$knitr`  
 <br/>
 <br/>
 
 **Ulcerative Colitis**  
 1=Yes, 2=No, 8=Don't Know
-`r sjt.xtab(vetsa1AllDat$ULCOYN, vetsa1AllDat$VETSAGRP, variableLabels=c("Ulcerative Colitis","VETSA 1 Group"),no.output=TRUE)$knitr`  
+`r sjt.xtab(vetsa1AllDat$ULCOYN, vetsa1AllDat$VETSAGRP, var.labels=c("Ulcerative Colitis","VETSA 1 Group"),no.output=TRUE)$knitr`  
 <br/>
-`r sjt.xtab(vetsa2AllDat$ULCOYN, vetsa2AllDat$VETSAGRP, variableLabels=c("Ulcerative Colitis","VETSA 2 Group"),no.output=TRUE)$knitr`  
+`r sjt.xtab(vetsa2AllDat$ULCOYN, vetsa2AllDat$VETSAGRP, var.labels=c("Ulcerative Colitis","VETSA 2 Group"),no.output=TRUE)$knitr`  
 <br/>
-`r sjt.xtab(vetsa1ARAllDat$ULCOYN, vetsa1ARAllDat$VETSAGRP, variableLabels=c("Ulcerative Colitis","VETSA Group"),no.output=TRUE)$knitr`  
+`r sjt.xtab(vetsa1ARAllDat$ULCOYN, vetsa1ARAllDat$VETSAGRP, var.labels=c("Ulcerative Colitis","VETSA Group"),no.output=TRUE)$knitr`  
 <br/>
 <br/>
 
 **Overactive Thyroid**  
 1=Yes, 2=No, 8=Don't Know
-`r sjt.xtab(vetsa1AllDat$OTHYYN, vetsa1AllDat$VETSAGRP, variableLabels=c("Overactive Thyroid","VETSA 1 Group"),no.output=TRUE)$knitr`  
+`r sjt.xtab(vetsa1AllDat$OTHYYN, vetsa1AllDat$VETSAGRP, var.labels=c("Overactive Thyroid","VETSA 1 Group"),no.output=TRUE)$knitr`  
 <br/>
-`r sjt.xtab(vetsa2AllDat$OTHYYN, vetsa2AllDat$VETSAGRP, variableLabels=c("Overactive Thyroid","VETSA 2 Group"),no.output=TRUE)$knitr`  
+`r sjt.xtab(vetsa2AllDat$OTHYYN, vetsa2AllDat$VETSAGRP, var.labels=c("Overactive Thyroid","VETSA 2 Group"),no.output=TRUE)$knitr`  
 <br/>
-`r sjt.xtab(vetsa1ARAllDat$OTHYYN, vetsa1ARAllDat$VETSAGRP, variableLabels=c("Overactive Thyroid","VETSA Group"),no.output=TRUE)$knitr`  
+`r sjt.xtab(vetsa1ARAllDat$OTHYYN, vetsa1ARAllDat$VETSAGRP, var.labels=c("Overactive Thyroid","VETSA Group"),no.output=TRUE)$knitr`  
 <br/>
 <br/>
 
 **Underactive Thyroid**  
 1=Yes, 2=No, 8=Don't Know
-`r sjt.xtab(vetsa1AllDat$UNDYYN, vetsa1AllDat$VETSAGRP, variableLabels=c("Underactive Thyroid","VETSA 1 Group"),no.output=TRUE)$knitr`  
+`r sjt.xtab(vetsa1AllDat$UNDYYN, vetsa1AllDat$VETSAGRP, var.labels=c("Underactive Thyroid","VETSA 1 Group"),no.output=TRUE)$knitr`  
 <br/>
-`r sjt.xtab(vetsa2AllDat$UNDYYN, vetsa2AllDat$VETSAGRP, variableLabels=c("Underactive Thyroid","VETSA 2 Group"),no.output=TRUE)$knitr`  
+`r sjt.xtab(vetsa2AllDat$UNDYYN, vetsa2AllDat$VETSAGRP, var.labels=c("Underactive Thyroid","VETSA 2 Group"),no.output=TRUE)$knitr`  
 <br/>
-`r sjt.xtab(vetsa1ARAllDat$UNDYYN, vetsa1ARAllDat$VETSAGRP, variableLabels=c("Underactive Thyroid","VETSA Group"),no.output=TRUE)$knitr`  
+`r sjt.xtab(vetsa1ARAllDat$UNDYYN, vetsa1ARAllDat$VETSAGRP, var.labels=c("Underactive Thyroid","VETSA Group"),no.output=TRUE)$knitr`  
 <br/>
 <br/>
 
 **Osteoarthritis**  
 1=Yes, 2=No, 8=Don't Know
-`r sjt.xtab(vetsa1AllDat$OARTYN, vetsa1AllDat$VETSAGRP, variableLabels=c("Osteoarthritis","VETSA 1 Group"),no.output=TRUE)$knitr`  
+`r sjt.xtab(vetsa1AllDat$OARTYN, vetsa1AllDat$VETSAGRP, var.labels=c("Osteoarthritis","VETSA 1 Group"),no.output=TRUE)$knitr`  
 <br/>
-`r sjt.xtab(vetsa2AllDat$OARTYN, vetsa2AllDat$VETSAGRP, variableLabels=c("Osteoarthritis","VETSA 2 Group"),no.output=TRUE)$knitr`  
+`r sjt.xtab(vetsa2AllDat$OARTYN, vetsa2AllDat$VETSAGRP, var.labels=c("Osteoarthritis","VETSA 2 Group"),no.output=TRUE)$knitr`  
 <br/>
-`r sjt.xtab(vetsa1ARAllDat$OARTYN, vetsa1ARAllDat$VETSAGRP, variableLabels=c("Osteoarthritis","VETSA Group"),no.output=TRUE)$knitr`  
+`r sjt.xtab(vetsa1ARAllDat$OARTYN, vetsa1ARAllDat$VETSAGRP, var.labels=c("Osteoarthritis","VETSA Group"),no.output=TRUE)$knitr`  
 <br/>
 <br/>
 
 **Gout**  
 1=Yes, 2=No, 8=Don't Know
-`r sjt.xtab(vetsa1AllDat$GOUTYN, vetsa1AllDat$VETSAGRP, variableLabels=c("Gout","VETSA 1 Group"),no.output=TRUE)$knitr`  
+`r sjt.xtab(vetsa1AllDat$GOUTYN, vetsa1AllDat$VETSAGRP, var.labels=c("Gout","VETSA 1 Group"),no.output=TRUE)$knitr`  
 <br/>
-`r sjt.xtab(vetsa2AllDat$GOUTYN, vetsa2AllDat$VETSAGRP, variableLabels=c("Gout","VETSA 2 Group"),no.output=TRUE)$knitr`  
+`r sjt.xtab(vetsa2AllDat$GOUTYN, vetsa2AllDat$VETSAGRP, var.labels=c("Gout","VETSA 2 Group"),no.output=TRUE)$knitr`  
 <br/>
-`r sjt.xtab(vetsa1ARAllDat$GOUTYN, vetsa1ARAllDat$VETSAGRP, variableLabels=c("Gout","VETSA Group"),no.output=TRUE)$knitr`  
+`r sjt.xtab(vetsa1ARAllDat$GOUTYN, vetsa1ARAllDat$VETSAGRP, var.labels=c("Gout","VETSA Group"),no.output=TRUE)$knitr`  
 <br/>
 <br/>
 
 **Rheumatoid Arthritis**  
 1=Yes, 2=No, 8=Don't Know
-`r sjt.xtab(vetsa1AllDat$RARTYN, vetsa1AllDat$VETSAGRP, variableLabels=c("Rheumatoid Arthritis","VETSA 1 Group"),no.output=TRUE)$knitr`  
+`r sjt.xtab(vetsa1AllDat$RARTYN, vetsa1AllDat$VETSAGRP, var.labels=c("Rheumatoid Arthritis","VETSA 1 Group"),no.output=TRUE)$knitr`  
 <br/>
-`r sjt.xtab(vetsa2AllDat$RARTYN, vetsa2AllDat$VETSAGRP, variableLabels=c("Rheumatoid Arthritis","VETSA 2 Group"),no.output=TRUE)$knitr`  
+`r sjt.xtab(vetsa2AllDat$RARTYN, vetsa2AllDat$VETSAGRP, var.labels=c("Rheumatoid Arthritis","VETSA 2 Group"),no.output=TRUE)$knitr`  
 <br/>
-`r sjt.xtab(vetsa1ARAllDat$RARTYN, vetsa1ARAllDat$VETSAGRP, variableLabels=c("Rheumatoid Arthritis","VETSA Group"),no.output=TRUE)$knitr`  
+`r sjt.xtab(vetsa1ARAllDat$RARTYN, vetsa1ARAllDat$VETSAGRP, var.labels=c("Rheumatoid Arthritis","VETSA Group"),no.output=TRUE)$knitr`  
 <br/>
 <br/>
 
 **Glaucoma**  
 1=Yes, 2=No, 8=Don't Know
-`r sjt.xtab(vetsa1AllDat$GLAUYN, vetsa1AllDat$VETSAGRP, variableLabels=c("Glaucoma","VETSA 1 Group"),no.output=TRUE)$knitr`  
+`r sjt.xtab(vetsa1AllDat$GLAUYN, vetsa1AllDat$VETSAGRP, var.labels=c("Glaucoma","VETSA 1 Group"),no.output=TRUE)$knitr`  
 <br/>
-`r sjt.xtab(vetsa2AllDat$GLAUYN, vetsa2AllDat$VETSAGRP, variableLabels=c("Glaucoma","VETSA 2 Group"),no.output=TRUE)$knitr`  
+`r sjt.xtab(vetsa2AllDat$GLAUYN, vetsa2AllDat$VETSAGRP, var.labels=c("Glaucoma","VETSA 2 Group"),no.output=TRUE)$knitr`  
 <br/>
-`r sjt.xtab(vetsa1ARAllDat$GLAUYN, vetsa1ARAllDat$VETSAGRP, variableLabels=c("Glaucoma","VETSA Group"),no.output=TRUE)$knitr`  
+`r sjt.xtab(vetsa1ARAllDat$GLAUYN, vetsa1ARAllDat$VETSAGRP, var.labels=c("Glaucoma","VETSA Group"),no.output=TRUE)$knitr`  
 <br/>
 <br/>
 
 **PTSD**  
 1=Yes, 2=No, 8=Don't Know
-`r sjt.xtab(vetsa1AllDat$PTSDYN, vetsa1AllDat$VETSAGRP, variableLabels=c("PTSD","VETSA 1 Group"),no.output=TRUE)$knitr`  
+`r sjt.xtab(vetsa1AllDat$PTSDYN, vetsa1AllDat$VETSAGRP, var.labels=c("PTSD","VETSA 1 Group"),no.output=TRUE)$knitr`  
 <br/>
-`r sjt.xtab(vetsa2AllDat$PTSDYN, vetsa2AllDat$VETSAGRP, variableLabels=c("PTSD","VETSA 2 Group"),no.output=TRUE)$knitr`  
+`r sjt.xtab(vetsa2AllDat$PTSDYN, vetsa2AllDat$VETSAGRP, var.labels=c("PTSD","VETSA 2 Group"),no.output=TRUE)$knitr`  
 <br/>
-`r sjt.xtab(vetsa1ARAllDat$PTSDYN, vetsa1ARAllDat$VETSAGRP, variableLabels=c("PTSD","VETSA Group"),no.output=TRUE)$knitr`  
+`r sjt.xtab(vetsa1ARAllDat$PTSDYN, vetsa1ARAllDat$VETSAGRP, var.labels=c("PTSD","VETSA Group"),no.output=TRUE)$knitr`  
 <br/>
 <br/>
 
 **Migraines**  
 1=Yes, 2=No, 8=Don't Know
-`r sjt.xtab(vetsa1AllDat$MIGRYN, vetsa1AllDat$VETSAGRP, variableLabels=c("Migraines","VETSA 1 Group"),no.output=TRUE)$knitr`  
+`r sjt.xtab(vetsa1AllDat$MIGRYN, vetsa1AllDat$VETSAGRP, var.labels=c("Migraines","VETSA 1 Group"),no.output=TRUE)$knitr`  
 <br/>
-`r sjt.xtab(vetsa2AllDat$MIGRYN, vetsa2AllDat$VETSAGRP, variableLabels=c("Migraines","VETSA 2 Group"),no.output=TRUE)$knitr`  
+`r sjt.xtab(vetsa2AllDat$MIGRYN, vetsa2AllDat$VETSAGRP, var.labels=c("Migraines","VETSA 2 Group"),no.output=TRUE)$knitr`  
 <br/>
-`r sjt.xtab(vetsa1ARAllDat$MIGRYN, vetsa1ARAllDat$VETSAGRP, variableLabels=c("Migraines","VETSA Group"),no.output=TRUE)$knitr`  
+`r sjt.xtab(vetsa1ARAllDat$MIGRYN, vetsa1ARAllDat$VETSAGRP, var.labels=c("Migraines","VETSA Group"),no.output=TRUE)$knitr`  
 <br/>
 <br/>
 
 **Seizures**  
 1=Yes, 2=No, 8=Don't Know
-`r sjt.xtab(vetsa1AllDat$SEIZYN, vetsa1AllDat$VETSAGRP, variableLabels=c("Seizures","VETSA 1 Group"),no.output=TRUE)$knitr`  
+`r sjt.xtab(vetsa1AllDat$SEIZYN, vetsa1AllDat$VETSAGRP, var.labels=c("Seizures","VETSA 1 Group"),no.output=TRUE)$knitr`  
 <br/>
-`r sjt.xtab(vetsa2AllDat$SEIZYN, vetsa2AllDat$VETSAGRP, variableLabels=c("Seizures","VETSA 2 Group"),no.output=TRUE)$knitr`  
+`r sjt.xtab(vetsa2AllDat$SEIZYN, vetsa2AllDat$VETSAGRP, var.labels=c("Seizures","VETSA 2 Group"),no.output=TRUE)$knitr`  
 <br/>
-`r sjt.xtab(vetsa1ARAllDat$SEIZYN, vetsa1ARAllDat$VETSAGRP, variableLabels=c("Seizures","VETSA Group"),no.output=TRUE)$knitr`  
+`r sjt.xtab(vetsa1ARAllDat$SEIZYN, vetsa1ARAllDat$VETSAGRP, var.labels=c("Seizures","VETSA Group"),no.output=TRUE)$knitr`  
 <br/>
 <br/>
 
 **Stroke**  
 1=Yes, 2=No, 8=Don't Know
-`r sjt.xtab(vetsa1AllDat$STROYN, vetsa1AllDat$VETSAGRP, variableLabels=c("Stroke","VETSA 1 Group"),no.output=TRUE)$knitr`  
+`r sjt.xtab(vetsa1AllDat$STROYN, vetsa1AllDat$VETSAGRP, var.labels=c("Stroke","VETSA 1 Group"),no.output=TRUE)$knitr`  
 <br/>
-`r sjt.xtab(vetsa2AllDat$STROYN, vetsa2AllDat$VETSAGRP, variableLabels=c("Stroke","VETSA 2 Group"),no.output=TRUE)$knitr`  
+`r sjt.xtab(vetsa2AllDat$STROYN, vetsa2AllDat$VETSAGRP, var.labels=c("Stroke","VETSA 2 Group"),no.output=TRUE)$knitr`  
 <br/>
-`r sjt.xtab(vetsa1ARAllDat$STROYN, vetsa1ARAllDat$VETSAGRP, variableLabels=c("Stroke","VETSA Group"),no.output=TRUE)$knitr`  
+`r sjt.xtab(vetsa1ARAllDat$STROYN, vetsa1ARAllDat$VETSAGRP, var.labels=c("Stroke","VETSA Group"),no.output=TRUE)$knitr`  
 <br/>
 <br/>
 
 **Alcohol Abuse or Dependency**  
 1=Yes, 2=No, 8=Don't Know
-`r sjt.xtab(vetsa1AllDat$AAADYN, vetsa1AllDat$VETSAGRP, variableLabels=c("Alcohol Abuse or Dependency","VETSA 1 Group"),no.output=TRUE)$knitr`  
+`r sjt.xtab(vetsa1AllDat$AAADYN, vetsa1AllDat$VETSAGRP, var.labels=c("Alcohol Abuse or Dependency","VETSA 1 Group"),no.output=TRUE)$knitr`  
 <br/>
-`r sjt.xtab(vetsa2AllDat$AAADYN, vetsa2AllDat$VETSAGRP, variableLabels=c("Alcohol Abuse or Dependency","VETSA 2 Group"),no.output=TRUE)$knitr`  
+`r sjt.xtab(vetsa2AllDat$AAADYN, vetsa2AllDat$VETSAGRP, var.labels=c("Alcohol Abuse or Dependency","VETSA 2 Group"),no.output=TRUE)$knitr`  
 <br/>
-`r sjt.xtab(vetsa1ARAllDat$AAADYN, vetsa1ARAllDat$VETSAGRP, variableLabels=c("Alcohol Abuse or Dependency","VETSA Group"),no.output=TRUE)$knitr`  
+`r sjt.xtab(vetsa1ARAllDat$AAADYN, vetsa1ARAllDat$VETSAGRP, var.labels=c("Alcohol Abuse or Dependency","VETSA Group"),no.output=TRUE)$knitr`  
 <br/>
 <br/>
 
 **Depression**  
 1=Yes, 2=No, 8=Don't Know
-`r sjt.xtab(vetsa1AllDat$DEPRYN, vetsa1AllDat$VETSAGRP, variableLabels=c("Depression","VETSA 1 Group"),no.output=TRUE)$knitr`  
+`r sjt.xtab(vetsa1AllDat$DEPRYN, vetsa1AllDat$VETSAGRP, var.labels=c("Depression","VETSA 1 Group"),no.output=TRUE)$knitr`  
 <br/>
-`r sjt.xtab(vetsa2AllDat$DEPRYN, vetsa2AllDat$VETSAGRP, variableLabels=c("Depression","VETSA 2 Group"),no.output=TRUE)$knitr`  
+`r sjt.xtab(vetsa2AllDat$DEPRYN, vetsa2AllDat$VETSAGRP, var.labels=c("Depression","VETSA 2 Group"),no.output=TRUE)$knitr`  
 <br/>
-`r sjt.xtab(vetsa1ARAllDat$DEPRYN, vetsa1ARAllDat$VETSAGRP, variableLabels=c("Depression","VETSA Group"),no.output=TRUE)$knitr`  
+`r sjt.xtab(vetsa1ARAllDat$DEPRYN, vetsa1ARAllDat$VETSAGRP, var.labels=c("Depression","VETSA Group"),no.output=TRUE)$knitr`  
 <br/>
 <br/>
 
 **Anxiety**  
 1=Yes, 2=No, 8=Don't Know
-`r sjt.xtab(vetsa1AllDat$ANXDYN, vetsa1AllDat$VETSAGRP, variableLabels=c("Anxiety","VETSA 1 Group"),no.output=TRUE)$knitr`  
+`r sjt.xtab(vetsa1AllDat$ANXDYN, vetsa1AllDat$VETSAGRP, var.labels=c("Anxiety","VETSA 1 Group"),no.output=TRUE)$knitr`  
 <br/>
-`r sjt.xtab(vetsa2AllDat$ANXDYN, vetsa2AllDat$VETSAGRP, variableLabels=c("Anxiety","VETSA 2 Group"),no.output=TRUE)$knitr`  
+`r sjt.xtab(vetsa2AllDat$ANXDYN, vetsa2AllDat$VETSAGRP, var.labels=c("Anxiety","VETSA 2 Group"),no.output=TRUE)$knitr`  
 <br/>
-`r sjt.xtab(vetsa1ARAllDat$ANXDYN, vetsa1ARAllDat$VETSAGRP, variableLabels=c("Anxiety","VETSA Group"),no.output=TRUE)$knitr`  
+`r sjt.xtab(vetsa1ARAllDat$ANXDYN, vetsa1ARAllDat$VETSAGRP, var.labels=c("Anxiety","VETSA Group"),no.output=TRUE)$knitr`  
 <br/>
 <br/>
 
 **Drug Abuse or Dependency**  
 1=Yes, 2=No, 8=Don't Know
-`r sjt.xtab(vetsa1AllDat$DADDYN, vetsa1AllDat$VETSAGRP, variableLabels=c("Drug Abuse or Dependency","VETSA 1 Group"),no.output=TRUE)$knitr`  
+`r sjt.xtab(vetsa1AllDat$DADDYN, vetsa1AllDat$VETSAGRP, var.labels=c("Drug Abuse or Dependency","VETSA 1 Group"),no.output=TRUE)$knitr`  
 <br/>
-`r sjt.xtab(vetsa2AllDat$DADDYN, vetsa2AllDat$VETSAGRP, variableLabels=c("Drug Abuse or Dependency","VETSA 2 Group"),no.output=TRUE)$knitr`  
+`r sjt.xtab(vetsa2AllDat$DADDYN, vetsa2AllDat$VETSAGRP, var.labels=c("Drug Abuse or Dependency","VETSA 2 Group"),no.output=TRUE)$knitr`  
 <br/>
-`r sjt.xtab(vetsa1ARAllDat$DADDYN, vetsa1ARAllDat$VETSAGRP, variableLabels=c("Drug Abuse or Dependency","VETSA Group"),no.output=TRUE)$knitr`  
+`r sjt.xtab(vetsa1ARAllDat$DADDYN, vetsa1ARAllDat$VETSAGRP, var.labels=c("Drug Abuse or Dependency","VETSA Group"),no.output=TRUE)$knitr`  
 <br/>
 <br/>
 
 **Cancer**  
 1=Yes, 2=No, 8=Don't Know
-`r sjt.xtab(vetsa1AllDat$CANCYN, vetsa1AllDat$VETSAGRP, variableLabels=c("Cancer","VETSA 1 Group"),no.output=TRUE)$knitr`  
+`r sjt.xtab(vetsa1AllDat$CANCYN, vetsa1AllDat$VETSAGRP, var.labels=c("Cancer","VETSA 1 Group"),no.output=TRUE)$knitr`  
 <br/>
-`r sjt.xtab(vetsa2AllDat$CANCYN, vetsa2AllDat$VETSAGRP, variableLabels=c("Cancer","VETSA 2 Group"),no.output=TRUE)$knitr`  
+`r sjt.xtab(vetsa2AllDat$CANCYN, vetsa2AllDat$VETSAGRP, var.labels=c("Cancer","VETSA 2 Group"),no.output=TRUE)$knitr`  
 <br/>
-`r sjt.xtab(vetsa1ARAllDat$CANCYN, vetsa1ARAllDat$VETSAGRP, variableLabels=c("Cancer","VETSA Group"),no.output=TRUE)$knitr`  
+`r sjt.xtab(vetsa1ARAllDat$CANCYN, vetsa1ARAllDat$VETSAGRP, var.labels=c("Cancer","VETSA Group"),no.output=TRUE)$knitr`  
 <br/>
 <br/>
 
@@ -500,3 +502,9 @@ t.test(INCOME ~ VETSAGRP, data=vetsa1ARAllDat)
 ```
 
 
+```{r, include=FALSE}
+#Save out datasets used for analysis
+write.csv(vetsa1AllDat, "/home/jelman/netshare/K/Projects/PracticeEffects/data/GroupComparisons_V1_V1V2.csv")
+write.csv(vetsa2AllDat, "/home/jelman/netshare/K/Projects/PracticeEffects/data/GroupComparisons_V1V2_V2AR.csv")
+write.csv(vetsa1ARAllDat, "/home/jelman/netshare/K/Projects/PracticeEffects/data/GroupComparisons_V1_V2AR.csv")
+```
