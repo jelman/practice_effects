@@ -12,6 +12,7 @@
 
 # Import libraries
 library(dplyr)
+library(lme4)
 
 # Create vector of all variable names for which  practice effects are 
 # calculated. These variables will be adjusted
@@ -95,8 +96,8 @@ write.csv(allData,"/home/jelman/netshare/K/Projects/PracticeEffects/data/PracEff
 adjustDataset = function(regVars,adjVars,nDemoVars=16,data){
   #######################################################################
   # Adjust dataset for specified set of variables.Regresses passed      #
-  # variables from each measure using mixed effects models. Residuals   #
-  # are scaled to 0 mean and unit standard deviation.                   #
+  # variables from each measure using linear regression. The intercept  #
+  # is added back in to retain mean level information.                  #
   # Input:                                                              #
   # regVars = List of variables to regress out                          #
   # adjVars = List of variables to be adjusted                          #
@@ -125,13 +126,13 @@ adjustDataset = function(regVars,adjVars,nDemoVars=16,data){
   
   # fitting models
   models <- lapply(adjVars, function(x) {
-    fmla = as.formula(paste0(x," ~ 0 + ",regVars))
-    lm(formula=fmla, data = data, na.action=na.exclude)
+    fmla = as.formula(paste0(x," ~ ",regVars," + (1|case)"))
+    lmer(formula=fmla, data = data, na.action=na.exclude)
   })
   
   # storing residuals from each model into data frame
   for(v in 1:nVars){
-    data[,tot+v] <- residuals(models[[v]])
+    data[,tot+v] <- residuals(models[[v]]) + fixef(models[[v]])[[1]]
   }
   
   #dataR is now your residualized parameters
@@ -358,6 +359,7 @@ write.csv(nasAdjRawScoresData,
 # Save out dataset
 write.csv(scaleValues, "/home/jelman/netshare/K/Projects/PracticeEffects/data/V1_nas201tranAdjustedRaw_Means_SDs.csv",
           row.names = FALSE)
+
 #-----------------------------------------------------------------------------------#
 # Create dataset adjusted for TEDALL (Education)                              #
 #                                                                                   #

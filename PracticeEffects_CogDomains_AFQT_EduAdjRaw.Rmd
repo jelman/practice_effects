@@ -1,11 +1,13 @@
 ---
-title: "Practice Effects on Cognitive Domain and AFQT Tests: Raw scores adjusted for Education"
+title: 'Practice Effects on Cognitive Domain and AFQT Tests: Raw scores adjusted for
+  Education'
 author: "Jeremy Elman"
 date: '`r Sys.Date()`'
 output:
-  word_document: default
+  pdf_document: default
   html_document:
     theme: readable
+  word_document: default
 ---
 
 ```{r global_options, include=FALSE}
