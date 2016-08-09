@@ -14,32 +14,36 @@
 library(dplyr)
 library(lme4)
 
-# Create vector of all variable names for which  practice effects are 
-# calculated. These variables will be adjusted
-zVarsV1 = c("zVisSpat","zMR1COR","zHFTOTCOR","zSTWKMem","zdsfraw","zdsbraw",
-            "zlntot","zsspfraw","zsspbraw","zrsatottran","zEpsMem","zcvatot",
-            "zcvsdfr","zcvldfr","zlmitot","zlmdtot","zvritot","zvrdtot",
-            "zAbsReason","zMTXTRAN","zVerbFlu","zlfcor","zcfcor",
-            "zExecTrailsSwitch","ztrl4adjtran","zProcSpeed","zstrwraw",
-            "zstrcraw","ztrl2tran","ztrl3tran","zExecCategorySwitch",
-            "zCSSACCADJ","zExecInhibit","zstrit","zafqtpcttran","zafqtvocpcttran",
-            "zafqtarpcttran","zafqttlpcttran","zafqtbxpcttran")
-zVarsV1
-zVarsV2 = paste0(zVarsV1,"_v2")
+# Load raw test scores and demographics data
+allData = read.csv("/home/jelman/netshare/M/PSYCH/KREMEN/VETSA DATA FILES_852014/Practice Effect Cognition/data/V1V2_PracticeEffect_Raw.csv",
+                   stringsAsFactors = FALSE)
 
-rawVarsV1 = c("MR1COR","HFTOTCOR","MTXTRAN","dsfraw","dsbraw","lntot","sspfraw","sspbraw",
-              "RSATOTTRAN","cvatot","CVSDFR","CVLDFR","lmitot","lmdtot","vritot","vrdtot",
-              "LFCOR","CFCOR","strwraw","strcraw","TRL2TRAN","TRL3TRAN","TRL4ADJTRAN",
-              "CSSACCADJ","strit","afqtpcttran","afqtvocpcttran","afqtarpcttran","afqttlpcttran",
-              "afqtbxpcttran")
+# Convert all variable names to upper case
+names(allData) = toupper(names(allData))
+
+# Select subjects from groups of interest
+allData = allData %>%
+  filter(VETSAGRP=="V1V2" | VETSAGRP=="V1" | VETSAGRP=="V2AR")
+
+
+# Create list of raw variable names to adjust
+rawVarsV1 = c("MR1COR","TRL1T","TRL2T","TRL3T","TRL4T","TRL5T","CSSACC","MTXRAW","CVA1RAW","CVATOT","CVSDFR","CVLDFR","AFQTPCT",
+              "AFQTVOCPCT","AFQTARPCT","AFQTTLPCT","AFQTBXPCT","AFQTPCTTRAN","AFQTVOCPCTTRAN","AFQTARPCTTRAN","AFQTTLPCTTRAN",
+              "AFQTBXPCTTRAN","DSFRAW","DSBRAW","SSPFRAW","SSPBRAW","LNTOT","LMITOT","LMDTOT","VRITOT","VRDTOT","VRCTOT","HFTOTCOR",
+              "STRWRAW","STRCRAW","STRCWRAW","LFFCOR","LFACOR","LFSCOR","LFCOR","CFANCOR","CFBNCOR","CFCOR","CSCOR","SRTLMEAN",
+              "SRTLSTD","SRTRMEAN","SRTRSTD","SRTGMEN","SRTGSTD","CHRTLMEAN","CHRTRMEAN","CHRTLSTD","CHRTRSTD","CHRTGMEAN",
+              "CHRTGSTD","RSATOT")
+rawVarsV2 = paste0(rawVarsV1, "_V2")
+
+# Create lists of z-scored variable names to create calculate practice effect with
+zVarsV1 = paste0("z",rawVarsV1)
+zVarsV2 = paste0("z",rawVarsV2)
+
+# Print variable names and verify these are correct
 rawVarsV1
-rawVarsV2 = paste0(rawVarsV1,"_v2")
 rawVarsV2
-rawCogDomainsV1 = c("VisSpat","STWKMem","AbsReason","EpsMem","VerbFlu", "ExecTrailsSwitch",
-                    "ProcSpeed","ExecCategorySwitch","ExecInhibit")
-rawCogDomainsV1
-rawCogDomainsV2 = paste0(rawCogDomainsV1,"_v2")
-rawCogDomainsV2
+zVarsV1
+zVarsV2
 
 #---------------------------#
 # Create unadjusted dataset #
