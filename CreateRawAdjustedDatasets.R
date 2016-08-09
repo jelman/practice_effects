@@ -45,53 +45,6 @@ rawVarsV2
 zVarsV1
 zVarsV2
 
-#---------------------------#
-# Create unadjusted dataset #
-#---------------------------#
-
-## Load demographic data ##
-demoData = read.csv("/home/jelman/netshare/K/data/VETSA_demo_vars.csv", stringsAsFactors = F)
-
-## Load VETSA 1 Cognitive Domain data ##
-vetsa1CogDomains = read.csv("/home/jelman/netshare/K/Projects/Cognitive Domains/data/V1_CognitiveDomains_All.csv", stringsAsFactors = F)
-
-## Load VETSA 2 Cognitive Domain data ##
-vetsa2CogDomains = read.csv("/home/jelman/netshare/K/Projects/Cognitive Domains/data/V2_CognitiveDomains_All.csv", stringsAsFactors = F)
-
-
-## Make sure variable names match up between V1 and V2 datasets ##
-# Make sure suffix has the same case for all variables
-names(vetsa2CogDomains) = gsub("_V2","_v2",names(vetsa2CogDomains))
-# Rename zrsatotrevtran variable in V1 to match variable name in V2
-vetsa1CogDomains = dplyr::rename(vetsa1CogDomains, zrsatottran=zrsatotrevtran)
-# Rename RSATOTrevtran variable in V1 to match variable name in V2
-vetsa1CogDomains = dplyr::rename(vetsa1CogDomains, RSATOTTRAN=RSATOTrevtran)
-# Rename strit variable in V1 to match variable name in V2
-vetsa1CogDomains = dplyr::rename(vetsa1CogDomains, strit=STRIT)
-# Remove zVerbal and zvoctran. These were not collected at time 2
-vetsa1CogDomains = vetsa1CogDomains %>% dplyr::select(-one_of(c("zVerbal","zvoctran")))
-
-## Load VETSA 1 AFQT data ##
-vetsa1afqt = read.csv("/home/jelman/netshare/K/Projects/PracticeEffects/data/V1_AFQTscores_All.csv",
-                      stringsAsFactors = F)
-## Load VETSA 2 AFQT data ##
-vetsa2afqt = read.csv("/home/jelman/netshare/K/Projects/PracticeEffects/data/V2_AFQTscores_All.csv",
-                      stringsAsFactors = F)
-
-# Join demographic data with VETSA1 & VETSA2 datasets
-allData = demoData %>%
-  left_join(vetsa1CogDomains, by="vetsaid") %>% 
-  left_join(vetsa2CogDomains, by="vetsaid") %>%
-  left_join(vetsa1afqt, by="vetsaid") %>%
-  left_join(vetsa2afqt, by="vetsaid")
-
-# Select subjects from groups of interest
-allData = allData %>%
-  filter(VETSAGRP=="V1V2" | VETSAGRP=="V1" | VETSAGRP=="V2AR")
-
-# Write out unadjusted dataset
-write.csv(allData,"/home/jelman/netshare/K/Projects/PracticeEffects/data/PracEffectData_Unadj.csv", 
-          row.names=F)
 
 #----------------------------------------------------------------------------#
 #                     Define functions                                       #
@@ -159,119 +112,9 @@ addScaleVals = function(df,varname, x) {
 }
 
 
-renameVars = function(df){
-  ###############################################################
-  # Rename variables to be consistent with other unadjusted and #
-  # unadjusted datasets.                                        #
-  # Input:                                                      #
-  # df = Dataframe containing variables to be renamed           #
-  ###############################################################
-  dfAdjusted = df %>%
-    dplyr::rename(zrsatottran_adj=zRSATOTTRAN_adj,
-                  zrsatottran_v2_adj=zRSATOTTRAN_v2_adj,
-                  zcvsdfr_adj=zCVSDFR_adj,
-                  zcvsdfr_v2_adj=zCVSDFR_v2_adj,
-                  zcvldfr_adj=zCVLDFR_adj,
-                  zcvldfr_v2_adj=zCVLDFR_v2_adj,
-                  zlfcor_adj=zLFCOR_adj,
-                  zlfcor_v2_adj=zLFCOR_v2_adj,
-                  zcfcor_adj=zCFCOR_adj,
-                  zcfcor_v2_adj=zCFCOR_v2_adj,
-                  ztrl2tran_adj=zTRL2TRAN_adj,
-                  ztrl2tran_v2_adj=zTRL2TRAN_v2_adj,
-                  ztrl3tran_adj=zTRL3TRAN_adj,
-                  ztrl3tran_v2_adj=zTRL3TRAN_v2_adj,
-                  ztrl4adjtran_adj=zTRL4ADJTRAN_adj,
-                  ztrl4adjtran_v2_adj=zTRL4ADJTRAN_v2_adj)
-  dfAdjusted
-}
-
-
-createV1CogDomains = function(df){
-  #########################################################################
-  # Creates cognitive domains for V1 data. Composite scores are means of  #
-  # tests comprising each domain. Note: mean of z-scores does not         #
-  # produce a z-score (SD will likely be <1).                             #
-  # Input:                                                                #
-  # df = Dataframe containing variables to be renamed                     #
-  #########################################################################
-  
-  df$VisSpat_adj = rowMeans(df[c("zMR1COR_adj","zHFTOTCOR_adj")],na.rm=T)
-  df$AbsReason_adj = df$zMTXTRAN_adj
-  df$STWKMem_adj = rowMeans(df[,c("zdsfraw_adj","zdsbraw_adj","zlntot_adj",
-                                   "zsspfraw_adj","zsspbraw_adj","zrsatottran_adj")], 
-                             na.rm=T)
-  df$EpsMem_adj = rowMeans(df[,c("zcvatot_adj","zcvsdfr_adj","zcvldfr_adj",
-                                  "zlmitot_adj","zlmdtot_adj","zvritot_adj","zvrdtot_adj")], 
-                            na.rm=T)
-  df$VerbFlu_adj = rowMeans(df[,c("zlfcor_adj","zcfcor_adj")], na.rm=T)
-  df$ProcSpeed_adj = rowMeans(df[,c("zstrwraw_adj","zstrcraw_adj","ztrl2tran_adj",
-                                     "ztrl3tran_adj")],na.rm=T)
-  df$ExecTrailsSwitch_adj = df$ztrl4adjtran_adj 
-  df$ExecCategorySwitch_adj = df$zCSSACCADJ_adj
-  df$ExecInhibit_adj = df$zstrit_adj
-  df
-}
-
-
-createV2CogDomains = function(df){
-  #########################################################################
-  # Creates cognitive domains for V2 data. Composite scores are means of  #
-  # tests comprising each domain. Note: mean of z-scores does not         #
-  # produce a z-score (SD will likely be <1).                             #
-  # Input:                                                                #
-  # df = Dataframe containing variables to be renamed                     #
-  #########################################################################
-  
-  df$VisSpat_v2_adj = rowMeans(df[c("zMR1COR_v2_adj","zHFTOTCOR_v2_adj")],na.rm=T)
-  df$AbsReason_v2_adj = df$zMTXTRAN_v2_adj
-  df$STWKMem_v2_adj = rowMeans(df[,c("zdsfraw_v2_adj", "zdsbraw_v2_adj",
-                                      "zlntot_v2_adj","zsspfraw_v2_adj",
-                                      "zsspbraw_v2_adj","zrsatottran_v2_adj")], na.rm=T)
-  df$EpsMem_v2_adj = rowMeans(df[,c("zcvatot_v2_adj","zcvsdfr_v2_adj",
-                                     "zcvldfr_v2_adj","zlmitot_v2_adj",
-                                     "zlmdtot_v2_adj","zvritot_v2_adj","zvrdtot_v2_adj")], 
-                               na.rm=T)
-  df$VerbFlu_v2_adj = rowMeans(df[,c("zlfcor_v2_adj","zcfcor_v2_adj")],na.rm=T)
-  df$ProcSpeed_v2_adj = rowMeans(df[,c("zstrwraw_v2_adj","zstrcraw_v2_adj",
-                                        "ztrl2tran_v2_adj","ztrl3tran_v2_adj")],na.rm=T)
-  df$ExecTrailsSwitch_v2_adj = df$ztrl4adjtran_v2_adj 
-  df$ExecCategorySwitch_v2_adj = df$zCSSACCADJ_v2_adj
-  df$ExecInhibit_v2_adj = df$zstrit_v2_adj
-  df
-}
-  
-
 ########################################
 ### Begin creating adjusted datasets ###
 ########################################
-
-#-----------------------------------------------------------------------------------#
-# Create dataset adjusted for nas201tran (Age 20 AFQT)                              #
-#                                                                                   #
-# Adjustment consists of regressing out nuisance variable from z-scored variables.  #
-# Intercept is not included to avoid mean centering.                                #
-#-----------------------------------------------------------------------------------#
-
-# Create list of variables to adjust
-adjVars = c(zVarsV1, zVarsV2)
-
-# Set number of demographic variables included in dataframe (these won't be adjusted)
-nDemoVars = 16
-
-# Filter out subjects missing variable to be regressed out
-data = subset(allData, !is.na(allData$nas201tran))
-
-# Specify nas201tran (Age 20 AFQT as variable to regress out)
-regVars = paste("scale(nas201tran)", sep=" + ")
-
-# Regress nas201tran out of dataset
-nasAdjZscoreData = adjustDataset(regVars, adjVars, nDemoVars, data)
-
-# Save out adjusted dataset
-write.csv(nasAdjZscoreData, 
-          "/home/jelman/netshare/K/Projects/PracticeEffects/data/PracEffectData_nas201tran_ZAdj.csv",
-          row.names = FALSE)
 
 #-----------------------------------------------------------------------------------#
 # Create dataset adjusted for nas201tran (Age 20 AFQT)                              #
@@ -365,7 +208,7 @@ write.csv(scaleValues, "/home/jelman/netshare/K/Projects/PracticeEffects/data/V1
           row.names = FALSE)
 
 #-----------------------------------------------------------------------------------#
-# Create dataset adjusted for TEDALL (Education)                              #
+# Create dataset adjusted for TEDALL (Education)                                    #
 #                                                                                   #
 # Adjustment consists of regressing out nuisance variable from raw variables.       # 
 # Residuals of V1 and V2 variables are then scaled (z-scored) by V1 mean and SD.    # 
