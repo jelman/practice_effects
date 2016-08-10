@@ -31,7 +31,7 @@ rawVarsV1 = c("MR1COR","TRL1T","TRL2T","TRL3T","TRL4T","TRL5T","CSSACC","MTXRAW"
               "AFQTVOCPCT","AFQTARPCT","AFQTTLPCT","AFQTBXPCT","AFQTPCTTRAN","AFQTVOCPCTTRAN","AFQTARPCTTRAN","AFQTTLPCTTRAN",
               "AFQTBXPCTTRAN","DSFRAW","DSBRAW","SSPFRAW","SSPBRAW","LNTOT","LMITOT","LMDTOT","VRITOT","VRDTOT","VRCTOT","HFTOTCOR",
               "STRWRAW","STRCRAW","STRCWRAW","LFFCOR","LFACOR","LFSCOR","LFCOR","CFANCOR","CFBNCOR","CFCOR","CSCOR","SRTLMEAN",
-              "SRTLSTD","SRTRMEAN","SRTRSTD","SRTGMEN","SRTGSTD","CHRTLMEAN","CHRTRMEAN","CHRTLSTD","CHRTRSTD","CHRTGMEAN",
+              "SRTLSTD","SRTRMEAN","SRTRSTD","SRTGMEAN","SRTGSTD","CHRTLMEAN","CHRTRMEAN","CHRTLSTD","CHRTRSTD","CHRTGMEAN",
               "CHRTGSTD","RSATOT")
 rawVarsV2 = paste0(rawVarsV1, "_V2")
 
@@ -50,7 +50,7 @@ zVarsV2
 #                     Define functions                                       #
 #----------------------------------------------------------------------------#
 
-adjustDataset = function(regVars,adjVars,nDemoVars=16,data){
+adjustDataset = function(regVars,adjVars,nDemoVars=7,data){
   #######################################################################
   # Adjust dataset for specified set of variables.Regresses passed      #
   # variables from each measure using linear regression. The intercept  #
@@ -83,7 +83,7 @@ adjustDataset = function(regVars,adjVars,nDemoVars=16,data){
   
   # fitting models
   models <- lapply(adjVars, function(x) {
-    fmla = as.formula(paste0(x," ~ ",regVars," + (1|case)"))
+    fmla = as.formula(paste0(x," ~ ",regVars," + (1|CASE)"))
     lmer(formula=fmla, data = data, na.action=na.exclude)
   })
   
@@ -129,13 +129,13 @@ addScaleVals = function(df,varname, x) {
 adjVars = c(rawVarsV1, rawVarsV2)
 
 # Set number of demographic variables included in dataframe (these won't be adjusted)
-nDemoVars = 16
+nDemoVars = 7
 
 # Filter out subjects missing variable to be regressed out
-data = subset(allData, !is.na(allData$nas201tran))
+data = subset(allData, !is.na(allData$NAS201TRAN))
 
 # Specify nas201tran (Age 20 AFQT as variable to regress out)
-regVars = paste("scale(nas201tran)", sep=" + ")
+regVars = paste("scale(NAS201TRAN)", sep=" + ")
 
 # Regress nas201tran out of dataset
 nasAdjRawScoresData = adjustDataset(regVars, adjVars, nDemoVars, data)
@@ -158,40 +158,7 @@ for(i in rawVarsV1){
 for(i in rawVarsV2){
   varnameV2 = paste0(i, "_adj")
   zvarname = paste0("z", varnameV2)
-  varnameV1 = gsub("_v2","",varnameV2)
-  nasAdjRawScoresData[[zvarname]] = scale(nasAdjRawScoresData[[varnameV2]],
-                                          center=scaleValues$Mean[scaleValues$Variable==varnameV1],
-                                          scale=scaleValues$SD[scaleValues$Variable==varnameV1])
-  nasAdjRawScoresData[[varnameV2]] = NULL
-}
-
-# Rename variables to be consistent with other unadjusted and unadjusted datasets
-nasAdjRawScoresData = renameVars(nasAdjRawScoresData)
-
-# Create VETSA 1 cognitive domain scores
-nasAdjRawScoresData = createV1CogDomains(nasAdjRawScoresData)
-
-# Create VETSA 2 cognitive domain scores
-nasAdjRawScoresData = createV2CogDomains(nasAdjRawScoresData)
-
-# Scale VETSA 1 cognitive domain variables that have been adjusted for nas201tran
-# Adds mean and SD to dataframe and deletes adjusted raw variables from dataset. 
-# This is necessary to make composite scores actual z-scores
-for(i in rawCogDomainsV1){
-  varname = paste0(i, "_adj")
-  zvarname = paste0("z", varname)
-  nasAdjRawScoresData[[zvarname]] = scale(nasAdjRawScoresData[[varname]])
-  scaleValues = addScaleVals(scaleValues, varname, nasAdjRawScoresData[[zvarname]])
-  nasAdjRawScoresData[[varname]] = NULL
-}
-
-# Scale VETSA 2 cognitive domain variables that have been adjusted for nas201tran using VETSA 1 mean and SD
-# Delete adjusted raw variable from dataset
-# This is necessary to make composite scores actual z-scores
-for(i in rawCogDomainsV2){
-  varnameV2 = paste0(i, "_adj")
-  zvarname = paste0("z", varnameV2)
-  varnameV1 = gsub("_v2","",varnameV2)
+  varnameV1 = gsub("_V2","",varnameV2)
   nasAdjRawScoresData[[zvarname]] = scale(nasAdjRawScoresData[[varnameV2]],
                                           center=scaleValues$Mean[scaleValues$Variable==varnameV1],
                                           scale=scaleValues$SD[scaleValues$Variable==varnameV1])
@@ -200,11 +167,11 @@ for(i in rawCogDomainsV2){
 
 # Save out adjusted dataset
 write.csv(nasAdjRawScoresData, 
-          "/home/jelman/netshare/K/Projects/PracticeEffects/data/PracEffectData_nas201tran_RawAdj.csv",
+          "/home/jelman/netshare/M/PSYCH/KREMEN/VETSA DATA FILES_852014/Practice Effect Cognition/data/CogData_NAS201TRAN_Adj.csv",
           row.names = FALSE)
 
 # Save out dataset
-write.csv(scaleValues, "/home/jelman/netshare/K/Projects/PracticeEffects/data/V1_nas201tranAdjustedRaw_Means_SDs.csv",
+write.csv(scaleValues, "/home/jelman/netshare/M/PSYCH/KREMEN/VETSA DATA FILES_852014/Practice Effect Cognition/data/V1_NAS201TRAN_Adj_Means_SDs.csv",
           row.names = FALSE)
 
 #-----------------------------------------------------------------------------------#
@@ -220,7 +187,7 @@ write.csv(scaleValues, "/home/jelman/netshare/K/Projects/PracticeEffects/data/V1
 adjVars = c(rawVarsV1, rawVarsV2)
 
 # Set number of demographic variables included in dataframe (these won't be adjusted)
-nDemoVars = 16
+nDemoVars = 7
 
 # Filter out subjects missing variable to be regressed out
 data = subset(allData, !is.na(allData$TEDALL))
@@ -249,52 +216,18 @@ for(i in rawVarsV1){
 for(i in rawVarsV2){
   varnameV2 = paste0(i, "_adj")
   zvarname = paste0("z", varnameV2)
-  varnameV1 = gsub("_v2","",varnameV2)
+  varnameV1 = gsub("_V2","",varnameV2)
   tedAdjRawScoresData[[zvarname]] = scale(tedAdjRawScoresData[[varnameV2]],
                                           center=scaleValues$Mean[scaleValues$Variable==varnameV1],
                                           scale=scaleValues$SD[scaleValues$Variable==varnameV1])
   tedAdjRawScoresData[[varnameV2]] = NULL
 }
-
-# Rename variables to be consistent with other unadjusted and unadjusted datasets
-tedAdjRawScoresData = renameVars(tedAdjRawScoresData)
-
-# Create VETSA 1 cognitive domain scores
-tedAdjRawScoresData = createV1CogDomains(tedAdjRawScoresData)
-
-# Create VETSA 2 cognitive domain scores
-tedAdjRawScoresData = createV2CogDomains(tedAdjRawScoresData)
-
-# Scale VETSA 1 cognitive domain variables that have been adjusted for TEDALL
-# Adds mean and SD to dataframe and deletes adjusted raw variables from dataset. 
-# This is necessary to make composite scores actual z-scores
-for(i in rawCogDomainsV1){
-  varname = paste0(i, "_adj")
-  zvarname = paste0("z", varname)
-  tedAdjRawScoresData[[zvarname]] = scale(tedAdjRawScoresData[[varname]])
-  scaleValues = addScaleVals(scaleValues, varname, tedAdjRawScoresData[[zvarname]])
-  tedAdjRawScoresData[[varname]] = NULL
-}
-
-# Scale VETSA 2 cognitive domain variables that have been adjusted for TEDALL using VETSA 1 mean and SD
-# Delete adjusted raw variable from dataset
-# This is necessary to make composite scores actual z-scores
-for(i in rawCogDomainsV2){
-  varnameV2 = paste0(i, "_adj")
-  zvarname = paste0("z", varnameV2)
-  varnameV1 = gsub("_v2","",varnameV2)
-  tedAdjRawScoresData[[zvarname]] = scale(tedAdjRawScoresData[[varnameV2]],
-                                          center=scaleValues$Mean[scaleValues$Variable==varnameV1],
-                                          scale=scaleValues$SD[scaleValues$Variable==varnameV1])
-  tedAdjRawScoresData[[varnameV2]] = NULL
-}
-
 
 # Save out adjusted dataset
 write.csv(tedAdjRawScoresData, 
-          "/home/jelman/netshare/K/Projects/PracticeEffects/data/PracEffectData_TEDALL_RawAdj.csv",
+          "/home/jelman/netshare/M/PSYCH/KREMEN/VETSA DATA FILES_852014/Practice Effect Cognition/data/CogData_TEDALL_Adj.csv",
           row.names = FALSE)
 
 # Save out dataset
-write.csv(scaleValues, "/home/jelman/netshare/K/Projects/PracticeEffects/data/V1_TEDALLAdjustedRaw_Means_SDs.csv",
+write.csv(scaleValues, "/home/jelman/netshare/M/PSYCH/KREMEN/VETSA DATA FILES_852014/Practice Effect Cognition/data/V1_TEDALL_Adj_Means_SDs.csv",
           row.names = FALSE)
