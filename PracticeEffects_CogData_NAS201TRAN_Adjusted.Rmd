@@ -23,7 +23,7 @@ library(permute)
 
 ```{r, include=F}
 # Load data
-allDat = read.csv("/home/jelman/netshare/K/Projects/PracticeEffects/data/PracEffectData_nas201tran_RawAdj.csv")
+allDat = read.csv("/home/jelman/netshare/K/Projects/PracticeEffects/data/CogData_NAS201TRAN_Adj.csv")
 
 # Select subjects from groups of interest
 allDat = allDat %>%
@@ -55,7 +55,7 @@ The difference (D) between time 2 scores of longitudinal returnees (S1T2) and ti
 ```{r, include=F}
 calcPracticeEffect = function(dat, varName, idxS1T2, idxS2T2,idxS1T1ret){
   varV1 = varName
-  varV2 = paste0(varV1, "_v2")
+  varV2 = paste0(varV1, "_V2")
   varV1 = paste0(varV1,"_adj")
   varV2 = paste0(varV2,"_adj")
   # Longitudinal Subjects Time 2
@@ -80,21 +80,22 @@ calcPracticeEffect = function(dat, varName, idxS1T2, idxS2T2,idxS1T1ret){
 
 ```{r, include=F}
 # Create vector of all variable names to calculate practice effects for
-allVars = c("zVisSpat","zMR1COR","zHFTOTCOR","zSTWKMem","zdsfraw","zdsbraw",
-            "zlntot","zsspfraw","zsspbraw","zrsatottran","zEpsMem","zcvatot",
-            "zcvsdfr","zcvldfr","zlmitot","zlmdtot","zvritot","zvrdtot",
-            "zAbsReason","zMTXTRAN","zVerbFlu","zlfcor","zcfcor",
-            "zExecTrailsSwitch","ztrl4adjtran","zProcSpeed","zstrwraw",
-            "zstrcraw","ztrl2tran","ztrl3tran","zExecCategorySwitch",
-            "zCSSACCADJ","zExecInhibit","zstrit","zafqtpcttran","zafqtvocpcttran",
-            "zafqtarpcttran","zafqttlpcttran","zafqtbxpcttran")
-# Create list of cognitive domains to present separately
-cogDomains = c("zVisSpat","zSTWKMem","zEpsMem","zAbsReason","zVerbFlu",
-               "zExecTrailsSwitch","zProcSpeed","zExecCategorySwitch",
-               "zExecInhibit")
+allVars = c("zMR1COR","zTRL1T","zTRL2T","zTRL3T","zTRL4T","zTRL5T","zCSSACC","zMTXRAW","zCVA1RAW","zCVATOT",
+            "zCVSDFR","zCVLDFR","zAFQTPCT","zAFQTVOCPCT","zAFQTARPCT","zAFQTTLPCT","zAFQTBXPCT","zAFQTPCTTRAN",
+            "zAFQTVOCPCTTRAN","zAFQTARPCTTRAN","zAFQTTLPCTTRAN","zAFQTBXPCTTRAN","zDSFRAW","zDSBRAW",
+            "zSSPFRAW","zSSPBRAW","zLNTOT","zLMITOT","zLMDTOT","zVRITOT","zVRDTOT","zVRCTOT","zHFTOTCOR",
+            "zSTRWRAW","zSTRCRAW","zSTRCWRAW","zLFFCOR","zLFACOR","zLFSCOR","zLFCOR","zCFANCOR","zCFBNCOR",
+            "zCFCOR","zCSCOR","zSRTLMEAN","zSRTLSTD","zSRTRMEAN","zSRTRSTD","zSRTGMEAN","zSRTGSTD","zCHRTLMEAN",
+            "zCHRTRMEAN","zCHRTLSTD","zCHRTRSTD","zCHRTGMEAN","zCHRTGSTD","zRSATOT")
+
+# # Create list of cognitive domains to present separately
+# cogDomains = c("zVisSpat","zSTWKMem","zEpsMem","zAbsReason","zVerbFlu",
+#                "zExecTrailsSwitch","zProcSpeed","zExecCategorySwitch",
+#                "zExecInhibit")
+
 #Create list of AFQT scores to present separately
-afqtVars = c("zafqtpcttran","zafqtvocpcttran","zafqtarpcttran","zafqttlpcttran",
-             "zafqtbxpcttran")
+afqtVars = c("zAFQTPCT","zAFQTVOCPCT","zAFQTARPCT","zAFQTTLPCT","zAFQTBXPCT","zAFQTPCTTRAN",
+            "zAFQTVOCPCTTRAN","zAFQTARPCTTRAN","zAFQTTLPCTTRAN","zAFQTBXPCTTRAN")
 
 # Create indices of different groups
 idxS1T2 = which(allDat$VETSAGRP=="V1V2")
@@ -106,7 +107,10 @@ pracEffects = sapply(allVars, function(x) calcPracticeEffect(allDat, x, idxS1T2,
 
 ```
 
+
 ```{r, include=F}
+### Run permutation testing to generate p-values for practice effects ###
+
 set.seed(21)
 # Set parameters for permutation testing of practice effects
 N = nrow(allDat)                   # Numer of subjects
@@ -140,19 +144,25 @@ permResults = data.frame(permResults)
 # Calculate p values based on permutations and observed values
 pvalsPerm = apply(permResults, 1, function(x) pracEffects > abs(x))
 pvals = 1 - (rowMeans(pvalsPerm))
+```
+
+
+```{r, include=F}
+### Gather results into dataframe ###
 
 # Combine practice effects results and permutation p-values
 results = data.frame("PracticeEffect" = pracEffects, "P" = pvals)
 
-# Get indices of cognitive domains
-idxCogDomains = which(rownames(results) %in% cogDomains)
+# # Get indices of cognitive domains
+# idxCogDomains = which(rownames(results) %in% cogDomains)
+
 # Get indices of AFQT tests
 idxAFQT = which(rownames(results) %in% afqtVars)
 
 #Split results into composite scores of cognitive domains and individual tests
-resultsCogDomains = results[idxCogDomains,]
+# resultsCogDomains = results[idxCogDomains,]
 resultsAFQT = results[idxAFQT,]
-resultsTests = results[-c(idxCogDomains,idxAFQT),]
+resultsTests = results[-idxAFQT,]
 ```
 
 --------------------------------------
@@ -161,12 +171,12 @@ P-values for practice effects were determined through permutation testing with `
 
 
 ```{r, echo=F}
-kable(resultsTests, digits=3, caption="Cognitive Domain Individual Tests")
+kable(resultsTests, digits=3, caption="Individual Tests")
 ```
 
 
 ```{r, echo=F}
-kable(resultsCogDomains, digits=3, caption="Cognitive Domain Composites")
+# kable(resultsCogDomains, digits=3, caption="Cognitive Domain Composites")
 ```
 
 
