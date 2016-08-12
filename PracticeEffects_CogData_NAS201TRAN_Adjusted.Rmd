@@ -19,6 +19,7 @@ library(dplyr)
 library(psych)
 library(knitr)
 library(permute)
+library(boot)
 ```
 
 ```{r, include=F}
@@ -114,7 +115,7 @@ pracEffects = sapply(allVars, function(x) calcPracticeEffect(allDat, x, idxS1T2,
 set.seed(21)
 # Set parameters for permutation testing of practice effects
 N = nrow(allDat)                   # Numer of subjects
-nPerm = 10000                      # Number of permutations to run
+nPerm = 5000                      # Number of permutations to run
 nLong = length(idxS1T1ret)         # Number of longitudinal subjects
 nAR = length(idxS2T2)              # Number of attrition replacement subjects
 
@@ -146,12 +147,55 @@ pvalsPerm = apply(permResults, 1, function(x) pracEffects > abs(x))
 pvals = 1 - (rowMeans(pvalsPerm))
 ```
 
+```{r}
+### Generate bootstrapped confidence intervals and standard error ###
+
+bootPracticeEffect = function(data, idx){
+  dat = data[idx,]
+  idxV1V2boot = which(dat$VETSAGRP=="V1V2")
+  idxV2ARboot = which(dat$VETSAGRP=="V2AR")
+  sampResults = sapply(allVars, function(x) calcPracticeEffect(dat, x, 
+                                                  idxV1V2boot,
+                                                  idxV2ARboot,
+                                                  idxV1V2boot))
+  return(sampResults)
+}
+
+boot.out = boot(allDat, statistic=bootPracticeEffect, strata=allDat$VETSAGRP, R=10000)
+
+# # Alternative way to conduct bootstrapping
+# set.seed(21)
+# # Set parameters for permutation testing of practice effects
+# N = nrow(allDat)                   # Numer of subjects
+# nBoot = 1000                      # Number of boostrap resamples to run
+# nLong = length(idxS1T1ret)         # Number of longitudinal subjects
+# nAR = length(idxS2T2)              # Number of attrition replacement subjects
+# 
+# # Get indices of different groups
+# idxV1V2 = which(allDat$VETSAGRP=="V1V2")
+# idxV2AR = which(allDat$VETSAGRP=="V2AR")
+# 
+# # Initialize empty matrix for boostrap results
+# bootResults = matrix(ncol=length(allVars), nrow=nBoot)
+# colnames(bootResults) = allVars
+# 
+# # Run bootstrap resamples and collect results into matrix
+# for(i in 1:nBoot){
+#     idxV1V2boot = sample(idxV1V2, replace=TRUE)
+#     idxV2ARboot = sample(idxV2AR, replace=TRUE)
+#     bootResults[i,] = sapply(allVars, function(x) calcPracticeEffect(allDat, x, 
+#                                                       idxV1V2boot,
+#                                                       idxV2ARboot,
+#                                                       idxV1V2boot))
+# }
+```
+
 
 ```{r, include=F}
 ### Gather results into dataframe ###
 
 # Combine practice effects results and permutation p-values
-results = data.frame("PracticeEffect" = pracEffects, "P" = pvals)
+results = data.frame("PracticeEffect" = pracEffects, SE=apply(boot.out$t, 2, sd), "P" = pvals)
 
 # # Get indices of cognitive domains
 # idxCogDomains = which(rownames(results) %in% cogDomains)
