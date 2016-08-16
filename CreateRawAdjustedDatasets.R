@@ -15,16 +15,11 @@ library(dplyr)
 library(lme4)
 
 # Load raw test scores and demographics data
-allData = read.csv("/home/jelman/netshare/M/PSYCH/KREMEN/VETSA DATA FILES_852014/Practice Effect Cognition/data/V1V2_PracticeEffect_Raw.csv",
+allData = read.csv("/home/jelman/netshare/K/Projects/PracticeEffects/data/V1V2_PracticeEffect_Raw.csv",
                    stringsAsFactors = FALSE)
 
 # Convert all variable names to upper case
 names(allData) = toupper(names(allData))
-
-# Select subjects from groups of interest
-allData = allData %>%
-  filter(VETSAGRP=="V1V2" | VETSAGRP=="V1" | VETSAGRP=="V2AR")
-
 
 # Create list of raw variable names to adjust
 rawVarsV1 = c("MR1COR","TRL1T","TRL2T","TRL3T","TRL4T","TRL5T","CSSACC","MTXRAW","CVA1RAW","CVATOT","CVSDFR","CVLDFR","AFQTPCT",
@@ -140,17 +135,23 @@ regVars = paste("scale(NAS201TRAN)", sep=" + ")
 # Regress nas201tran out of dataset
 nasAdjRawScoresData = adjustDataset(regVars, adjVars, nDemoVars, data)
 
+# Save out dataset with Age 20 AFQT regressed out
+write.csv(nasAdjRawScoresData, "/home/jelman/netshare/K/Projects/PracticeEffects/data/CogData_NAS201TRAN_Adj.csv",
+          row.names=F)
+
 # Initialize dataframe to hold means and SDs
 scaleValues = data.frame()
+
+nasAdjZscoresData = nasAdjRawScoresData
 
 # Scale VETSA 1 variables that have been adjusted for nas201tran
 # Adds mean and SD to dataframe and deletes adjusted raw variables from dataset
 for(i in rawVarsV1){
   varname = paste0(i, "_adj")
   zvarname = paste0("z", varname)
-  nasAdjRawScoresData[[zvarname]] = scale(nasAdjRawScoresData[[varname]])
-  scaleValues = addScaleVals(scaleValues, varname, nasAdjRawScoresData[[zvarname]])
-  nasAdjRawScoresData[[varname]] = NULL
+  nasAdjZscoresData[[zvarname]] = scale(nasAdjZscoresData[[varname]])
+  scaleValues = addScaleVals(scaleValues, varname, nasAdjZscoresData[[zvarname]])
+  nasAdjZscoresData[[varname]] = NULL
 }
 
 # Scale VETSA 2 variables that have been adjusted for nas201tran using VETSA 1 mean and SD
@@ -159,19 +160,19 @@ for(i in rawVarsV2){
   varnameV2 = paste0(i, "_adj")
   zvarname = paste0("z", varnameV2)
   varnameV1 = gsub("_V2","",varnameV2)
-  nasAdjRawScoresData[[zvarname]] = scale(nasAdjRawScoresData[[varnameV2]],
+  nasAdjZscoresData[[zvarname]] = scale(nasAdjZscoresData[[varnameV2]],
                                           center=scaleValues$Mean[scaleValues$Variable==varnameV1],
                                           scale=scaleValues$SD[scaleValues$Variable==varnameV1])
-  nasAdjRawScoresData[[varnameV2]] = NULL
+  nasAdjZscoresData[[varnameV2]] = NULL
 }
 
-# Save out adjusted dataset
-write.csv(nasAdjRawScoresData, 
-          "/home/jelman/netshare/M/PSYCH/KREMEN/VETSA DATA FILES_852014/Practice Effect Cognition/data/CogData_NAS201TRAN_Adj.csv",
+# Save out adjusted and z-scored dataset
+write.csv(nasAdjZscoresData, 
+          "/home/jelman/netshare/K/Projects/PracticeEffects/data/CogData_NAS201TRAN_Adj_Zscored.csv",
           row.names = FALSE)
 
-# Save out dataset
-write.csv(scaleValues, "/home/jelman/netshare/M/PSYCH/KREMEN/VETSA DATA FILES_852014/Practice Effect Cognition/data/V1_NAS201TRAN_Adj_Means_SDs.csv",
+# Save out means and standard deviations used to standardize scores
+write.csv(scaleValues, "/home/jelman/netshare/K/Projects/PracticeEffects/data/V1_NAS201TRAN_Adj_Means_SDs.csv",
           row.names = FALSE)
 
 #-----------------------------------------------------------------------------------#
@@ -198,17 +199,23 @@ regVars = paste("scale(TEDALL)", sep=" + ")
 # Regress TEDALL out of dataset
 tedAdjRawScoresData = adjustDataset(regVars, adjVars, nDemoVars, data)
 
+# Save out dataset with Education regressed out
+write.csv(tedAdjRawScoresData, "/home/jelman/netshare/K/Projects/PracticeEffects/data/CogData_TEDALL_Adj.csv",
+          row.names=F)
+
 # Initialize dataframe to hold means and SDs
 scaleValues = data.frame()
+
+tedAdjZScoresData = tedAdjRawScoresData
 
 # Scale VETSA 1 variables that have been adjusted for TEDALL
 # Adds mean and SD to dataframe and deletes adjusted raw variables from dataset
 for(i in rawVarsV1){
   varname = paste0(i, "_adj")
   zvarname = paste0("z", varname)
-  tedAdjRawScoresData[[zvarname]] = scale(tedAdjRawScoresData[[varname]])
-  scaleValues = addScaleVals(scaleValues, varname, tedAdjRawScoresData[[zvarname]])
-  tedAdjRawScoresData[[varname]] = NULL
+  tedAdjZScoresData[[zvarname]] = scale(tedAdjZScoresData[[varname]])
+  scaleValues = addScaleVals(scaleValues, varname, tedAdjZScoresData[[zvarname]])
+  tedAdjZScoresData[[varname]] = NULL
 }
 
 # Scale VETSA 2 variables that have been adjusted for TEDALL using VETSA 1 mean and SD
@@ -217,17 +224,17 @@ for(i in rawVarsV2){
   varnameV2 = paste0(i, "_adj")
   zvarname = paste0("z", varnameV2)
   varnameV1 = gsub("_V2","",varnameV2)
-  tedAdjRawScoresData[[zvarname]] = scale(tedAdjRawScoresData[[varnameV2]],
+  tedAdjZScoresData[[zvarname]] = scale(tedAdjZScoresData[[varnameV2]],
                                           center=scaleValues$Mean[scaleValues$Variable==varnameV1],
                                           scale=scaleValues$SD[scaleValues$Variable==varnameV1])
-  tedAdjRawScoresData[[varnameV2]] = NULL
+  tedAdjZScoresData[[varnameV2]] = NULL
 }
 
-# Save out adjusted dataset
-write.csv(tedAdjRawScoresData, 
-          "/home/jelman/netshare/M/PSYCH/KREMEN/VETSA DATA FILES_852014/Practice Effect Cognition/data/CogData_TEDALL_Adj.csv",
+# Save out adjusted and z-scored dataset
+write.csv(tedAdjZScoresData, 
+          "/home/jelman/netshare/K/Projects/PracticeEffects/data/CogData_TEDALL_Adj_Zscored.csv",
           row.names = FALSE)
 
-# Save out dataset
-write.csv(scaleValues, "/home/jelman/netshare/M/PSYCH/KREMEN/VETSA DATA FILES_852014/Practice Effect Cognition/data/V1_TEDALL_Adj_Means_SDs.csv",
+# Save out means and standard deviations used to standardize scores
+write.csv(scaleValues, "/home/jelman/netshare/K/Projects/PracticeEffects/data/V1_TEDALL_Adj_Means_SDs.csv",
           row.names = FALSE)
