@@ -27,9 +27,11 @@ library(boot)
 allDat = read.csv("/home/jelman/netshare/K/Projects/PracticeEffects/data/CogData_NAS201TRAN_Adj.csv")
 
 # Select subjects from groups of interest
-allDat = allDat %>%
+subsetDat = allDat %>%
   filter(VETSAGRP=="V1V2" | VETSAGRP=="V1" | VETSAGRP=="V2AR")
 
+# Take out V1ne subject in order to add back in later
+V1neDat = allDat %>% filter(VETSAGRP=="v1ne")
 ```
 
 ## Adjustment for Age 20 AFQT  
@@ -99,11 +101,11 @@ afqtVars = c("zAFQTPCT","zAFQTVOCPCT","zAFQTARPCT","zAFQTTLPCT","zAFQTBXPCT","zA
             "zAFQTVOCPCTTRAN","zAFQTARPCTTRAN","zAFQTTLPCTTRAN","zAFQTBXPCTTRAN")
 
 # Create indices of different groups
-idxS1T2 = which(allDat$VETSAGRP=="V1V2")
-idxS1T1ret = which(allDat$VETSAGRP=="V1V2")
-idxS2T2 = which(allDat$VETSAGRP=="V2AR")
+idxS1T2 = which(subsetDat$VETSAGRP=="V1V2")
+idxS1T1ret = which(subsetDat$VETSAGRP=="V1V2")
+idxS2T2 = which(subsetDat$VETSAGRP=="V2AR")
 # Calculate practice effects for all cognitive domains and tests
-pracEffects = sapply(allVars, function(x) calcPracticeEffect(allDat, x, idxS1T2,
+pracEffects = sapply(allVars, function(x) calcPracticeEffect(subsetDat, x, idxS1T2,
                                                           idxS2T2, idxS1T1ret))
 
 ```
@@ -114,15 +116,15 @@ pracEffects = sapply(allVars, function(x) calcPracticeEffect(allDat, x, idxS1T2,
 
 set.seed(21)
 # Set parameters for permutation testing of practice effects
-N = nrow(allDat)                   # Numer of subjects
+N = nrow(subsetDat)                   # Numer of subjects
 nPerm = 5000                      # Number of permutations to run
 nLong = length(idxS1T1ret)         # Number of longitudinal subjects
 nAR = length(idxS2T2)              # Number of attrition replacement subjects
 
 # Get indices of different groups
-idxV1V2 = which(allDat$VETSAGRP=="V1V2")
-idxV2AR = which(allDat$VETSAGRP=="V2AR")
-idxV1 = which(allDat$VETSAGRP=="V1")
+idxV1V2 = which(subsetDat$VETSAGRP=="V1V2")
+idxV2AR = which(subsetDat$VETSAGRP=="V2AR")
+idxV1 = which(subsetDat$VETSAGRP=="V1")
 
 # Initialize empty matrix for permutation results
 permResults = matrix(ncol=length(allVars), nrow=nPerm)
@@ -136,7 +138,7 @@ for(i in 1:nPerm){
     idxS1T2perm = idxT2[1:nLong]
     idxS2T2perm = idxT2[(nLong+1):(nLong+nAR)]
     idxS1T1retperm = idxT1[1:nLong]
-    permResults[i,] = sapply(allVars, function(x) calcPracticeEffect(allDat, x, 
+    permResults[i,] = sapply(allVars, function(x) calcPracticeEffect(subsetDat, x, 
                                                       idxS1T2perm,
                                                       idxS2T2perm,
                                                       idxS1T1retperm))
@@ -147,7 +149,7 @@ pvalsPerm = apply(permResults, 1, function(x) pracEffects > abs(x))
 pvals = 1 - (rowMeans(pvalsPerm))
 ```
 
-```{r}
+```{r, include=FALSE}
 ### Generate bootstrapped confidence intervals and standard error ###
 
 bootPracticeEffect = function(data, idx){
@@ -161,19 +163,20 @@ bootPracticeEffect = function(data, idx){
   return(sampResults)
 }
 
-boot.out = boot(allDat, statistic=bootPracticeEffect, strata=allDat$VETSAGRP, R=10000)
+set.seed(21)
+boot.out = boot(subsetDat, statistic=bootPracticeEffect, strata=subsetDat$VETSAGRP, R=10000)
 
 # # Alternative way to conduct bootstrapping
 # set.seed(21)
 # # Set parameters for permutation testing of practice effects
-# N = nrow(allDat)                   # Numer of subjects
+# N = nrow(subsetDat)                   # Numer of subjects
 # nBoot = 1000                      # Number of boostrap resamples to run
 # nLong = length(idxS1T1ret)         # Number of longitudinal subjects
 # nAR = length(idxS2T2)              # Number of attrition replacement subjects
 # 
 # # Get indices of different groups
-# idxV1V2 = which(allDat$VETSAGRP=="V1V2")
-# idxV2AR = which(allDat$VETSAGRP=="V2AR")
+# idxV1V2 = which(subsetDat$VETSAGRP=="V1V2")
+# idxV2AR = which(subsetDat$VETSAGRP=="V2AR")
 # 
 # # Initialize empty matrix for boostrap results
 # bootResults = matrix(ncol=length(allVars), nrow=nBoot)
@@ -183,7 +186,7 @@ boot.out = boot(allDat, statistic=bootPracticeEffect, strata=allDat$VETSAGRP, R=
 # for(i in 1:nBoot){
 #     idxV1V2boot = sample(idxV1V2, replace=TRUE)
 #     idxV2ARboot = sample(idxV2AR, replace=TRUE)
-#     bootResults[i,] = sapply(allVars, function(x) calcPracticeEffect(allDat, x, 
+#     bootResults[i,] = sapply(allVars, function(x) calcPracticeEffect(subsetDat, x, 
 #                                                       idxV1V2boot,
 #                                                       idxV2ARboot,
 #                                                       idxV1V2boot))
@@ -228,12 +231,28 @@ kable(resultsTests, digits=3, caption="Individual Tests")
 kable(resultsAFQT, digits=3, caption="AFQT Scores")
 ```
 
-```{r, echo=F}
-# par(mfrow=c(ceiling(length(vars)/3),3))
-# 
-# hist(permResults[[x]], breaks=20)
-# abline(v=quantile(permResults[[x]], c(.025, .975)), lty=2)
-# abline(v=pracEffects[[x]], col='red', lty=2)
+```{r, include=F}
+# # Write out practice effect results (adjustment value, estimate of precision, and p value)
+# write.csv(results, '/home/jelman/netshare/K/Projects/PracticeEffects/results/PracEffects_NAS201TRAN_Results.csv')
 ```
+
+```{r, include=F}
+# # Create dataset adjusted for practice effects
+# # Note: Only time 2 scores of longitudinal (V1V2) subjects are adjusted
+# 
+# peAdjDat = subsetDat
+# for (varName in allVars) {
+#   varName_V2 = paste0(varName, "_V2_adj")
+#   peAdjDat[idxV1V2, varName_V2] = peAdjDat[idxV1V2, varName_V2] - pracEffects[varName]
+# }
+# 
+# # Add back in V1ne subjects
+# peAdjDat = rbind(peAdjDat, V1neDat)
+# 
+# # Save out adjusted dataset
+# write.csv(peAdjDat, '/home/jelman/netshare/K/Projects/PracticeEffects/data/CogData_NAS201TRAN_PracEffect_Adj.csv',
+#           row.names=FALSE)
+```
+
 
 
