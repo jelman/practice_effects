@@ -1,6 +1,6 @@
 ---
 title: 'Practice Effects on Cognitive Domain and AFQT Tests: Raw scores adjusted for
-  Age 20  AFQT'
+  Age 20  AFQT and Z-scored'
 author: "Jeremy Elman"
 date: '`r Sys.Date()`'
 output:
@@ -24,7 +24,7 @@ library(boot)
 
 ```{r, include=F}
 # Load data
-allDat = read.csv("/home/jelman/netshare/K/Projects/PracticeEffects/data/CogData_NAS201TRAN_Adj.csv")
+allDat = read.csv("/home/jelman/netshare/K/Projects/PracticeEffects/data/CogData_NAS201TRAN_Adj_Zscored.csv")
 
 # Select subjects from groups of interest
 subsetDat = allDat %>%
@@ -34,7 +34,7 @@ subsetDat = allDat %>%
 V1neDat = allDat %>% filter(VETSAGRP=="v1ne")
 ```
 
-## Adjustment for Age 20 AFQT  
+## Adjustment for Age 20 AFQT and standardization
 
 The scores have been adjusted for age 20 AFQT by regressing the (scaled) nas201tran variable from each raw test score. VETSA 1 and VETSA 2 scores are then standardized (z-scored) using the mean and SD of VETSA 1 scores. Cognitive domain composites are created by averaging these standardized score within domain.
 
@@ -117,7 +117,7 @@ pracEffects = sapply(allVars, function(x) calcPracticeEffect(subsetDat, x, idxS1
 set.seed(21)
 # Set parameters for permutation testing of practice effects
 N = nrow(subsetDat)                   # Numer of subjects
-nPerm = 5000                      # Number of permutations to run
+nPerm = 10000                      # Number of permutations to run
 nLong = length(idxS1T1ret)         # Number of longitudinal subjects
 nAR = length(idxS2T2)              # Number of attrition replacement subjects
 
@@ -164,7 +164,8 @@ bootPracticeEffect = function(data, idx){
 }
 
 set.seed(21)
-boot.out = boot(subsetDat, statistic=bootPracticeEffect, strata=subsetDat$VETSAGRP, R=10000)
+nBoot = 10000
+boot.out = boot(subsetDat, statistic=bootPracticeEffect, strata=subsetDat$VETSAGRP, R=nBoot)
 
 # # Alternative way to conduct bootstrapping
 # set.seed(21)
@@ -215,6 +216,7 @@ resultsTests = results[-idxAFQT,]
 --------------------------------------
 
 P-values for practice effects were determined through permutation testing with `r nPerm` permutations. 
+Standard Errors were determined through bootstrapping with `r nBoot` resamples.
 
 
 ```{r, echo=F}
@@ -232,8 +234,8 @@ kable(resultsAFQT, digits=3, caption="AFQT Scores")
 ```
 
 ```{r, include=F}
-# # Write out practice effect results (adjustment value, estimate of precision, and p value)
-# write.csv(results, '/home/jelman/netshare/K/Projects/PracticeEffects/results/PracEffects_NAS201TRAN_Results.csv')
+# Write out practice effect results (adjustment value, estimate of precision, and p value)
+write.csv(results, '/home/jelman/netshare/K/Projects/PracticeEffects/results/PracEffects_NAS201TRAN_Zscored_Results.csv')
 ```
 
 
