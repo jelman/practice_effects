@@ -34,13 +34,13 @@ subsetDat = allDat %>%
 V1neDat = allDat %>% filter(VETSAGRP=="v1ne")
 
 # Create vector of all variable names to calculate practice effects for
-testVars = c("zMR1COR","zTRL1T","zTRL2T","zTRL3T","zTRL4T","zTRL5T","zCSSACC","zMTXRAW","zCVA1RAW","zCVATOT",
-            "zCVSDFR","zCVLDFR","zAFQTPCT","zAFQTVOCPCT","zAFQTARPCT","zAFQTTLPCT","zAFQTBXPCT","zAFQTPCTTRAN",
-            "zAFQTVOCPCTTRAN","zAFQTARPCTTRAN","zAFQTTLPCTTRAN","zAFQTBXPCTTRAN","zDSFRAW","zDSBRAW",
-            "zSSPFRAW","zSSPBRAW","zLNTOT","zLMITOT","zLMDTOT","zVRITOT","zVRDTOT","zVRCTOT","zHFTOTCOR",
-            "zSTRWRAW","zSTRCRAW","zSTRCWRAW","zLFFCOR","zLFACOR","zLFSCOR","zLFCOR","zCFANCOR","zCFBNCOR",
-            "zCFCOR","zCSCOR","zSRTLMEAN","zSRTLSTD","zSRTRMEAN","zSRTRSTD","zSRTGMEAN","zSRTGSTD","zCHRTLMEAN",
-            "zCHRTRMEAN","zCHRTLSTD","zCHRTRSTD","zCHRTGMEAN","zCHRTGSTD","zRSATOT")
+testVars = c("zMR1COR","zTRL1TLOG","zTRL2TLOG","zTRL3TLOG","zTRL4TLOG","zTRL5TLOG","zCSSACC","zMTXRAW","zCVA1RAW",
+             "zCVATOT","zCVSDFR","zCVLDFR","zAFQTPCT","zAFQTVOCPCT","zAFQTARPCT","zAFQTTLPCT","zAFQTBXPCT",
+             "zAFQTPCTTRAN","zAFQTVOCPCTTRAN","zAFQTARPCTTRAN","zAFQTTLPCTTRAN","zAFQTBXPCTTRAN","zDSFRAW",
+             "zDSBRAW","zSSPFRAW","zSSPBRAW","zLNTOT","zLMITOT","zLMDTOT","zVRITOT","zVRDTOT","zVRCTOT","zHFTOTCOR",
+            "zSTRWRAW","zSTRCRAW","zSTRCWRAW","zLFFCOR","zLFACOR","zLFSCOR","zLFCOR","zCFANCOR","zCFBNCOR","zCFCOR",
+            "zCSCOR","zSRTLMEANLOG","zSRTLSTDLOG","zSRTRMEANLOG","zSRTRSTDLOG","zSRTGMEANLOG","zSRTGSTDLOG",
+            "zCHRTLMEANLOG","zCHRTRMEANLOG","zCHRTLSTDLOG","zCHRTRSTDLOG","zCHRTGMEANLOG","zCHRTGSTDLOG","zRSATOT")
 
 # Create list of cognitive domains to present separately
 cogVars = c("zVisSpat","zSTWKMem","zEpsMem","zAbsReason","zVerbFlu",
@@ -118,12 +118,11 @@ calcCogDomains = function(testdat){
   testdat[['zEpsMem']] = mean(testdat[c("zCVATOT","zCVSDFR","zCVLDFR","zLMITOT",
                                                "zLMDTOT","zVRITOT","zVRDTOT")])
   testdat[['zVerbFlu']] = mean(testdat[c("zLFCOR","zCFCOR")])
-  testdat[['zProcSpeed']] = mean(testdat[c("zSTRWRAW","zSTRCRAW","zTRL2T","zTRL3T")])
-  testdat[['zExecTrailsSwitch']] = testdat['zTRL4T']
+  testdat[['zProcSpeed']] = mean(testdat[c("zSTRWRAW","zSTRCRAW","zTRL2TLOG","zTRL3TLOG")])
+  testdat[['zExecTrailsSwitch']] = testdat['zTRL4TLOG']
   testdat[['zExecCategorySwitch']] = testdat['zCSSACC']
   testdat
 }
-
 
 ```
 
