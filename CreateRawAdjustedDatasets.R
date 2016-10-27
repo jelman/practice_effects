@@ -21,13 +21,27 @@ allData = read.csv("/home/jelman/netshare/K/Projects/PracticeEffects/data/V1V2_P
 # Convert all variable names to upper case
 names(allData) = toupper(names(allData))
 
+# Log transform timing data
+timeVarsV1 = c("TRL1T","TRL2T","TRL3T","TRL4T","TRL5T","SRTLMEAN","SRTLSTD","SRTRMEAN",
+                "SRTRSTD","SRTGMEAN","SRTGSTD","CHRTLMEAN","CHRTRMEAN","CHRTLSTD",
+                "CHRTRSTD","CHRTGMEAN","CHRTGSTD")
+timeVarsLogV1 = paste0(timeVarsV1, "LOG")
+timeVarsV2 = paste0(timeVarsV1, "_V2")
+timeVarsLogV2 = paste0(timeVarsLogV1, "_V2")
+
+
+allData[timeVarsLogV1] = log(allData[timeVarsV1])                
+allData = dplyr::select(allData, -one_of(timeVarsV1))
+allData[timeVarsLogV2] = log(allData[timeVarsV2])                
+allData = dplyr::select(allData, -one_of(timeVarsV2))
+
 # Create list of raw variable names to adjust
-rawVarsV1 = c("MR1COR","TRL1T","TRL2T","TRL3T","TRL4T","TRL5T","CSSACC","MTXRAW","CVA1RAW","CVATOT","CVSDFR","CVLDFR","AFQTPCT",
-              "AFQTVOCPCT","AFQTARPCT","AFQTTLPCT","AFQTBXPCT","AFQTPCTTRAN","AFQTVOCPCTTRAN","AFQTARPCTTRAN","AFQTTLPCTTRAN",
+rawVarsV1 = c("MR1COR","TRL1TLOG","TRL2TLOG","TRL3TLOG","TRL4TLOG","TRL5TLOG","CSSACC","MTXRAW","CVA1RAW","CVATOT","CVSDFR","CVLDFR",
+              "AFQTPCT","AFQTVOCPCT","AFQTARPCT","AFQTTLPCT","AFQTBXPCT","AFQTPCTTRAN","AFQTVOCPCTTRAN","AFQTARPCTTRAN","AFQTTLPCTTRAN",
               "AFQTBXPCTTRAN","DSFRAW","DSBRAW","SSPFRAW","SSPBRAW","LNTOT","LMITOT","LMDTOT","VRITOT","VRDTOT","VRCTOT","HFTOTCOR",
-              "STRWRAW","STRCRAW","STRCWRAW","LFFCOR","LFACOR","LFSCOR","LFCOR","CFANCOR","CFBNCOR","CFCOR","CSCOR","SRTLMEAN",
-              "SRTLSTD","SRTRMEAN","SRTRSTD","SRTGMEAN","SRTGSTD","CHRTLMEAN","CHRTRMEAN","CHRTLSTD","CHRTRSTD","CHRTGMEAN",
-              "CHRTGSTD","RSATOT")
+              "STRWRAW","STRCRAW","STRCWRAW","LFFCOR","LFACOR","LFSCOR","LFCOR","CFANCOR","CFBNCOR","CFCOR","CSCOR","SRTLMEANLOG",
+              "SRTLSTDLOG","SRTRMEANLOG","SRTRSTDLOG","SRTGMEANLOG","SRTGSTDLOG","CHRTLMEANLOG","CHRTRMEANLOG","CHRTLSTDLOG",
+              "CHRTRSTDLOG","CHRTGMEANLOG","CHRTGSTDLOG","RSATOT")
 rawVarsV2 = paste0(rawVarsV1, "_V2")
 
 # Create lists of z-scored variable names to create calculate practice effect with
