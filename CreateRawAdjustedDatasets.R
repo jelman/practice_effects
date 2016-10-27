@@ -121,6 +121,49 @@ addScaleVals = function(df,varname, x) {
 }
 
 
+
+########################################
+###     Create unadjusted dataset    ###
+########################################
+
+# Adjust raw scores from VETSA 1 and VETSA 2
+adjVars = c(rawVarsV1, rawVarsV2)
+
+zScoreData = allData
+
+# Initialize dataframe to hold means and SDs
+scaleValues = data.frame()
+
+# Scale unadjusted VETSA 1 variables 
+# Adds mean and SD to dataframe and deletes adjusted raw variables from dataset
+for(varname in rawVarsV1){
+  zvarname = paste0("z", varname)
+  zScoreData[[zvarname]] = scale(zScoreData[[varname]])
+  scaleValues = addScaleVals(scaleValues, varname, zScoreData[[zvarname]])
+  zScoreData[[varname]] = NULL
+}
+
+# Scale VETSA 2 variables that have been adjusted for TEDALL using VETSA 1 mean and SD
+# Delete adjusted raw variable from dataset
+for(varnameV2 in rawVarsV2){
+  zvarname = paste0("z", varnameV2)
+  varnameV1 = gsub("_V2","",varnameV2)
+  zScoreData[[zvarname]] = scale(zScoreData[[varnameV2]],
+                                        center=scaleValues$Mean[scaleValues$Variable==varnameV1],
+                                        scale=scaleValues$SD[scaleValues$Variable==varnameV1])
+  zScoreData[[varnameV2]] = NULL
+}
+
+# Save out adjusted and z-scored dataset
+write.csv(zScoreData, 
+          "/home/jelman/netshare/K/Projects/PracticeEffects/data/CogData_Unadj_Zscored.csv",
+          row.names = FALSE)
+
+# Save out means and standard deviations used to standardize scores
+write.csv(scaleValues, "/home/jelman/netshare/K/Projects/PracticeEffects/data/V1_Unadj_Means_SDs.csv",
+          row.names = FALSE)
+
+
 ########################################
 ### Begin creating adjusted datasets ###
 ########################################
