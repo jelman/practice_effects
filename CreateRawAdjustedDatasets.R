@@ -92,13 +92,13 @@ adjustDataset = function(regVars,adjVars,nDemoVars=7,data){
   
   # fitting models
   models <- lapply(adjVars, function(x) {
-    fmla = as.formula(paste0(x," ~ ",regVars," + (1|CASE)"))
-    lmer(formula=fmla, data = data, na.action=na.exclude)
+    fmla = as.formula(paste0(x," ~ ",regVars))
+    lm(formula=fmla, data = data, na.action=na.exclude)
   })
   
   # storing residuals from each model into data frame
   for(v in 1:nVars){
-    data[,tot+v] <- residuals(models[[v]]) + fixef(models[[v]])[[1]]
+    data[,tot+v] <- residuals(models[[v]]) + coef(models[[v]])[[1]]
   }
   
   #dataR is now your residualized parameters
