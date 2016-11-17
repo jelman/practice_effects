@@ -208,6 +208,10 @@ results = data.frame("PracticeEffect" = pracEffects, SE=apply(boot.out$t, 2, sd)
 idxAFQT = which(rownames(results) %in% afqtVars)
 
 #Split results into composite scores of individual tests and AFQT.
+<<<<<<< HEAD
+=======
+# resultsCogDomains = results[idxCogDomains,]
+>>>>>>> 5353ac54b368712e2149bcad9e06c1c51b07220c
 resultsAFQT = results[idxAFQT,]
 resultsTests = results[-c(idxAFQT),]
 ```
