@@ -1,6 +1,6 @@
 ---
 title: 'Practice Effects on Cognitive Domain and AFQT Tests: Raw scores adjusted for
-  Age 20  AFQT'
+  Age 20  AFQT and kept on raw score scale'
 author: "Jeremy Elman"
 date: '`r Sys.Date()`'
 output:
@@ -32,11 +32,40 @@ subsetDat = allDat %>%
 
 # Take out V1ne subject in order to add back in later
 V1neDat = allDat %>% filter(VETSAGRP=="v1ne")
+
+# Create vector of all variable names to calculate practice effects for
+testVars = c("MR1COR","TRL1TLOG","TRL2TLOG","TRL3TLOG","TRL4TLOG","TRL5TLOG","CSSACC","MTXRAW","CVA1RAW",
+             "CVATOT","CVSDFR","CVLDFR","AFQTPCT","AFQTVOCPCT","AFQTARPCT","AFQTTLPCT","AFQTBXPCT",
+             "AFQTPCTTRAN","AFQTVOCPCTTRAN","AFQTARPCTTRAN","AFQTTLPCTTRAN","AFQTBXPCTTRAN","DSFRAW",
+             "DSBRAW","SSPFRAW","SSPBRAW","LNTOT","LMITOT","LMDTOT","VRITOT","VRDTOT","VRCTOT","HFTOTCOR",
+            "STRWRAW","STRCRAW","STRCWRAW","LFFCOR","LFACOR","LFSCOR","LFCOR","CFANCOR","CFBNCOR","CFCOR",
+            "CSCOR","SRTLMEANLOG","SRTLSTDLOG","SRTRMEANLOG","SRTRSTDLOG","SRTGMEANLOG","SRTGSTDLOG",
+            "CHRTLMEANLOG","CHRTRMEANLOG","CHRTLSTDLOG","CHRTRSTDLOG","CHRTGMEANLOG","CHRTGSTDLOG","RSATOT")
+
+# Create list of cognitive domains to present separately
+cogVars = c("VisSpat","STWKMem","EpsMem","AbsReason","VerbFlu",
+               "ExecTrailsSwitch","ProcSpeed","ExecCategorySwitch")
+
+# Create list of test variables and cognitive domains
+allVars = c(testVars, cogVars)
+
+#Create list of AFQT scores to present separately
+afqtVars = c("AFQTPCT","AFQTVOCPCT","AFQTARPCT","AFQTTLPCT","AFQTBXPCT","AFQTPCTTRAN",
+            "AFQTVOCPCTTRAN","AFQTARPCTTRAN","AFQTTLPCTTRAN","AFQTBXPCTTRAN")
+
+# Create indices of different groups
+idxS1T2 = which(subsetDat$VETSAGRP=="V1V2")
+idxS1T1ret = which(subsetDat$VETSAGRP=="V1V2")
+idxS2T2 = which(subsetDat$VETSAGRP=="V2AR")
 ```
 
-## Adjustment for Age 20 AFQT  
+## Adjustment for Age 20 AFQT and standardization
 
-The scores have been adjusted for age 20 AFQT by regressing the (scaled) nas201tran variable from each raw test score. 
+1. The scores have been adjusted for age 20 AFQT by regressing the (scaled) nas201tran variable from each raw test score. 
+2. VETSA 1 and VETSA 2 scores are then standardized (z-scored) using the mean and SD of VETSA 1 scores. 
+3. Practice effects are calculated from these z-scores.
+4. Practice effects for cognitive domains are created by averaging the practice effects from all tests within a domain.
+
 
 ## Calculation of practice effects  
 
@@ -56,6 +85,7 @@ The difference (D) between time 2 scores of longitudinal returnees (S1T2) and ti
 
 
 ```{r, include=F}
+# Define function to calculate practice effects as specified above.
 calcPracticeEffect = function(dat, varName, idxS1T2, idxS2T2,idxS1T1ret){
   varV1 = varName
   varV2 = paste0(varV1, "_V2")
@@ -78,36 +108,30 @@ calcPracticeEffect = function(dat, varName, idxS1T2, idxS2T2,idxS1T1ret){
   P = D - A
   P
 }
+
+# Define function to create composite cognitive domains 
+calcCogDomains = function(testdat){
+  testdat[['VisSpat']] = mean(testdat[c("MR1COR","HFTOTCOR")])
+  testdat[['AbsReason']] = testdat['MTXRAW']
+  testdat[['STWKMem']] = mean(testdat[c("DSFRAW","DSBRAW","LNTOT","SSPFRAW",
+                                              "SSPBRAW","RSATOT")])
+  testdat[['EpsMem']] = mean(testdat[c("CVATOT","CVSDFR","CVLDFR","LMITOT",
+                                               "LMDTOT","VRITOT","VRDTOT")])
+  testdat[['VerbFlu']] = mean(testdat[c("LFCOR","CFCOR")])
+  testdat[['ProcSpeed']] = mean(testdat[c("STRWRAW","STRCRAW","TRL2TLOG","TRL3TLOG")])
+  testdat[['ExecTrailsSwitch']] = testdat['TRL4TLOG']
+  testdat[['ExecCategorySwitch']] = testdat['CSSACC']
+  testdat
+}
+
 ```
 
 
 ```{r, include=F}
-# Create vector of all variable names to calculate practice effects for
-allVars = c("MR1COR","TRL1T","TRL2T","TRL3T","TRL4T","TRL5T","CSSACC","MTXRAW","CVA1RAW","CVATOT",
-            "CVSDFR","CVLDFR","AFQTPCT","AFQTVOCPCT","AFQTARPCT","AFQTTLPCT","AFQTBXPCT","AFQTPCTTRAN",
-            "AFQTVOCPCTTRAN","AFQTARPCTTRAN","AFQTTLPCTTRAN","AFQTBXPCTTRAN","DSFRAW","DSBRAW",
-            "SSPFRAW","SSPBRAW","LNTOT","LMITOT","LMDTOT","VRITOT","VRDTOT","VRCTOT","HFTOTCOR",
-            "STRWRAW","STRCRAW","STRCWRAW","LFFCOR","LFACOR","LFSCOR","LFCOR","CFANCOR","CFBNCOR",
-            "CFCOR","CSCOR","SRTLMEAN","SRTLSTD","SRTRMEAN","SRTRSTD","SRTGMEAN","SRTGSTD","CHRTLMEAN",
-            "CHRTRMEAN","CHRTLSTD","CHRTRSTD","CHRTGMEAN","CHRTGSTD","RSATOT")
-
-# # Create list of cognitive domains to present separately
-# cogDomains = c("VisSpat","STWKMem","EpsMem","AbsReason","VerbFlu",
-#                "ExecTrailsSwitch","ProcSpeed","ExecCategorySwitch",
-#                "ExecInhibit")
-
-#Create list of AFQT scores to present separately
-afqtVars = c("AFQTPCT","AFQTVOCPCT","AFQTARPCT","AFQTTLPCT","AFQTBXPCT","AFQTPCTTRAN",
-            "AFQTVOCPCTTRAN","AFQTARPCTTRAN","AFQTTLPCTTRAN","AFQTBXPCTTRAN")
-
-# Create indices of different groups
-idxS1T2 = which(subsetDat$VETSAGRP=="V1V2")
-idxS1T1ret = which(subsetDat$VETSAGRP=="V1V2")
-idxS2T2 = which(subsetDat$VETSAGRP=="V2AR")
 # Calculate practice effects for all cognitive domains and tests
-pracEffects = sapply(allVars, function(x) calcPracticeEffect(subsetDat, x, idxS1T2,
+pracEffects = sapply(testVars, function(x) calcPracticeEffect(subsetDat, x, idxS1T2,
                                                           idxS2T2, idxS1T1ret))
-
+pracEffects = calcCogDomains(pracEffects)
 ```
 
 
@@ -116,7 +140,7 @@ pracEffects = sapply(allVars, function(x) calcPracticeEffect(subsetDat, x, idxS1
 
 set.seed(21)
 # Set parameters for permutation testing of practice effects
-N = nrow(subsetDat)                   # Numer of subjects
+N = nrow(subsetDat)                # Numer of subjects
 nPerm = 10000                      # Number of permutations to run
 nLong = length(idxS1T1ret)         # Number of longitudinal subjects
 nAR = length(idxS2T2)              # Number of attrition replacement subjects
@@ -138,10 +162,11 @@ for(i in 1:nPerm){
     idxS1T2perm = idxT2[1:nLong]
     idxS2T2perm = idxT2[(nLong+1):(nLong+nAR)]
     idxS1T1retperm = idxT1[1:nLong]
-    permResults[i,] = sapply(allVars, function(x) calcPracticeEffect(subsetDat, x, 
+    tmpResults = sapply(testVars, function(x) calcPracticeEffect(subsetDat, x, 
                                                       idxS1T2perm,
                                                       idxS2T2perm,
                                                       idxS1T1retperm))
+    permResults[i,] = calcCogDomains(tmpResults)
 }
 permResults = data.frame(permResults)
 # Calculate p values based on permutations and observed values
@@ -156,10 +181,11 @@ bootPracticeEffect = function(data, idx){
   dat = data[idx,]
   idxV1V2boot = which(dat$VETSAGRP=="V1V2")
   idxV2ARboot = which(dat$VETSAGRP=="V2AR")
-  sampResults = sapply(allVars, function(x) calcPracticeEffect(dat, x, 
+  sampResults = sapply(testVars, function(x) calcPracticeEffect(dat, x, 
                                                   idxV1V2boot,
                                                   idxV2ARboot,
                                                   idxV1V2boot))
+  sampResults = calcCogDomains(sampResults)
   return(sampResults)
 }
 
@@ -187,7 +213,7 @@ boot.out = boot(subsetDat, statistic=bootPracticeEffect, strata=subsetDat$VETSAG
 # for(i in 1:nBoot){
 #     idxV1V2boot = sample(idxV1V2, replace=TRUE)
 #     idxV2ARboot = sample(idxV2AR, replace=TRUE)
-#     bootResults[i,] = sapply(allVars, function(x) calcPracticeEffect(subsetDat, x, 
+#     bootResults[i,] = sapply(testVars, function(x) calcPracticeEffect(subsetDat, x, 
 #                                                       idxV1V2boot,
 #                                                       idxV2ARboot,
 #                                                       idxV1V2boot))
@@ -206,11 +232,13 @@ results = data.frame("PracticeEffect" = pracEffects, SE=apply(boot.out$t, 2, sd)
 
 # Get indices of AFQT tests
 idxAFQT = which(rownames(results) %in% afqtVars)
+idxCogDomains = which(rownames(results) %in% cogVars)
 
-#Split results into composite scores of cognitive domains and individual tests
+#Split results into composite scores of individual tests, cognitive domains, and AFQT.
 # resultsCogDomains = results[idxCogDomains,]
 resultsAFQT = results[idxAFQT,]
-resultsTests = results[-idxAFQT,]
+resultsCogDomains = results[idxCogDomains,]
+resultsTests = results[-c(idxAFQT,idxCogDomains),]
 ```
 
 --------------------------------------
@@ -225,7 +253,7 @@ kable(resultsTests, digits=3, caption="Individual Tests")
 
 
 ```{r, echo=F}
-# kable(resultsCogDomains, digits=3, caption="Cognitive Domain Composites")
+kable(resultsCogDomains, digits=3, caption="Cognitive Domain Composites")
 ```
 
 
@@ -235,7 +263,7 @@ kable(resultsAFQT, digits=3, caption="AFQT Scores")
 
 ```{r, include=F}
 # Write out practice effect results (adjustment value, estimate of precision, and p value)
-write.csv(results, '/home/jelman/netshare/K/Projects/PracticeEffects/results/PracEffects_NAS201TRAN_Results.csv')
+write.csv(results, '/home/jelman/netshare/K/Projects/PracticeEffects/results/PracEffects_NAS201TRAN_Zscored_Results.csv')
 ```
 
 
