@@ -42,12 +42,8 @@ testVars = c("MR1COR","TRL1TLOG","TRL2TLOG","TRL3TLOG","TRL4TLOG","TRL5TLOG","CS
             "CSCOR","SRTLMEANLOG","SRTLSTDLOG","SRTRMEANLOG","SRTRSTDLOG","SRTGMEANLOG","SRTGSTDLOG",
             "CHRTLMEANLOG","CHRTRMEANLOG","CHRTLSTDLOG","CHRTRSTDLOG","CHRTGMEANLOG","CHRTGSTDLOG","RSATOT")
 
-# Create list of cognitive domains to present separately
-cogVars = c("VisSpat","STWKMem","EpsMem","AbsReason","VerbFlu",
-               "ExecTrailsSwitch","ProcSpeed","ExecCategorySwitch")
-
-# Create list of test variables and cognitive domains
-allVars = c(testVars, cogVars)
+# Create list of test variables
+allVars = c(testVars)
 
 #Create list of AFQT scores to present separately
 afqtVars = c("AFQTPCT","AFQTVOCPCT","AFQTARPCT","AFQTTLPCT","AFQTBXPCT","AFQTPCTTRAN",
@@ -62,9 +58,7 @@ idxS2T2 = which(subsetDat$VETSAGRP=="V2AR")
 ## Adjustment for Age 20 AFQT and standardization
 
 1. The scores have been adjusted for age 20 AFQT by regressing the (scaled) nas201tran variable from each raw test score. 
-2. VETSA 1 and VETSA 2 scores are then standardized (z-scored) using the mean and SD of VETSA 1 scores. 
-3. Practice effects are calculated from these z-scores.
-4. Practice effects for cognitive domains are created by averaging the practice effects from all tests within a domain.
+2. Practice effects are calculated from scores on the raw score scale.
 
 
 ## Calculation of practice effects  
@@ -109,21 +103,6 @@ calcPracticeEffect = function(dat, varName, idxS1T2, idxS2T2,idxS1T1ret){
   P
 }
 
-# Define function to create composite cognitive domains 
-calcCogDomains = function(testdat){
-  testdat[['VisSpat']] = mean(testdat[c("MR1COR","HFTOTCOR")])
-  testdat[['AbsReason']] = testdat['MTXRAW']
-  testdat[['STWKMem']] = mean(testdat[c("DSFRAW","DSBRAW","LNTOT","SSPFRAW",
-                                              "SSPBRAW","RSATOT")])
-  testdat[['EpsMem']] = mean(testdat[c("CVATOT","CVSDFR","CVLDFR","LMITOT",
-                                               "LMDTOT","VRITOT","VRDTOT")])
-  testdat[['VerbFlu']] = mean(testdat[c("LFCOR","CFCOR")])
-  testdat[['ProcSpeed']] = mean(testdat[c("STRWRAW","STRCRAW","TRL2TLOG","TRL3TLOG")])
-  testdat[['ExecTrailsSwitch']] = testdat['TRL4TLOG']
-  testdat[['ExecCategorySwitch']] = testdat['CSSACC']
-  testdat
-}
-
 ```
 
 
@@ -131,7 +110,6 @@ calcCogDomains = function(testdat){
 # Calculate practice effects for all cognitive domains and tests
 pracEffects = sapply(testVars, function(x) calcPracticeEffect(subsetDat, x, idxS1T2,
                                                           idxS2T2, idxS1T1ret))
-pracEffects = calcCogDomains(pracEffects)
 ```
 
 
@@ -166,7 +144,6 @@ for(i in 1:nPerm){
                                                       idxS1T2perm,
                                                       idxS2T2perm,
                                                       idxS1T1retperm))
-    permResults[i,] = calcCogDomains(tmpResults)
 }
 permResults = data.frame(permResults)
 # Calculate p values based on permutations and observed values
@@ -227,18 +204,13 @@ boot.out = boot(subsetDat, statistic=bootPracticeEffect, strata=subsetDat$VETSAG
 # Combine practice effects results and permutation p-values
 results = data.frame("PracticeEffect" = pracEffects, SE=apply(boot.out$t, 2, sd), "P" = pvals)
 
-# # Get indices of cognitive domains
-# idxCogDomains = which(rownames(results) %in% cogDomains)
-
 # Get indices of AFQT tests
 idxAFQT = which(rownames(results) %in% afqtVars)
-idxCogDomains = which(rownames(results) %in% cogVars)
 
-#Split results into composite scores of individual tests, cognitive domains, and AFQT.
+#Split results into composite scores of individual tests and AFQT.
 # resultsCogDomains = results[idxCogDomains,]
 resultsAFQT = results[idxAFQT,]
-resultsCogDomains = results[idxCogDomains,]
-resultsTests = results[-c(idxAFQT,idxCogDomains),]
+resultsTests = results[-c(idxAFQT),]
 ```
 
 --------------------------------------
@@ -249,11 +221,6 @@ Standard Errors were determined through bootstrapping with `r nBoot` resamples.
 
 ```{r, echo=F}
 kable(resultsTests, digits=3, caption="Individual Tests")
-```
-
-
-```{r, echo=F}
-kable(resultsCogDomains, digits=3, caption="Cognitive Domain Composites")
 ```
 
 
