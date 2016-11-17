@@ -1,5 +1,5 @@
 ---
-title: 'Practice Effects on Cognitive Domain and AFQT Tests: Raw scores adjusted for
+title: 'Practice Effects on Cognitive Tests and AFQT Tests: Raw scores adjusted for
   Age 20  AFQT and Z-scored'
 author: "Jeremy Elman"
 date: '`r Sys.Date()`'
