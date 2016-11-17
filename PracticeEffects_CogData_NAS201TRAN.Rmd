@@ -1,6 +1,6 @@
 ---
 title: 'Practice Effects on Cognitive Tests and AFQT Tests: Raw scores adjusted for
-  Age 20  AFQT and kept on raw score scale'
+  Age 20  AFQT on raw score scale'
 author: "Jeremy Elman"
 date: '`r Sys.Date()`'
 output:
@@ -119,7 +119,7 @@ pracEffects = sapply(testVars, function(x) calcPracticeEffect(subsetDat, x, idxS
 set.seed(21)
 # Set parameters for permutation testing of practice effects
 N = nrow(subsetDat)                # Numer of subjects
-nPerm = 10000                      # Number of permutations to run
+nPerm = 100                     # Number of permutations to run
 nLong = length(idxS1T1ret)         # Number of longitudinal subjects
 nAR = length(idxS2T2)              # Number of attrition replacement subjects
 
@@ -144,6 +144,7 @@ for(i in 1:nPerm){
                                                       idxS1T2perm,
                                                       idxS2T2perm,
                                                       idxS1T1retperm))
+    permResults[i,] = tmpResults
 }
 permResults = data.frame(permResults)
 # Calculate p values based on permutations and observed values
