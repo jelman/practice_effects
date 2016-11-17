@@ -35,6 +35,11 @@ allData = dplyr::select(allData, -one_of(timeVarsV1))
 allData[timeVarsLogV2] = log(allData[timeVarsV2])                
 allData = dplyr::select(allData, -one_of(timeVarsV2))
 
+# Save out unadjusted scores on raw score scale
+write.csv(allData, 
+          "/home/jelman/netshare/K/Projects/PracticeEffects/data/CogData_Unadj.csv",
+          row.names = FALSE)
+
 # Create list of raw variable names to adjust
 rawVarsV1 = c("MR1COR","TRL1TLOG","TRL2TLOG","TRL3TLOG","TRL4TLOG","TRL5TLOG","CSSACC","MTXRAW","CVA1RAW","CVATOT","CVSDFR","CVLDFR",
               "AFQTPCT","AFQTVOCPCT","AFQTARPCT","AFQTTLPCT","AFQTBXPCT","AFQTPCTTRAN","AFQTVOCPCTTRAN","AFQTARPCTTRAN","AFQTTLPCTTRAN",
@@ -122,9 +127,9 @@ addScaleVals = function(df,varname, x) {
 
 
 
-########################################
-###     Create unadjusted dataset    ###
-########################################
+#################################################
+###     Create unadjusted z-scored dataset    ###
+#################################################
 
 # Adjust raw scores from VETSA 1 and VETSA 2
 adjVars = c(rawVarsV1, rawVarsV2)
