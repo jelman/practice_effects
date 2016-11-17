@@ -54,7 +54,7 @@ for (varName in varNames) {
 }
 
 # Save out dataset that has been adjusted for AFQT and Practice Effects, as well as z-scored based on VETSA 1 values 
-write.csv(unadj_df_PEadj, '/home/jelman/netshare/K/Projects/PracticeEffects/results/CogData_NAS201TRAN_PracEffect_Adj_Zscored.csv',
+write.csv(unadj_df_PEadj, '/home/jelman/netshare/K/Projects/PracticeEffects/results/CogData_Unadj_RawScale.csv',
           row.names=FALSE)
 
 #---------------------------------------#
