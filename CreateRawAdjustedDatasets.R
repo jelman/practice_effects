@@ -12,7 +12,7 @@
 library(dplyr)
 
 # Load raw test scores and demographics data
-allData = read.csv("~/netshare/M/PSYCH/KREMEN/Practice Effect Cognition/data/V1V2_CogData_Raw.csv",
+allData = read.csv("~/netshare/M/PSYCH/KREMEN/Practice Effect Cognition/data/raw/V1V2_CogData_Raw.csv",
                    stringsAsFactors = FALSE)
 
 # Convert all variable names to upper case
@@ -44,10 +44,12 @@ rawVarsV1 = c("MR1COR","TRL1TLOG","TRL2TLOG","TRL3TLOG","TRL4TLOG","TRL5TLOG","C
               "AFQTBXPCTTRAN","DSFRAW","DSBRAW","SSPFRAW","SSPBRAW","LNTOT","LMITOT","LMDTOT","VRITOT","VRDTOT","VRCTOT","HFTOTCOR",
               "STRWRAW","STRCRAW","STRCWRAW","LFFCOR","LFACOR","LFSCOR","LFCOR","CFANCOR","CFBNCOR","CFCOR","CSCOR","SRTLMEANLOG",
               "SRTLSTDLOG","SRTRMEANLOG","SRTRSTDLOG","SRTGMEANLOG","SRTGSTDLOG","CHRTLMEANLOG","CHRTRMEANLOG","CHRTLSTDLOG",
-              "CHRTRSTDLOG","CHRTGMEANLOG","CHRTGSTDLOG","RSATOT")
+              "CHRTRSTDLOG","CHRTGMEANLOG","CHRTGSTDLOG","RSATOT","AXHITRATE","AXFARATE","AXMISSRATE","BXHITRATE","BXFARATE",
+              "BXMISSRATE","CPTDPRIME")
 rawVarsV2 = paste0(rawVarsV1, "_V2")
 
 # Create lists of z-scored variable names to create calculate practice effect with
+
 zVarsV1 = paste0("z",rawVarsV1)
 zVarsV2 = paste0("z",rawVarsV2)
 
@@ -89,7 +91,7 @@ adjustDataset = function(regVars,adjVars,nDemoVars=7,data){
   
   # Create Data Frame
   data <- cbind(data,matrix(NA,nrow=n,ncol=nVars))
-  names(data) <- c(allNames,paste(adjVars,"_adj",sep=""))
+  names(data) <- c(allNames,paste(adjVars,"_nas",sep=""))
   
   ### Running Loop Using lapply ###
   
@@ -170,8 +172,8 @@ nasAdjZscoresData = nasAdjRawScoresData
 # Scale VETSA 1 variables that have been adjusted for nas201tran
 # Adds mean and SD to dataframe and deletes adjusted raw variables from dataset
 for(i in rawVarsV1){
-  varname = paste0(i, "_adj")
-  zvarname = paste0("z", varname)
+  varname = paste0(i, "_nas")
+  zvarname = gsub("_nas","_znas",varname)
   nasAdjZscoresData[[zvarname]] = scale(nasAdjZscoresData[[varname]])
   scaleValues = addScaleVals(scaleValues, varname, nasAdjZscoresData[[zvarname]])
   nasAdjZscoresData[[varname]] = NULL
@@ -180,8 +182,8 @@ for(i in rawVarsV1){
 # Scale VETSA 2 variables that have been adjusted for nas201tran using VETSA 1 mean and SD
 # Delete adjusted raw variable from dataset
 for(i in rawVarsV2){
-  varnameV2 = paste0(i, "_adj")
-  zvarname = paste0("z", varnameV2)
+  varnameV2 = paste0(i, "_nas")
+  zvarname = gsub("_nas","_znas",varnameV2)
   varnameV1 = gsub("_V2","",varnameV2)
   nasAdjZscoresData[[zvarname]] = scale(nasAdjZscoresData[[varnameV2]],
                                           center=scaleValues$Mean[scaleValues$Variable==varnameV1],
