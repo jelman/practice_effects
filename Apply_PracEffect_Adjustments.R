@@ -1,104 +1,116 @@
 #######################################################################################
-# This script adjusts cognitive test scores for practice effects. Two datasets are    #
+# This script adjusts cognitive test scores for practice effects. Three datasets are  #
 # adjusted:                                                                           #
 #                                                                                     #
-# 1.) Scores on the raw test score scale that are not adjusted for age 20 AFQT.       #
-#     These are adjusted by practice effects calculated from scores that *have*       #
-#     been adjusted for AFQT, but remain on raw score scale.                          #
+# 1.) Scores that have been *not* been adjusted for age 20 AFQT and remain on the     #
+#     raw test score scale. These are adjusted by practice effects calculated from    #
+#     scores that *have* been adjusted for AFQT, but remain on raw score scale.       #
+#     Can be used when age 20 AFQT is a predictor of interest.                        #
 #                                                                                     #
 # 2.) Scores that have been adjusted for age 20 AFQT and z-scored based on VETSA1     #
 #     means and standard deviations. These are adjusted by practice effects           #
 #     calculated from scores that have been adjusted for AFQT and z-scored based      #
-#     on VETSA1 means and standard deviations.                                        #
+#     on VETSA1 means and standard deviations. These should not be used if age 20     #
+#     is a predictor of interest.                                                     #
+# 3.) Scores that have been adjusted for age 20 AFQT but remain on the raw score      #
+#     scale. These are adjusted by practice effects calculated from scores that       #
+#     *have* been adjusted for AFQT, but remain on raw score scale. These should not  #
+#     be used if age 20 is a predictor of interest.                                   #
 #                                                                                     #
 # Note: Only time 2 scores of longitudinal (V1V2) subjects are adjusted               #
 #                                                                                     #
 #######################################################################################
 
-#-----------------------------------------#
-#   1. Scores on raw score scale          #
-#-----------------------------------------#
-
-## Load dataset to be adjusted ##
-
-# Scores that have been adjusted for AFQT and z-scored based on VETSA 1 means and SD's
-unadj_df = read.csv("/home/jelman/netshare/K/Projects/PracticeEffects/data/CogData_Unadj.csv",
-                        stringsAsFactors = F)
-
-# Values that have been calculated based scores adjusted for AFQT and z-scored based on VETSA 1 means and SD's
-pracEffects = read.csv("/home/jelman/netshare/K/Projects/PracticeEffects/results/PracEffects_NAS201TRAN_Results.csv",
-                                row.names=1, stringsAsFactors = F)
-
-# Get basenames of test scores to adjust
+# Basenames of scores to adjust
 varNames = c("MR1COR","TRL1TLOG","TRL2TLOG","TRL3TLOG","TRL4TLOG","TRL5TLOG","CSSACC","MTXRAW","CVA1RAW","CVATOT","CVSDFR","CVLDFR",
              "AFQTPCT","AFQTVOCPCT","AFQTARPCT","AFQTTLPCT","AFQTBXPCT","AFQTPCTTRAN","AFQTVOCPCTTRAN","AFQTARPCTTRAN","AFQTTLPCTTRAN",
              "AFQTBXPCTTRAN","DSFRAW","DSBRAW","SSPFRAW","SSPBRAW","LNTOT","LMITOT","LMDTOT","VRITOT","VRDTOT","VRCTOT","HFTOTCOR",
              "STRWRAW","STRCRAW","STRCWRAW","LFFCOR","LFACOR","LFSCOR","LFCOR","CFANCOR","CFBNCOR","CFCOR","CSCOR","SRTLMEANLOG",
              "SRTLSTDLOG","SRTRMEANLOG","SRTRSTDLOG","SRTGMEANLOG","SRTGSTDLOG","CHRTLMEANLOG","CHRTRMEANLOG","CHRTLSTDLOG",
-             "CHRTRSTDLOG","CHRTGMEANLOG","CHRTGSTDLOG","RSATOT")
+             "CHRTRSTDLOG","CHRTGMEANLOG","CHRTGSTDLOG","RSATOT","AXHITRATE","AXFARATE","AXMISSRATE","BXHITRATE","BXFARATE",
+             "BXMISSRATE","CPTDPRIME")
 
+#-----------------------------------------------------------------#
+#   1. Scores on raw score scale, not adjusted for age 20 AFQT    #
+#-----------------------------------------------------------------#
 
+# Load dataset to be adjusted: No age 20 afqt adjustment, raw score scale
+unadj_df = read.csv("~/netshare/M/PSYCH/KREMEN/Practice Effect Cognition/data/V1V2_CogData_Unadj.csv",
+                        stringsAsFactors = F)
+
+# Load practice effect values calculated based scores adjusted for AFQT but on raw score scale
+pracEffects = read.csv("~/netshare/M/PSYCH/KREMEN/Practice Effect Cognition/results/PracEffectValues_NASAdj.csv",
+                                row.names=1, stringsAsFactors = F)
 
 ## Apply practice effect adjustments ## 
-
-# Apply practice effect adjustment to scores that have had age 20 AFQT regressed out and z-scored 
-# using VETSA 1 mean and SD.
 
 unadj_df_PEadj = unadj_df
 idxV1V2 = which(unadj_df_PEadj$VETSAGRP=="V1V2")
 for (varName in varNames) {
   varName_V2 = paste0(varName, "_V2")
-  varName_PE = paste0(varName)
-  pe_Zscored = pracEffects[varName_PE,"PracticeEffect"]
-  unadj_df_PEadj[idxV1V2, varName_V2] = unadj_df_PEadj[idxV1V2, varName_V2] - pe_Zscored
+  newVarName_V2 = paste0(varName_V2,"p")
+  peVal = pracEffects[varName,"PracticeEffect"]
+  unadj_df_PEadj[idxV1V2, newVarName_V2] = unadj_df_PEadj[idxV1V2, varName_V2] - peVal
+  unadj_df_PEadj[[varName_V2]] = NULL
 }
 
-# Save out dataset that has been adjusted for AFQT and Practice Effects, as well as z-scored based on VETSA 1 values 
-write.csv(unadj_df_PEadj, '/home/jelman/netshare/K/Projects/PracticeEffects/results/CogData_Unadj_RawScale.csv',
+# Save out dataset of scores not adjusted for AFQT, raw score scale, practice effect adjusted
+write.csv(unadj_df_PEadj, '~/netshare/M/PSYCH/KREMEN/Practice Effect Cognition/data/V1V2_CogData_PE.csv',
           row.names=FALSE)
 
-#---------------------------------------#
-#   2. Scores on z-score scale          #
-#---------------------------------------#
+#-----------------------------------------------------------------------#
+#   2. Scores on z-score scale that have been adjusted for age 20 AFQT  #
+#-----------------------------------------------------------------------#
 
-## Load dataset to be adjusted ##
-
-# Scores that have been adjusted for AFQT and z-scored based on VETSA 1 means and SD's
-nas201adjzscore_df = read.csv("/home/jelman/netshare/K/Projects/PracticeEffects/data/CogData_NAS201TRAN_Adj_Zscored.csv",
+# Load dataset to be adjusted: Age 20 afqt adjusted, z-score scale
+nas201adjzscore_df = read.csv("~/netshare/M/PSYCH/KREMEN/Practice Effect Cognition/data/V1V2_CogData_NASAdj_Z.csv",
                         stringsAsFactors = F)
 
-## Load calculated practice effects values to adjust by ##
-
-
-# Values that have been calculated based scores adjusted for AFQT and z-scored based on VETSA 1 means and SD's
-pracEffects_Zscored = read.csv("/home/jelman/netshare/K/Projects/PracticeEffects/results/PracEffects_NAS201TRAN_Zscored_Results.csv",
+# Load practice effect values calculated based scores adjusted for AFQT and z-scored based on VETSA 1
+pracEffects_Zscored = read.csv("~/netshare/M/PSYCH/KREMEN/Practice Effect Cognition/results/PracEffectValues_NASAdj_Z.csv",
                                row.names=1, stringsAsFactors = F)
 
-# Get basenames of test scores to adjust
-varNames = c("MR1COR","TRL1TLOG","TRL2TLOG","TRL3TLOG","TRL4TLOG","TRL5TLOG","CSSACC","MTXRAW","CVA1RAW","CVATOT","CVSDFR","CVLDFR",
-             "AFQTPCT","AFQTVOCPCT","AFQTARPCT","AFQTTLPCT","AFQTBXPCT","AFQTPCTTRAN","AFQTVOCPCTTRAN","AFQTARPCTTRAN","AFQTTLPCTTRAN",
-             "AFQTBXPCTTRAN","DSFRAW","DSBRAW","SSPFRAW","SSPBRAW","LNTOT","LMITOT","LMDTOT","VRITOT","VRDTOT","VRCTOT","HFTOTCOR",
-             "STRWRAW","STRCRAW","STRCWRAW","LFFCOR","LFACOR","LFSCOR","LFCOR","CFANCOR","CFBNCOR","CFCOR","CSCOR","SRTLMEANLOG",
-             "SRTLSTDLOG","SRTRMEANLOG","SRTRSTDLOG","SRTGMEANLOG","SRTGSTDLOG","CHRTLMEANLOG","CHRTRMEANLOG","CHRTLSTDLOG",
-             "CHRTRSTDLOG","CHRTGMEANLOG","CHRTGSTDLOG","RSATOT")
-
-
-
 ## Apply practice effect adjustments ## 
-
-# Apply practice effect adjustment to scores that have had age 20 AFQT regressed out and z-scored 
-# using VETSA 1 mean and SD.
 
 nas201adjzscore_PEadj = nas201adjzscore_df
 idxV1V2 = which(nas201adjzscore_PEadj$VETSAGRP=="V1V2")
 for (varName in varNames) {
-  varName_V2 = paste0("z", varName, "_V2_adj")
-  varName_PE = paste0("z", varName)
-  pe_Zscored = pracEffects_Zscored[varName_PE,"PracticeEffect"]
-  nas201adjzscore_PEadj[idxV1V2, varName_V2] = nas201adjzscore_PEadj[idxV1V2, varName_V2] - pe_Zscored
+  varName_V2 = paste0(varName, "_V2_znas")
+  newVarName_V2 = paste0(varName_V2,"p")
+  peVal = pracEffects_Zscored[varName,"PracticeEffect"]
+  nas201adjzscore_PEadj[idxV1V2, newVarName_V2] = nas201adjzscore_PEadj[idxV1V2, varName_V2] - peVal
+  nas201adjzscore_PEadj[[varName_V2]] = NULL
 }
 
-# Save out dataset that has been adjusted for AFQT and Practice Effects, as well as z-scored based on VETSA 1 values 
-write.csv(nas201adjzscore_PEadj, '/home/jelman/netshare/K/Projects/PracticeEffects/results/CogData_NAS201TRAN_PracEffect_Adj_Zscored.csv',
+# Save out dataset of scores adjusted for AFQT, z-scored to VETSA 1, practice effect adjusted
+write.csv(nas201adjzscore_PEadj, '~/netshare/M/PSYCH/KREMEN/Practice Effect Cognition/data/V1V2_CogData_NASAdj_Z_PE.csv',
           row.names=FALSE)
 
+
+#--------------------------------------------------------------------------#
+#   3. Scores on  raw score scale that have been adjusted for age 20 AFQT  #
+#--------------------------------------------------------------------------#
+
+# Load dataset to be adjusted: Age 20 afqt adjusted, raw score scale
+nas201adj_df = read.csv("~/netshare/M/PSYCH/KREMEN/Practice Effect Cognition/data/V1V2_CogData_NASAdj.csv",
+                              stringsAsFactors = F)
+
+# Load practice effect values calculated based scores adjusted for AFQT but on raw score scale
+pracEffects = read.csv("~/netshare/M/PSYCH/KREMEN/Practice Effect Cognition/results/PracEffectValues_NASAdj.csv",
+                               row.names=1, stringsAsFactors = F)
+
+## Apply practice effect adjustments ## 
+
+nas201adj_PEadj = nas201adj_df
+idxV1V2 = which(nas201adj_PEadj$VETSAGRP=="V1V2")
+for (varName in varNames) {
+  varName_V2 = paste0(varName, "_V2_nas")
+  newVarName_V2 = paste0(varName_V2,"p")
+  peVal = pracEffects[varName,"PracticeEffect"]
+  nas201adj_PEadj[idxV1V2, newVarName_V2] = nas201adj_PEadj[idxV1V2, varName_V2] - peVal
+  nas201adj_PEadj[[varName_V2]] = NULL
+}
+
+# Save out dataset of scores adjusted for AFQT, z-scored to VETSA 1, practice effect adjusted
+write.csv(nas201adj_PEadj, '~/netshare/M/PSYCH/KREMEN/Practice Effect Cognition/data/V1V2_CogData_NASAdj_PE.csv',
+          row.names=FALSE)
