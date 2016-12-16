@@ -48,16 +48,10 @@ rawVarsV1 = c("MR1COR","TRL1TLOG","TRL2TLOG","TRL3TLOG","TRL4TLOG","TRL5TLOG","C
               "BXMISSRATE","CPTDPRIME")
 rawVarsV2 = paste0(rawVarsV1, "_V2")
 
-# Create lists of z-scored variable names to create calculate practice effect with
-
-zVarsV1 = paste0("z",rawVarsV1)
-zVarsV2 = paste0("z",rawVarsV2)
-
 # Print variable names and verify these are correct
 rawVarsV1
 rawVarsV2
-zVarsV1
-zVarsV2
+
 
 
 #----------------------------------------------------------------------------#
@@ -193,7 +187,7 @@ for(i in rawVarsV2){
 
 # Save out adjusted and z-scored dataset
 write.csv(nasAdjZscoresData, 
-          "~/netshare/M/PSYCH/KREMEN/Practice Effect Cognition/data/V1V2_CogData_zNASAdj_Z.csv",
+          "~/netshare/M/PSYCH/KREMEN/Practice Effect Cognition/data/V1V2_CogData_NASAdj_Z.csv",
           row.names = FALSE)
 
 # Save out means and standard deviations used to standardize scores
