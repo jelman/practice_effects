@@ -1,43 +1,41 @@
-######################################################################
-# Script to create datasets for practice effect analyses.            #
-# All datasets will include composite cognitive domain scores as     #
-# well as individual tests comprising them. AFQT and subtests        #
-# are also included.                                                 #
-#                                                                    #
-# In addition to unadjusted dataset, the script currently creates    #
-# datasets adjusted for:                                             #
-# nas201tran (Age 20 AFQT)                                           #
-#                                                                    #
-######################################################################
+#################################################################################
+# Script to create datasets for practice effect analyses.                       #
+# This script will create two datasets:                                         #
+#   - Cognitive data with nas201tran (age 20 AFQT) regressed out. Scores are    #
+#     not standardized.                                                         #
+#   - Cognitive data with above adjustment. Scores are standardized (z-scored)  #
+#     based on VETSA1 means and sd.                                             #
+#                                                                               #
+#################################################################################
 
 # Import libraries
 library(dplyr)
-library(lme4)
 
 # Load raw test scores and demographics data
-allData = read.csv("/home/jelman/netshare/K/Projects/PracticeEffects/data/V1V2_PracticeEffect_Raw.csv",
+allData = read.csv("~/netshare/M/PSYCH/KREMEN/Practice Effect Cognition/data/V1V2_CogData_Raw.csv",
                    stringsAsFactors = FALSE)
 
 # Convert all variable names to upper case
 names(allData) = toupper(names(allData))
 
-# Log transform timing data
+### Log transform timing data ###
+
+# Get names of variables to transform
 timeVarsV1 = c("TRL1T","TRL2T","TRL3T","TRL4T","TRL5T","SRTLMEAN","SRTLSTD","SRTRMEAN",
                 "SRTRSTD","SRTGMEAN","SRTGSTD","CHRTLMEAN","CHRTRMEAN","CHRTLSTD",
                 "CHRTRSTD","CHRTGMEAN","CHRTGSTD")
 timeVarsLogV1 = paste0(timeVarsV1, "LOG")
 timeVarsV2 = paste0(timeVarsV1, "_V2")
 timeVarsLogV2 = paste0(timeVarsLogV1, "_V2")
-
-
+# Transform
 allData[timeVarsLogV1] = log(allData[timeVarsV1])                
 allData = dplyr::select(allData, -one_of(timeVarsV1))
 allData[timeVarsLogV2] = log(allData[timeVarsV2])                
 allData = dplyr::select(allData, -one_of(timeVarsV2))
 
-# Save out unadjusted scores on raw score scale
+### Save out unadjusted scores on raw score scale ###
 write.csv(allData, 
-          "/home/jelman/netshare/K/Projects/PracticeEffects/data/CogData_Unadj.csv",
+          "~/netshare/M/PSYCH/KREMEN/Practice Effect Cognition/data/V1V2_CogData_Unadj.csv",
           row.names = FALSE)
 
 # Create list of raw variable names to adjust
@@ -127,48 +125,6 @@ addScaleVals = function(df,varname, x) {
 
 
 
-#################################################
-###     Create unadjusted z-scored dataset    ###
-#################################################
-
-# Adjust raw scores from VETSA 1 and VETSA 2
-adjVars = c(rawVarsV1, rawVarsV2)
-
-zScoreData = allData
-
-# Initialize dataframe to hold means and SDs
-scaleValues = data.frame()
-
-# Scale unadjusted VETSA 1 variables 
-# Adds mean and SD to dataframe and deletes adjusted raw variables from dataset
-for(varname in rawVarsV1){
-  zvarname = paste0("z", varname)
-  zScoreData[[zvarname]] = scale(zScoreData[[varname]])
-  scaleValues = addScaleVals(scaleValues, varname, zScoreData[[zvarname]])
-  zScoreData[[varname]] = NULL
-}
-
-# Scale VETSA 2 variables that have been adjusted for TEDALL using VETSA 1 mean and SD
-# Delete adjusted raw variable from dataset
-for(varnameV2 in rawVarsV2){
-  zvarname = paste0("z", varnameV2)
-  varnameV1 = gsub("_V2","",varnameV2)
-  zScoreData[[zvarname]] = scale(zScoreData[[varnameV2]],
-                                        center=scaleValues$Mean[scaleValues$Variable==varnameV1],
-                                        scale=scaleValues$SD[scaleValues$Variable==varnameV1])
-  zScoreData[[varnameV2]] = NULL
-}
-
-# Save out adjusted and z-scored dataset
-write.csv(zScoreData, 
-          "/home/jelman/netshare/K/Projects/PracticeEffects/data/CogData_Unadj_Zscored.csv",
-          row.names = FALSE)
-
-# Save out means and standard deviations used to standardize scores
-write.csv(scaleValues, "/home/jelman/netshare/K/Projects/PracticeEffects/data/V1_Unadj_Means_SDs.csv",
-          row.names = FALSE)
-
-
 ########################################
 ### Begin creating adjusted datasets ###
 ########################################
@@ -177,15 +133,13 @@ write.csv(scaleValues, "/home/jelman/netshare/K/Projects/PracticeEffects/data/V1
 # Create dataset adjusted for nas201tran (Age 20 AFQT)                              #
 #                                                                                   #
 # Adjustment consists of regressing out nuisance variable from raw variables.       # 
-# Residuals of V1 and V2 variables are then scaled (z-scored) by V1 mean and SD.    # 
-# Intercept is not included to avoid mean centering.                                #
-# Composite domain scores are created by averaging together these adjusted scores.  #
+# Intercept is added back in to avoid mean centering.                               #
 #-----------------------------------------------------------------------------------#
 
 # Adjust raw scores from VETSA 1 and VETSA 2
 adjVars = c(rawVarsV1, rawVarsV2)
 
-# Set number of demographic variables included in dataframe (these won't be adjusted)
+### Set number of demographic variables included in dataframe (these won't be adjusted) ###
 nDemoVars = 7
 
 # Filter out subjects missing variable to be regressed out
@@ -198,8 +152,15 @@ regVars = paste("scale(NAS201TRAN)", sep=" + ")
 nasAdjRawScoresData = adjustDataset(regVars, adjVars, nDemoVars, data)
 
 # Save out dataset with Age 20 AFQT regressed out
-write.csv(nasAdjRawScoresData, "/home/jelman/netshare/K/Projects/PracticeEffects/data/CogData_NAS201TRAN_Adj.csv",
+write.csv(nasAdjRawScoresData, "~/netshare/M/PSYCH/KREMEN/Practice Effect Cognition/data/V1V2_CogData_NASAdj.csv",
           row.names=F)
+
+#-----------------------------------------------------------------------------------#
+# Create dataset adjusted for nas201tran (Age 20 AFQT) and standardized.            #
+#                                                                                   #
+# Dataset with NAS201TRAN (age 20 AFQT) regressed out is standardized (z-scored)    #
+# based on V ETSA 2 means and sd.                                                   #
+#-----------------------------------------------------------------------------------#
 
 # Initialize dataframe to hold means and SDs
 scaleValues = data.frame()
@@ -230,73 +191,10 @@ for(i in rawVarsV2){
 
 # Save out adjusted and z-scored dataset
 write.csv(nasAdjZscoresData, 
-          "/home/jelman/netshare/K/Projects/PracticeEffects/data/CogData_NAS201TRAN_Adj_Zscored.csv",
+          "~/netshare/M/PSYCH/KREMEN/Practice Effect Cognition/data/V1V2_CogData_NASAdj_zscored.csv",
           row.names = FALSE)
 
 # Save out means and standard deviations used to standardize scores
-write.csv(scaleValues, "/home/jelman/netshare/K/Projects/PracticeEffects/data/V1_NAS201TRAN_Adj_Means_SDs.csv",
+write.csv(scaleValues, "~/netshare/M/PSYCH/KREMEN/Practice Effect Cognition/data/V1_NASAdj_Means_SDs.csv",
           row.names = FALSE)
 
-#-----------------------------------------------------------------------------------#
-# Create dataset adjusted for TEDALL (Education)                                    #
-#                                                                                   #
-# Adjustment consists of regressing out nuisance variable from raw variables.       # 
-# Residuals of V1 and V2 variables are then scaled (z-scored) by V1 mean and SD.    # 
-# Intercept is not included to avoid mean centering.                                #
-# Composite domain scores are created by averaging together these adjusted scores.  #
-#-----------------------------------------------------------------------------------#
-
-# Adjust raw scores from VETSA 1 and VETSA 2
-adjVars = c(rawVarsV1, rawVarsV2)
-
-# Set number of demographic variables included in dataframe (these won't be adjusted)
-nDemoVars = 7
-
-# Filter out subjects missing variable to be regressed out
-data = subset(allData, !is.na(allData$TEDALL))
-
-# Specify TEDALL (Education as variable to regress out)
-regVars = paste("scale(TEDALL)", sep=" + ")
-
-# Regress TEDALL out of dataset
-tedAdjRawScoresData = adjustDataset(regVars, adjVars, nDemoVars, data)
-
-# Save out dataset with Education regressed out
-write.csv(tedAdjRawScoresData, "/home/jelman/netshare/K/Projects/PracticeEffects/data/CogData_TEDALL_Adj.csv",
-          row.names=F)
-
-# Initialize dataframe to hold means and SDs
-scaleValues = data.frame()
-
-tedAdjZScoresData = tedAdjRawScoresData
-
-# Scale VETSA 1 variables that have been adjusted for TEDALL
-# Adds mean and SD to dataframe and deletes adjusted raw variables from dataset
-for(i in rawVarsV1){
-  varname = paste0(i, "_adj")
-  zvarname = paste0("z", varname)
-  tedAdjZScoresData[[zvarname]] = scale(tedAdjZScoresData[[varname]])
-  scaleValues = addScaleVals(scaleValues, varname, tedAdjZScoresData[[zvarname]])
-  tedAdjZScoresData[[varname]] = NULL
-}
-
-# Scale VETSA 2 variables that have been adjusted for TEDALL using VETSA 1 mean and SD
-# Delete adjusted raw variable from dataset
-for(i in rawVarsV2){
-  varnameV2 = paste0(i, "_adj")
-  zvarname = paste0("z", varnameV2)
-  varnameV1 = gsub("_V2","",varnameV2)
-  tedAdjZScoresData[[zvarname]] = scale(tedAdjZScoresData[[varnameV2]],
-                                          center=scaleValues$Mean[scaleValues$Variable==varnameV1],
-                                          scale=scaleValues$SD[scaleValues$Variable==varnameV1])
-  tedAdjZScoresData[[varnameV2]] = NULL
-}
-
-# Save out adjusted and z-scored dataset
-write.csv(tedAdjZScoresData, 
-          "/home/jelman/netshare/K/Projects/PracticeEffects/data/CogData_TEDALL_Adj_Zscored.csv",
-          row.names = FALSE)
-
-# Save out means and standard deviations used to standardize scores
-write.csv(scaleValues, "/home/jelman/netshare/K/Projects/PracticeEffects/data/V1_TEDALL_Adj_Means_SDs.csv",
-          row.names = FALSE)
