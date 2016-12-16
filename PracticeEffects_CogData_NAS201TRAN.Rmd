@@ -1,6 +1,6 @@
 ---
-title: 'Practice Effects on Cognitive Tests and AFQT Tests: Raw scores adjusted for
-  Age 20  AFQT on raw score scale'
+title: 'Practice Effects on Cognitive Tests and AFQT Tests: 
+        Adjusted for age 20 AFQT, raw scale score'
 author: "Jeremy Elman"
 date: '`r Sys.Date()`'
 output:
@@ -24,7 +24,7 @@ library(boot)
 
 ```{r, include=F}
 # Load data
-allDat = read.csv("/home/jelman/netshare/K/Projects/PracticeEffects/data/CogData_NAS201TRAN_Adj.csv")
+allDat = read.csv("~/netshare/M/PSYCH/KREMEN/Practice Effect Cognition/data/V1V2_CogData_NASAdj.csv")
 
 # Select subjects from groups of interest
 subsetDat = allDat %>%
@@ -38,12 +38,11 @@ testVars = c("MR1COR","TRL1TLOG","TRL2TLOG","TRL3TLOG","TRL4TLOG","TRL5TLOG","CS
              "CVATOT","CVSDFR","CVLDFR","AFQTPCT","AFQTVOCPCT","AFQTARPCT","AFQTTLPCT","AFQTBXPCT",
              "AFQTPCTTRAN","AFQTVOCPCTTRAN","AFQTARPCTTRAN","AFQTTLPCTTRAN","AFQTBXPCTTRAN","DSFRAW",
              "DSBRAW","SSPFRAW","SSPBRAW","LNTOT","LMITOT","LMDTOT","VRITOT","VRDTOT","VRCTOT","HFTOTCOR",
-            "STRWRAW","STRCRAW","STRCWRAW","LFFCOR","LFACOR","LFSCOR","LFCOR","CFANCOR","CFBNCOR","CFCOR",
-            "CSCOR","SRTLMEANLOG","SRTLSTDLOG","SRTRMEANLOG","SRTRSTDLOG","SRTGMEANLOG","SRTGSTDLOG",
-            "CHRTLMEANLOG","CHRTRMEANLOG","CHRTLSTDLOG","CHRTRSTDLOG","CHRTGMEANLOG","CHRTGSTDLOG","RSATOT")
+             "STRWRAW","STRCRAW","STRCWRAW","LFFCOR","LFACOR","LFSCOR","LFCOR","CFANCOR","CFBNCOR","CFCOR",
+             "CSCOR","SRTLMEANLOG","SRTLSTDLOG","SRTRMEANLOG","SRTRSTDLOG","SRTGMEANLOG","SRTGSTDLOG",
+             "CHRTLMEANLOG","CHRTRMEANLOG","CHRTLSTDLOG","CHRTRSTDLOG","CHRTGMEANLOG","CHRTGSTDLOG","RSATOT",
+             "AXHITRATE","AXFARATE","AXMISSRATE","BXHITRATE","BXFARATE","BXMISSRATE","CPTDPRIME")
 
-# Create list of test variables
-allVars = c(testVars)
 
 #Create list of AFQT scores to present separately
 afqtVars = c("AFQTPCT","AFQTVOCPCT","AFQTARPCT","AFQTTLPCT","AFQTBXPCT","AFQTPCTTRAN",
@@ -83,8 +82,8 @@ The difference (D) between time 2 scores of longitudinal returnees (S1T2) and ti
 calcPracticeEffect = function(dat, varName, idxS1T2, idxS2T2,idxS1T1ret){
   varV1 = varName
   varV2 = paste0(varV1, "_V2")
-  varV1 = paste0(varV1,"_adj")
-  varV2 = paste0(varV2,"_adj")
+  varV1 = paste0(varV1,"_nas")
+  varV2 = paste0(varV2,"_nas")
   # Longitudinal Subjects Time 2
   S1T2 = mean(dat[idxS1T2, varV2], na.rm=T)
   # Attrition Replacement Subjects Time 2
@@ -129,8 +128,8 @@ idxV2AR = which(subsetDat$VETSAGRP=="V2AR")
 idxV1 = which(subsetDat$VETSAGRP=="V1")
 
 # Initialize empty matrix for permutation results
-permResults = matrix(ncol=length(allVars), nrow=nPerm)
-colnames(permResults) = allVars
+permResults = matrix(ncol=length(testVars), nrow=nPerm)
+colnames(permResults) = testVars
 
 # Run permutations and collect results into matrix
 for(i in 1:nPerm){
@@ -183,8 +182,8 @@ boot.out = boot(subsetDat, statistic=bootPracticeEffect, strata=subsetDat$VETSAG
 # idxV2AR = which(subsetDat$VETSAGRP=="V2AR")
 # 
 # # Initialize empty matrix for boostrap results
-# bootResults = matrix(ncol=length(allVars), nrow=nBoot)
-# colnames(bootResults) = allVars
+# bootResults = matrix(ncol=length(testVars), nrow=nBoot)
+# colnames(bootResults) = testVars
 # 
 # # Run bootstrap resamples and collect results into matrix
 # for(i in 1:nBoot){
@@ -208,10 +207,6 @@ results = data.frame("PracticeEffect" = pracEffects, SE=apply(boot.out$t, 2, sd)
 idxAFQT = which(rownames(results) %in% afqtVars)
 
 #Split results into composite scores of individual tests and AFQT.
-<<<<<<< HEAD
-=======
-# resultsCogDomains = results[idxCogDomains,]
->>>>>>> 5353ac54b368712e2149bcad9e06c1c51b07220c
 resultsAFQT = results[idxAFQT,]
 resultsTests = results[-c(idxAFQT),]
 ```
@@ -233,7 +228,7 @@ kable(resultsAFQT, digits=3, caption="AFQT Scores")
 
 ```{r, include=F}
 # Write out practice effect results (adjustment value, estimate of precision, and p value)
-write.csv(results, '/home/jelman/netshare/K/Projects/PracticeEffects/results/PracEffects_NAS201TRAN_Results.csv')
+write.csv(results, '~/netshare/M/PSYCH/KREMEN/Practice Effect Cognition/results/PracEffectValues_NASAdj.csv')
 ```
 
 
