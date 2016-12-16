@@ -1,6 +1,6 @@
 ---
-title: 'Practice Effects on Cognitive Tests and AFQT Tests: Raw scores adjusted for
-  Age 20  AFQT and Z-scored'
+title: 'Practice Effects on Cognitive Tests and AFQT Tests: 
+        Adjusted for age 20 AFQT, standardized to VETSA 1'
 author: "Jeremy Elman"
 date: '`r Sys.Date()`'
 output:
@@ -24,7 +24,7 @@ library(boot)
 
 ```{r, include=F}
 # Load data
-allDat = read.csv("/home/jelman/netshare/K/Projects/PracticeEffects/data/CogData_NAS201TRAN_Adj_Zscored.csv")
+allDat = read.csv("~/netshare/M/PSYCH/KREMEN/Practice Effect Cognition/data/V1V2_CogData_NASAdj_Z.csv")
 
 # Select subjects from groups of interest
 subsetDat = allDat %>%
@@ -34,24 +34,18 @@ subsetDat = allDat %>%
 V1neDat = allDat %>% filter(VETSAGRP=="v1ne")
 
 # Create vector of all variable names to calculate practice effects for
-testVars = c("zMR1COR","zTRL1TLOG","zTRL2TLOG","zTRL3TLOG","zTRL4TLOG","zTRL5TLOG","zCSSACC","zMTXRAW","zCVA1RAW",
-             "zCVATOT","zCVSDFR","zCVLDFR","zAFQTPCT","zAFQTVOCPCT","zAFQTARPCT","zAFQTTLPCT","zAFQTBXPCT",
-             "zAFQTPCTTRAN","zAFQTVOCPCTTRAN","zAFQTARPCTTRAN","zAFQTTLPCTTRAN","zAFQTBXPCTTRAN","zDSFRAW",
-             "zDSBRAW","zSSPFRAW","zSSPBRAW","zLNTOT","zLMITOT","zLMDTOT","zVRITOT","zVRDTOT","zVRCTOT","zHFTOTCOR",
-            "zSTRWRAW","zSTRCRAW","zSTRCWRAW","zLFFCOR","zLFACOR","zLFSCOR","zLFCOR","zCFANCOR","zCFBNCOR","zCFCOR",
-            "zCSCOR","zSRTLMEANLOG","zSRTLSTDLOG","zSRTRMEANLOG","zSRTRSTDLOG","zSRTGMEANLOG","zSRTGSTDLOG",
-            "zCHRTLMEANLOG","zCHRTRMEANLOG","zCHRTLSTDLOG","zCHRTRSTDLOG","zCHRTGMEANLOG","zCHRTGSTDLOG","zRSATOT")
-
-# Create list of cognitive domains to present separately
-cogVars = c("zVisSpat","zSTWKMem","zEpsMem","zAbsReason","zVerbFlu",
-               "zExecTrailsSwitch","zProcSpeed","zExecCategorySwitch")
-
-# Create list of test variables and cognitive domains
-allVars = c(testVars, cogVars)
+testVars = c("MR1COR","TRL1TLOG","TRL2TLOG","TRL3TLOG","TRL4TLOG","TRL5TLOG","CSSACC","MTXRAW","CVA1RAW",
+             "CVATOT","CVSDFR","CVLDFR","AFQTPCT","AFQTVOCPCT","AFQTARPCT","AFQTTLPCT","AFQTBXPCT",
+             "AFQTPCTTRAN","AFQTVOCPCTTRAN","AFQTARPCTTRAN","AFQTTLPCTTRAN","AFQTBXPCTTRAN","DSFRAW",
+             "DSBRAW","SSPFRAW","SSPBRAW","LNTOT","LMITOT","LMDTOT","VRITOT","VRDTOT","VRCTOT","HFTOTCOR",
+             "STRWRAW","STRCRAW","STRCWRAW","LFFCOR","LFACOR","LFSCOR","LFCOR","CFANCOR","CFBNCOR","CFCOR",
+             "CSCOR","SRTLMEANLOG","SRTLSTDLOG","SRTRMEANLOG","SRTRSTDLOG","SRTGMEANLOG","SRTGSTDLOG",
+             "CHRTLMEANLOG","CHRTRMEANLOG","CHRTLSTDLOG","CHRTRSTDLOG","CHRTGMEANLOG","CHRTGSTDLOG","RSATOT",
+             "AXHITRATE","AXFARATE","AXMISSRATE","BXHITRATE","BXFARATE","BXMISSRATE","CPTDPRIME")
 
 #Create list of AFQT scores to present separately
-afqtVars = c("zAFQTPCT","zAFQTVOCPCT","zAFQTARPCT","zAFQTTLPCT","zAFQTBXPCT","zAFQTPCTTRAN",
-            "zAFQTVOCPCTTRAN","zAFQTARPCTTRAN","zAFQTTLPCTTRAN","zAFQTBXPCTTRAN")
+afqtVars = c("AFQTPCT","AFQTVOCPCT","AFQTARPCT","AFQTTLPCT","AFQTBXPCT","AFQTPCTTRAN",
+            "AFQTVOCPCTTRAN","AFQTARPCTTRAN","AFQTTLPCTTRAN","AFQTBXPCTTRAN")
 
 # Create indices of different groups
 idxS1T2 = which(subsetDat$VETSAGRP=="V1V2")
@@ -89,8 +83,8 @@ The difference (D) between time 2 scores of longitudinal returnees (S1T2) and ti
 calcPracticeEffect = function(dat, varName, idxS1T2, idxS2T2,idxS1T1ret){
   varV1 = varName
   varV2 = paste0(varV1, "_V2")
-  varV1 = paste0(varV1,"_adj")
-  varV2 = paste0(varV2,"_adj")
+  varV1 = paste0(varV1,"_znas")
+  varV2 = paste0(varV2,"_znas")
   # Longitudinal Subjects Time 2
   S1T2 = mean(dat[idxS1T2, varV2], na.rm=T)
   # Attrition Replacement Subjects Time 2
@@ -109,21 +103,6 @@ calcPracticeEffect = function(dat, varName, idxS1T2, idxS2T2,idxS1T1ret){
   P
 }
 
-# Define function to create composite cognitive domains 
-calcCogDomains = function(testdat){
-  testdat[['zVisSpat']] = mean(testdat[c("zMR1COR","zHFTOTCOR")])
-  testdat[['zAbsReason']] = testdat['zMTXRAW']
-  testdat[['zSTWKMem']] = mean(testdat[c("zDSFRAW","zDSBRAW","zLNTOT","zSSPFRAW",
-                                              "zSSPBRAW","zRSATOT")])
-  testdat[['zEpsMem']] = mean(testdat[c("zCVATOT","zCVSDFR","zCVLDFR","zLMITOT",
-                                               "zLMDTOT","zVRITOT","zVRDTOT")])
-  testdat[['zVerbFlu']] = mean(testdat[c("zLFCOR","zCFCOR")])
-  testdat[['zProcSpeed']] = mean(testdat[c("zSTRWRAW","zSTRCRAW","zTRL2TLOG","zTRL3TLOG")])
-  testdat[['zExecTrailsSwitch']] = testdat['zTRL4TLOG']
-  testdat[['zExecCategorySwitch']] = testdat['zCSSACC']
-  testdat
-}
-
 ```
 
 
@@ -131,7 +110,6 @@ calcCogDomains = function(testdat){
 # Calculate practice effects for all cognitive domains and tests
 pracEffects = sapply(testVars, function(x) calcPracticeEffect(subsetDat, x, idxS1T2,
                                                           idxS2T2, idxS1T1ret))
-pracEffects = calcCogDomains(pracEffects)
 ```
 
 
@@ -151,8 +129,8 @@ idxV2AR = which(subsetDat$VETSAGRP=="V2AR")
 idxV1 = which(subsetDat$VETSAGRP=="V1")
 
 # Initialize empty matrix for permutation results
-permResults = matrix(ncol=length(allVars), nrow=nPerm)
-colnames(permResults) = allVars
+permResults = matrix(ncol=length(testVars), nrow=nPerm)
+colnames(permResults) = testVars
 
 # Run permutations and collect results into matrix
 for(i in 1:nPerm){
@@ -166,7 +144,7 @@ for(i in 1:nPerm){
                                                       idxS1T2perm,
                                                       idxS2T2perm,
                                                       idxS1T1retperm))
-    permResults[i,] = calcCogDomains(tmpResults)
+    permResults[i,] = tmpResults
 }
 permResults = data.frame(permResults)
 # Calculate p values based on permutations and observed values
@@ -185,7 +163,6 @@ bootPracticeEffect = function(data, idx){
                                                   idxV1V2boot,
                                                   idxV2ARboot,
                                                   idxV1V2boot))
-  sampResults = calcCogDomains(sampResults)
   return(sampResults)
 }
 
@@ -206,8 +183,8 @@ boot.out = boot(subsetDat, statistic=bootPracticeEffect, strata=subsetDat$VETSAG
 # idxV2AR = which(subsetDat$VETSAGRP=="V2AR")
 # 
 # # Initialize empty matrix for boostrap results
-# bootResults = matrix(ncol=length(allVars), nrow=nBoot)
-# colnames(bootResults) = allVars
+# bootResults = matrix(ncol=length(testVars), nrow=nBoot)
+# colnames(bootResults) = testVars
 # 
 # # Run bootstrap resamples and collect results into matrix
 # for(i in 1:nBoot){
@@ -227,18 +204,12 @@ boot.out = boot(subsetDat, statistic=bootPracticeEffect, strata=subsetDat$VETSAG
 # Combine practice effects results and permutation p-values
 results = data.frame("PracticeEffect" = pracEffects, SE=apply(boot.out$t, 2, sd), "P" = pvals)
 
-# # Get indices of cognitive domains
-# idxCogDomains = which(rownames(results) %in% cogDomains)
-
 # Get indices of AFQT tests
 idxAFQT = which(rownames(results) %in% afqtVars)
-idxCogDomains = which(rownames(results) %in% cogVars)
 
-#Split results into composite scores of individual tests, cognitive domains, and AFQT.
-# resultsCogDomains = results[idxCogDomains,]
+#Split results into composite scores of individual tests and AFQT.
 resultsAFQT = results[idxAFQT,]
-resultsCogDomains = results[idxCogDomains,]
-resultsTests = results[-c(idxAFQT,idxCogDomains),]
+resultsTests = results[-c(idxAFQT),]
 ```
 
 --------------------------------------
@@ -251,19 +222,13 @@ Standard Errors were determined through bootstrapping with `r nBoot` resamples.
 kable(resultsTests, digits=3, caption="Individual Tests")
 ```
 
-
-```{r, echo=F}
-kable(resultsCogDomains, digits=3, caption="Cognitive Domain Composites")
-```
-
-
 ```{r, echo=F}
 kable(resultsAFQT, digits=3, caption="AFQT Scores")
 ```
 
 ```{r, include=F}
 # Write out practice effect results (adjustment value, estimate of precision, and p value)
-write.csv(results, '/home/jelman/netshare/K/Projects/PracticeEffects/results/PracEffects_NAS201TRAN_Zscored_Results.csv')
+write.csv(results, '~/netshare/M/PSYCH/KREMEN/Practice Effect Cognition/results/PracEffectValues_NASAdj_Z.csv')
 ```
 
 
