@@ -79,6 +79,7 @@ for (varName in varNames) {
 # Replace invalid negative numbers with 0
 unadj_df_PEadj = replaceNegValues(unadj_df_PEadj)
 
+
 # Save out dataset of scores not adjusted for AFQT, raw score scale, practice effect adjusted
 write.csv(unadj_df_PEadj, '~/netshare/M/PSYCH/KREMEN/Practice Effect Cognition/data/V1V2_CogData_PE.csv',
           row.names=FALSE)
