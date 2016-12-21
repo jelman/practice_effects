@@ -21,6 +21,13 @@
 #                                                                                     #
 #######################################################################################
 
+library(dplyr)
+
+
+###############################################
+#     Define variables names and functions    #
+###############################################
+
 # Basenames of scores to adjust
 varNames = c("MR1COR","TRL1TLOG","TRL2TLOG","TRL3TLOG","TRL4TLOG","TRL5TLOG","CSSACC","MTXRAW","CVA1RAW","CVATOT","CVSDFR","CVLDFR",
              "AFQTPCT","AFQTVOCPCT","AFQTARPCT","AFQTTLPCT","AFQTBXPCT","AFQTPCTTRAN","AFQTVOCPCTTRAN","AFQTARPCTTRAN","AFQTTLPCTTRAN",
@@ -29,6 +36,21 @@ varNames = c("MR1COR","TRL1TLOG","TRL2TLOG","TRL3TLOG","TRL4TLOG","TRL5TLOG","CS
              "SRTLSTDLOG","SRTRMEANLOG","SRTRSTDLOG","SRTGMEANLOG","SRTGSTDLOG","CHRTLMEANLOG","CHRTRMEANLOG","CHRTLSTDLOG",
              "CHRTRSTDLOG","CHRTGMEANLOG","CHRTGSTDLOG","RSATOT","AXHITRATE","AXFARATE","AXMISSRATE","BXHITRATE","BXFARATE",
              "BXMISSRATE","CPTDPRIME")
+
+# Function to replace negative numbers with zero
+zeroFloor = function(x){
+  x <- (x + abs(x)) / 2
+  x}
+
+# Apply function to columns that should not have negative numbers
+replaceNegValues = function(df){
+  negVars = names(df)[grepl("TRAN", names(df)) | grepl("DPRIME", names(df))]
+  posVars = names(df)[(!names(df) %in% negVars) & (!sapply(df, is.character))]  
+  df = df %>% mutate_at(.cols=posVars, .funs=zeroFloor)
+  df
+}
+
+
 
 #-----------------------------------------------------------------#
 #   1. Scores on raw score scale, not adjusted for age 20 AFQT    #
@@ -53,6 +75,9 @@ for (varName in varNames) {
   unadj_df_PEadj[idxV1V2, newVarName_V2] = unadj_df_PEadj[idxV1V2, varName_V2] - peVal
   unadj_df_PEadj[[varName_V2]] = NULL
 }
+
+# Replace invalid negative numbers with 0
+unadj_df_PEadj = replaceNegValues(unadj_df_PEadj)
 
 # Save out dataset of scores not adjusted for AFQT, raw score scale, practice effect adjusted
 write.csv(unadj_df_PEadj, '~/netshare/M/PSYCH/KREMEN/Practice Effect Cognition/data/V1V2_CogData_PE.csv',
@@ -110,6 +135,9 @@ for (varName in varNames) {
   nas201adj_PEadj[idxV1V2, newVarName_V2] = nas201adj_PEadj[idxV1V2, varName_V2] - peVal
   nas201adj_PEadj[[varName_V2]] = NULL
 }
+
+# Replace invalid negative numbers with 0
+nas201adj_PEadj = replaceNegValues(nas201adj_PEadj)
 
 # Save out dataset of scores adjusted for AFQT, z-scored to VETSA 1, practice effect adjusted
 write.csv(nas201adj_PEadj, '~/netshare/M/PSYCH/KREMEN/Practice Effect Cognition/data/V1V2_CogData_NASAdj_PE.csv',
