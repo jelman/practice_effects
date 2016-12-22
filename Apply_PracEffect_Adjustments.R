@@ -70,7 +70,8 @@ for (varName in varNames) {
   varName_V2 = paste0(varName, "_V2")
   newVarName_V2 = paste0(varName_V2,"p")
   peVal = pracEffects[varName,"PracticeEffect"]
-  unadj_df_PEadj[idxV1V2, newVarName_V2] = unadj_df_PEadj[idxV1V2, varName_V2] - peVal
+  unadj_df_PEadj[, newVarName_V2] = unadj_df_PEadj[, varName_V2]
+  unadj_df_PEadj[idxV1V2, newVarName_V2] = unadj_df_PEadj[idxV1V2, newVarName_V2] - peVal
   unadj_df_PEadj[[varName_V2]] = NULL
 }
 
@@ -109,7 +110,8 @@ for (varName in varNames) {
   varName_V2 = paste0(varName, "_V2_znas")
   newVarName_V2 = paste0(varName_V2,"p")
   peVal = pracEffects_Zscored[varName,"PracticeEffect"]
-  nas201adjzscore_PEadj[idxV1V2, newVarName_V2] = nas201adjzscore_PEadj[idxV1V2, varName_V2] - peVal
+  nas201adjzscore_PEadj[, newVarName_V2] = nas201adjzscore_PEadj[, varName_V2]
+  nas201adjzscore_PEadj[idxV1V2, newVarName_V2] = nas201adjzscore_PEadj[idxV1V2, newVarName_V2] - peVal
   nas201adjzscore_PEadj[[varName_V2]] = NULL
 }
 
@@ -138,7 +140,8 @@ for (varName in varNames) {
   varName_V2 = paste0(varName, "_V2_nas")
   newVarName_V2 = paste0(varName_V2,"p")
   peVal = pracEffects[varName,"PracticeEffect"]
-  nas201adj_PEadj[idxV1V2, newVarName_V2] = nas201adj_PEadj[idxV1V2, varName_V2] - peVal
+  nas201adj_PEadj[, newVarName_V2] = nas201adj_PEadj[, varName_V2]
+  nas201adj_PEadj[idxV1V2, newVarName_V2] = nas201adj_PEadj[idxV1V2, newVarName_V2] - peVal
   nas201adj_PEadj[[varName_V2]] = NULL
 }
 
