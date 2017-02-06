@@ -27,6 +27,7 @@ timeVarsV1 = c("TRL1T","TRL2T","TRL3T","TRL4T","TRL5T","SRTLMEAN","SRTLSTD","SRT
 timeVarsLogV1 = paste0(timeVarsV1, "LOG")
 timeVarsV2 = paste0(timeVarsV1, "_V2")
 timeVarsLogV2 = paste0(timeVarsLogV1, "_V2")
+
 # Transform
 allData[timeVarsLogV1] = log(allData[timeVarsV1])                
 allData = dplyr::select(allData, -one_of(timeVarsV1))
@@ -58,7 +59,7 @@ rawVarsV2
 #                     Define functions                                       #
 #----------------------------------------------------------------------------#
 
-adjustDataset = function(regVars,adjVars,nDemoVars=7,data){
+adjustDataset = function(regVars,adjVars,nDemoVars=7,suffix="adj",data){
   #######################################################################
   # Adjust dataset for specified set of variables.Regresses passed      #
   # variables from each measure using linear regression. The intercept  #
@@ -85,7 +86,7 @@ adjustDataset = function(regVars,adjVars,nDemoVars=7,data){
   
   # Create Data Frame
   data <- cbind(data,matrix(NA,nrow=n,ncol=nVars))
-  names(data) <- c(allNames,paste(adjVars,"_nas",sep=""))
+  names(data) <- c(allNames,paste(adjVars,suffix,sep="_"))
   
   ### Running Loop Using lapply ###
   
@@ -145,7 +146,7 @@ data = subset(allData, !is.na(allData$NAS201TRAN))
 regVars = paste("scale(NAS201TRAN)", sep=" + ")
 
 # Regress nas201tran out of dataset
-nasAdjRawScoresData = adjustDataset(regVars, adjVars, nDemoVars, data)
+nasAdjRawScoresData = adjustDataset(regVars, adjVars, nDemoVars, "nas", data)
 
 # Save out dataset with Age 20 AFQT regressed out
 write.csv(nasAdjRawScoresData, "~/netshare/M/PSYCH/KREMEN/Practice Effect Cognition/data/V1V2_CogData_NASAdj.csv",
@@ -155,7 +156,7 @@ write.csv(nasAdjRawScoresData, "~/netshare/M/PSYCH/KREMEN/Practice Effect Cognit
 # Create dataset adjusted for nas201tran (Age 20 AFQT) and standardized.            #
 #                                                                                   #
 # Dataset with NAS201TRAN (age 20 AFQT) regressed out is standardized (z-scored)    #
-# based on V ETSA 2 means and sd.                                                   #
+# based on VETSA 2 means and sd.                                                    #
 #-----------------------------------------------------------------------------------#
 
 # Initialize dataframe to hold means and SDs
@@ -194,3 +195,72 @@ write.csv(nasAdjZscoresData,
 write.csv(scaleValues, "~/netshare/M/PSYCH/KREMEN/Practice Effect Cognition/data/V1_NASAdj_Means_SDs.csv",
           row.names = FALSE)
 
+
+#-----------------------------------------------------------------------------------#
+# Create dataset adjusted for TEDALL (Education)                                    #
+#                                                                                   #
+# Adjustment consists of regressing out nuisance variable from raw variables.       # 
+# Intercept is added back in to avoid mean centering.                               #
+#-----------------------------------------------------------------------------------#
+
+# Adjust raw scores from VETSA 1 and VETSA 2
+adjVars = c(rawVarsV1, rawVarsV2)
+
+### Set number of demographic variables included in dataframe (these won't be adjusted) ###
+nDemoVars = 7
+
+# Filter out subjects missing variable to be regressed out
+data = subset(allData, !is.na(allData$TEDALL))
+
+# Specify nas201tran (Age 20 AFQT as variable to regress out)
+regVars = paste("scale(TEDALL)", sep=" + ")
+
+# Regress nas201tran out of dataset
+tedAdjRawScoresData = adjustDataset(regVars, adjVars, nDemoVars, "ted", data)
+
+# Save out dataset with Education regressed out
+write.csv(tedAdjRawScoresData, "~/netshare/M/PSYCH/KREMEN/Practice Effect Cognition/data/V1V2_CogData_TEDALLAdj.csv",
+          row.names=F)
+
+#-----------------------------------------------------------------------------------#
+# Create dataset adjusted for TEDALL (Education) and standardized.                  #
+#                                                                                   #
+# Dataset with TEDALL (Education) regressed out is standardized (z-scored)          #
+# based on VETSA 2 means and sd.                                                    #
+#-----------------------------------------------------------------------------------#
+
+# Initialize dataframe to hold means and SDs
+scaleValues = data.frame()
+
+tedAdjZscoresData = tedAdjRawScoresData
+
+# Scale VETSA 1 variables that have been adjusted for TEDALL
+# Adds mean and SD to dataframe and deletes adjusted raw variables from dataset
+for(i in rawVarsV1){
+  varname = paste0(i, "_ted")
+  zvarname = gsub("_ted","_zted",varname)
+  tedAdjZscoresData[[zvarname]] = scale(tedAdjZscoresData[[varname]])
+  scaleValues = addScaleVals(scaleValues, varname, tedAdjZscoresData[[zvarname]])
+  tedAdjZscoresData[[varname]] = NULL
+}
+
+# Scale VETSA 2 variables that have been adjusted for TEDALL using VETSA 1 mean and SD
+# Delete adjusted raw variable from dataset
+for(i in rawVarsV2){
+  varnameV2 = paste0(i, "_ted")
+  zvarname = gsub("_ted","_zted",varnameV2)
+  varnameV1 = gsub("_V2","",varnameV2)
+  tedAdjZscoresData[[zvarname]] = scale(tedAdjZscoresData[[varnameV2]],
+                                        center=scaleValues$Mean[scaleValues$Variable==varnameV1],
+                                        scale=scaleValues$SD[scaleValues$Variable==varnameV1])
+  tedAdjZscoresData[[varnameV2]] = NULL
+}
+
+# Save out adjusted and z-scored dataset
+write.csv(tedAdjZscoresData, 
+          "~/netshare/M/PSYCH/KREMEN/Practice Effect Cognition/data/V1V2_CogData_TEDALLAdj_Z.csv",
+          row.names = FALSE)
+
+# Save out means and standard deviations used to standardize scores
+write.csv(scaleValues, "~/netshare/M/PSYCH/KREMEN/Practice Effect Cognition/data/V1_TEDALLAdj_Means_SDs.csv",
+          row.names = FALSE)
