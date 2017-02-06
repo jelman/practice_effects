@@ -1,10 +1,15 @@
 #################################################################################
 # Script to create datasets for practice effect analyses.                       #
-# This script will create two datasets:                                         #
+# This script will create four datasets:                                        #
 #   - Cognitive data with nas201tran (age 20 AFQT) regressed out. Scores are    #
 #     not standardized.                                                         #
-#   - Cognitive data with above adjustment. Scores are standardized (z-scored)  #
+#   - Cognitive data with above adjustment for nas201tran. Scores are           # 
+#     standardized (z-scored)                                                   #
 #     based on VETSA1 means and sd.                                             #
+#   - Cognitive data with TEDALL (Education) regressed out. Scores are not      # 
+#     standardized.                                                             #
+#   - Cognitive data with above adjustment for TEDALL. Scores are standardized  #
+#     (z-scored) based on VETSA1 means and sd.                                  #
 #                                                                               #
 #################################################################################
 
