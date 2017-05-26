@@ -147,8 +147,8 @@ for(i in 1:nPerm){
 }
 permResults = data.frame(permResults)
 # Calculate p values based on permutations and observed values
-pvalsPerm = apply(permResults, 1, function(x) pracEffects > abs(x))
-pvals = 1 - (rowMeans(pvalsPerm))
+pvalsPerm = apply(permResults, 1, function(x) abs(x) >= abs(pracEffects))
+pvals = rowMeans(pvalsPerm)
 ```
 
 ```{r, include=FALSE}
