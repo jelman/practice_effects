@@ -69,7 +69,7 @@ testVars = c("VRCTOTSS","MTXT","DSPSS","SSPSS","LNSC","TRL1TSC","TRL4TSC",
 # Calculate practice effects for a given test score. 
 # Inputs:
 # ---------
-# dat: dataset 
+# df: dataset 
 # varName: Variable name to calculate practice effects for
 # idxReturn : Subjects that are returning for follow-up                               
 # idxReplace : Attrition replacements tested for the first time at follow-up          
@@ -78,20 +78,20 @@ testVars = c("VRCTOTSS","MTXT","DSPSS","SSPSS","LNSC","TRL1TSC","TRL4TSC",
 # Returns:
 # ----------
 # Value of estimated practice effect for varName
-#
-calcPracticeEffect = function(dat, varName, idxReturn, idxReplace,idxAll){
+
+calcPracticeEffect = function(df, varName, idxReturn, idxReplace,idxAll){
   varV1 = varName
   varV2 = paste0(varV1, "_V2")
   varV1 = paste0(varV1,"_adj")
   varV2 = paste0(varV2,"_adj")
   # Longitudinal Subjects Time 2
-  S1T2 = mean(dat[idxReturn, varV2], na.rm=T)
+  S1T2 = mean(df[idxReturn, varV2], na.rm=T)
   # Attrition Replacement Subjects Time 2
-  S2T2 = mean(dat[idxReplace, varV2], na.rm=T)
+  S2T2 = mean(df[idxReplace, varV2], na.rm=T)
   # Longitudinal Returnees Time 1
-  S1T1ret = mean(dat[idxReturn, varV1], na.rm=T)
+  S1T1ret = mean(df[idxReturn, varV1], na.rm=T)
   # All Subjects Time 1
-  S1T1all = mean(dat[idxAll, varV1], na.rm=T)
+  S1T1all = mean(df[idxAll, varV1], na.rm=T)
   
   # Difference score
   D = S1T2 - S2T2
@@ -106,7 +106,7 @@ calcPracticeEffect = function(dat, varName, idxReturn, idxReplace,idxAll){
 # Calculate p-value for practice effects using permutation testing
 # Inputs:
 # ---------
-# dat: dataset 
+# df: dataset 
 # testVars: List of variable names to calculate p-values for
 # pracEffects: List of estimates practice effects for variables listed in testVars
 # idxReturn : Subjects that are returning for follow-up                               
@@ -116,8 +116,8 @@ calcPracticeEffect = function(dat, varName, idxReturn, idxReplace,idxAll){
 # Returns:
 # ----------
 # List of p-values for all variables in testVars
-#
-calcPvalues = function(dat, testvars, pracEffects, idxReturn, idxReplace, idxAll){
+
+calcPvalues = function(df, testvars, pracEffects, idxReturn, idxReplace, idxAll){
   ### Run permutation testing to generate p-values for practice effects ###
   set.seed(21)
   # Set parameters for permutation testing of practice effects
@@ -128,7 +128,6 @@ calcPvalues = function(dat, testvars, pracEffects, idxReturn, idxReplace, idxAll
   # Initialize empty matrix for permutation results
   permResults = matrix(ncol=length(testVars), nrow=nPerm)
   colnames(permResults) = testVars
-  
   # Run permutations and collect results into matrix
   for(i in 1:nPerm){
     idxT2 = sample(c(idxReturn, idxReplace))
@@ -136,7 +135,7 @@ calcPvalues = function(dat, testvars, pracEffects, idxReturn, idxReplace, idxAll
     idxReturnPerm = idxT2[1:nLong]
     idxReplacePerm = idxT2[(nLong+1):(nLong+nAR)]
     idxAllPerm = idxT1[1:nLong]
-    permResults[i,] = sapply(testVars, function(x) calcPracticeEffect(dat, x, 
+    permResults[i,] = sapply(testVars, function(x) calcPracticeEffect(data, x, 
                                                                       idxReturnPerm,
                                                                       idxReplacePerm,
                                                                       idxAllPerm))
@@ -150,6 +149,41 @@ calcPvalues = function(dat, testvars, pracEffects, idxReturn, idxReplace, idxAll
 
 
 
+# Calculate standard errors for practice effects using bootstrap resampling
+# Inputs:
+# ---------
+# df: dataset 
+# testVars: List of variable names to calculate p-values for
+# namesReturn : Names of groups that are returning for follow-up                               
+# namesReplace : Names of attrition replacements tested for the first time at follow-up          
+# namesAll : Names of groups in full sample assessed at baseline                                           
+#
+# Returns:
+# ----------
+# List of standard errors for all variables in testVars
+
+calcStdError = function(df, testVars, namesReturn, namesReplace, namesAll){
+  # Define bootstrap function
+  bootPracticeEffect = function(data, strata){
+    dat = data[strata,]
+    idxReturn = which(dat$VETSAGRP %in% namesReturn)
+    idxReplace = which(dat$VETSAGRP %in% namesReplace)
+    idxAll = which(dat$VETSAGRP %in% namesAll)
+    sampResults = sapply(testVars, function(x) calcPracticeEffect(dat, x, 
+                                                                  idxReturn,
+                                                                  idxReplace,
+                                                                  idxAll))
+    return(sampResults)
+  }
+  set.seed(21)
+  nBoot = 10000
+  boot.out = boot(df, statistic=bootPracticeEffect, strata=df$VETSAGRP, R=nBoot)
+  SEvals = apply(boot.out$t, 2, sd)
+  SEvals
+}
+
+
+
 
 #-------------------------------------------------------------------------------------#
 # Calculate practice effects for all groups.                                          #
@@ -157,11 +191,10 @@ calcPvalues = function(dat, testvars, pracEffects, idxReturn, idxReplace, idxAll
 # Define function to calculate practice effects for a given measure. For each set     #
 # of practice effect calculations, appropriate groups need to be defined.             #
 #                                                                                     #
-# Get indices of the following groups:                                                #
-# idxReturn : Subjects that are returning for follow-up                               #
-# idxReplace : Attrition replacements tested for the first time at follow-up          #
-# idxAll : Full sample assessed at baseline                                           #
-# idxDrop = Subjects that were tested at baseline but did not return for follow-up    #
+# Get names and indices of the following groups:                                      #
+# [idx/names]Return : Subjects that are returning for follow-up                       #
+# [idx/names]Replace : Attrition replacements tested for the first time at follow-up  #
+# [idx/names]All : Full sample assessed at baseline                                   #
 #-------------------------------------------------------------------------------------#
 
 
@@ -169,36 +202,23 @@ calcPvalues = function(dat, testvars, pracEffects, idxReturn, idxReplace, idxAll
 #   V1V2V3:   time2 -> time3    #
 #################################
 
-# Define groups
+# Define names of groups
+namesReturn = c("V1V2V3")
+namesReplace = c("V3AR")
+namesAll = c("V1V2V3", "V1V2")
+# Define indices of groups
 idxReturn = which(subsetDat$VETSAGRP=="V1V2V3")
 idxReplace = which(subsetDat$VETSAGRP=="V3AR")
 idxAll = which(subsetDat$VETSAGRP=="V1V2V3" | subsetDat$VETSAGRP=="V1V2")
 
 # Calculate practice effects for all cognitive domains and tests
 pracEffects = sapply(testVars, function(x) calcPracticeEffect(subsetDat, x, idxReturn, idxReplace, idxAll))
-
 # Calculate p-values for all tests
 pvals = calcPvalues(subsetDat, testvars, pracEffects, idxReturn, idxReplace, idxAll)
-
-### Generate bootstrapped confidence intervals and standard error ###
-bootPracticeEffect = function(data, idx){
-  dat = data[idx,]
-  idxReturn = which(dat$VETSAGRP=="V1V2V3")
-  idxReplace = which(dat$VETSAGRP=="V3AR")
-  idxAll = which(dat$VETSAGRP=="V1V2V3" | dat$VETSAGRP=="V1V2")
-  sampResults = sapply(testVars, function(x) calcPracticeEffect(dat, x, 
-                                                  idxReturn,
-                                                  idxReplace,
-                                                  idxAll))
-  return(sampResults)
-}
-set.seed(21)
-nBoot = 10000
-boot.out = boot(subsetDat, statistic=bootPracticeEffect, strata=subsetDat$VETSAGRP, R=nBoot)
-
+# Calculate standard errors for all tests
+SEvals = calcStdError(subsetDat, testVars, namesReturn, namesReplace, namesAll)
 # Combine practice effects results and permutation p-values
-results = data.frame("PracticeEffect" = pracEffects, SE=apply(boot.out$t, 2, sd), "P" = pvals)
-
+results = data.frame("PracticeEffect" = pracEffects, SE=SEvals, "P" = pvals)
 # Write out practice effect results (adjustment value, estimate of precision, and p value)
 write.csv(results, '~/netshare/M/PSYCH/KREMEN/Practice Effect MCI/Results/PracEffectsMCI_NAS201TRAN_V1V2V3-t2t3.csv')
 
