@@ -46,7 +46,7 @@ library(boot)
 #   to calculate practice effects for.                                      #
 #---------------------------------------------------------------------------#
 # Load data that has been adjusted for age 20 AFQT
-allDat = read.csv("/home/jelman/netshare/K/Projects/PracEffects_MCI/data/V1V2_NAS201TRAN_Adj.csv")
+allDat = read.csv("/home/jelman/netshare/M/PSYCH/KREMEN/VETSA DATA FILES_852014/a_Practice effect revised cog scores/Practice Effect MCI/VETSA3/Data/V1V2_NAS201TRAN_Adj.csv")
 
 # Select subjects from groups of interest
 subsetDat = allDat %>%
@@ -62,7 +62,7 @@ testVars = c("VRCTOTSS","MTXT","DSPSS","SSPSS","LNSC","TRL1TSC","TRL4TSC",
 
 
 #-----------------------------------------------#
-#                 Define functions              #
+#           START DEFINING FUNCTIONS            #
 #-----------------------------------------------#
 
 
@@ -183,6 +183,9 @@ calcStdError = function(df, testVars, namesReturn, namesReplace, namesAll){
 }
 
 
+#-----------------------------------------------#
+#           STOP DEFINING FUNCTIONS             #
+#-----------------------------------------------#
 
 
 #-------------------------------------------------------------------------------------#
@@ -191,10 +194,10 @@ calcStdError = function(df, testVars, namesReturn, namesReplace, namesAll){
 # Define function to calculate practice effects for a given measure. For each set     #
 # of practice effect calculations, appropriate groups need to be defined.             #
 #                                                                                     #
-# Get names and indices of the following groups:                                      #
-# [idx/names]Return : Subjects that are returning for follow-up                       #
-# [idx/names]Replace : Attrition replacements tested for the first time at follow-up  #
-# [idx/names]All : Full sample assessed at baseline                                   #
+# Set names and indices of the following groups:                                      #
+# namesReturn : Subjects that are returning for follow-up                             #
+# namesReplace : Attrition replacements tested for the first time at follow-up        #
+# namesAll : Full sample assessed at baseline                                         #
 #-------------------------------------------------------------------------------------#
 
 
@@ -202,14 +205,15 @@ calcStdError = function(df, testVars, namesReturn, namesReplace, namesAll){
 #   V1V2V3:   time2 -> time3    #
 #################################
 
-# Define names of groups
+# Set names of groups
 namesReturn = c("V1V2V3")
 namesReplace = c("V3AR")
 namesAll = c("V1V2V3", "V1V2")
+
 # Define indices of groups
-idxReturn = which(subsetDat$VETSAGRP=="V1V2V3")
-idxReplace = which(subsetDat$VETSAGRP=="V3AR")
-idxAll = which(subsetDat$VETSAGRP=="V1V2V3" | subsetDat$VETSAGRP=="V1V2")
+idxReturn = which(subsetDat$VETSAGRP %in% namesReturn)
+idxReplace = which(subsetDat$VETSAGRP %in% namesReplace)
+idxAll = which(subsetDat$VETSAGRP %in% namesAll)
 
 # Calculate practice effects for all cognitive domains and tests
 pracEffects = sapply(testVars, function(x) calcPracticeEffect(subsetDat, x, idxReturn, idxReplace, idxAll))
@@ -221,4 +225,5 @@ SEvals = calcStdError(subsetDat, testVars, namesReturn, namesReplace, namesAll)
 results = data.frame("PracticeEffect" = pracEffects, SE=SEvals, "P" = pvals)
 # Write out practice effect results (adjustment value, estimate of precision, and p value)
 write.csv(results, '~/netshare/M/PSYCH/KREMEN/Practice Effect MCI/Results/PracEffectsMCI_NAS201TRAN_V1V2V3-t2t3.csv')
+
 
