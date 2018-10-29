@@ -1,27 +1,39 @@
----
-title: 'Practice Effects on Raw Test Scores for MCI Pipeline: Adjusted for Age 20  AFQT'
-author: "Jeremy Elman"
-date: '`r Sys.Date()`'
-output:
-  pdf_document: default
-  html_document:
-    theme: readable
-  word_document: default
----
-
-```{r global_options, include=FALSE}
-knitr::opts_chunk$set(warning=FALSE, message=FALSE)
-```
-
-```{r, include=F}
 library(dplyr)
 library(psych)
 library(knitr)
 library(permute)
 library(boot)
-```
 
-```{r, include=F}
+###################################################################################################
+#  Adjustment for Age 20 AFQT                                                                     #
+#  --------------------------                                                                     #
+# The scores have been adjusted for age 20 AFQT by regressing the (scaled) nas201tran variable    # 
+# from each raw test score.                                                                       #
+#                                                                                                 #
+#                                                                                                 #
+#  Calculation of practice effects                                                                #
+#  -------------------------------                                                                #
+# The difference (D) between time 2 scores of longitudinal returnees (S1T2) and time 2 attrition  #
+# replacements (S2T2) is the sum of attrition effects (A) and practice effects (P). The attrition #
+# effect is calculated as the difference in time 1 scores of returnees (S1T1ret) compared to the  #
+# entire group (S1T1all). The practice effect is therefore the difference D minus the attrition   #
+# effect.                                                                                         #
+#                                                                                                 #
+#                                                                                                 #
+#  D = A + P                                                                                      #
+#                                                                                                 #
+#  Difference score:                                                                              #
+#    D = S1T2 - S2T2                                                                              #
+#                                                                                                 #
+#  Attrition effect:                                                                              #
+#    A = S1T1ret - S1T1all                                                                        #
+#                                                                                                 #
+#  Practice effect:                                                                               #
+#    P = D - A                                                                                    #
+#                                                                                                 #
+###################################################################################################
+  
+  
 # Load data that has been adjusted for age 20 AFQT
 allDat = read.csv("/home/jelman/netshare/K/Projects/PracEffects_MCI/data/V1V2_NAS201TRAN_Adj.csv")
 
@@ -44,30 +56,7 @@ testVars = c("VRCTOTSS","MTXT","DSPSS","SSPSS","LNSC","TRL1TSC","TRL4TSC",
 idxReturn = which(subsetDat$VETSAGRP=="V1V2")
 idxReplace = which(subsetDat$VETSAGRP=="V2AR")
 idxAll = which(subsetDat$VETSAGRP=="V1V2" | subsetDat$VETSAGRP=="V2AR")
-```
 
-## Adjustment for Age 20 AFQT  
-
-The scores have been adjusted for age 20 AFQT by regressing the (scaled) nas201tran variable from each raw test score. 
-
-## Calculation of practice effects  
-
-The difference (D) between time 2 scores of longitudinal returnees (S1T2) and time 2 attrition replacements (S2T2) is the sum of attrition effects (A) and practice effects (P). The attrition effect is calculated as the difference in time 1 scores of returnees (S1T1ret) compared to the entire group (S1T1all). The practice effect is therefore the difference D minus the attrition effect.
-
-
-> $D = A + P$  
-> 
-> *Difference score*:
-> $D = S1T2 - S2T2$  
->  
-> *Attrition effect*:
-> $A = S1T1ret - S1T1all$  
-> 
-> *Practice effect*:
-> $P = D - A$  
-
-
-```{r, include=F}
 calcPracticeEffect = function(dat, varName, idxReturn, idxReplace,idxAll){
   varV1 = varName
   varV2 = paste0(varV1, "_V2")
@@ -90,16 +79,12 @@ calcPracticeEffect = function(dat, varName, idxReturn, idxReplace,idxAll){
   P = D - A
   P
 }
-```
 
 
-```{r, include=F}
 # Calculate practice effects for all cognitive domains and tests
 pracEffects = sapply(testVars, function(x) calcPracticeEffect(subsetDat, x, idxReturn, idxReplace,idxAll))
-```
 
 
-```{r, include=F}
 ### Run permutation testing to generate p-values for practice effects ###
 
 set.seed(21)
@@ -132,12 +117,11 @@ for(i in 1:nPerm){
                                                       idxAllPerm))
 }
 permResults = data.frame(permResults)
+
 # Calculate p values based on permutations and observed values
 pvalsPerm = apply(permResults, 1, function(x) abs(x) >= abs(pracEffects))
 pvals = rowMeans(pvalsPerm)
-```
 
-```{r, include=FALSE}
 ### Generate bootstrapped confidence intervals and standard error ###
 
 bootPracticeEffect = function(data, idx){
@@ -182,32 +166,17 @@ boot.out = boot(subsetDat, statistic=bootPracticeEffect, strata=subsetDat$VETSAG
 #                                                       idxReplaceboot,
 #                                                       idxAllboot))
 # }
-```
 
 
-```{r, include=F}
 ### Gather results into dataframe ###
 
 # Combine practice effects results and permutation p-values
 results = data.frame("PracticeEffect" = pracEffects, SE=apply(boot.out$t, 2, sd), "P" = pvals)
 
-```
 
---------------------------------------
-
-P-values for practice effects were determined through permutation testing with `r nPerm` permutations. 
-Standard Errors were determined through bootstrapping with `r nBoot` resamples.
-
-
-```{r, echo=F}
 kable(results, digits=3, caption="Individual Tests")
-```
 
 
-```{r, include=F}
 # Write out practice effect results (adjustment value, estimate of precision, and p value)
 write.csv(results, '~/netshare/M/PSYCH/KREMEN/Practice Effect MCI/Results/PracEffectsMCI_NAS201TRAN_Results.csv')
-```
-
-
 
