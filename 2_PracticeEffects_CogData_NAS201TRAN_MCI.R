@@ -41,12 +41,44 @@ library(boot)
 #                                                                                                 #
 ###################################################################################################
   
-  
+#---------------------------------------------------------------------------#
+#   Load data, filter for subjects of interest and define tests             #
+#   to calculate practice effects for.                                      #
+#---------------------------------------------------------------------------#
+# Load data that has been adjusted for age 20 AFQT
+allDat = read.csv("/home/jelman/netshare/K/Projects/PracEffects_MCI/data/V1V2_NAS201TRAN_Adj.csv")
+
+# Select subjects from groups of interest
+subsetDat = allDat %>%
+  filter(VETSAGRP=="V1V2" | VETSAGRP=="V1" | VETSAGRP=="V2AR")
+
+# Take out V1ne subject in order to add back in later
+V1neDat = allDat %>% filter(VETSAGRP=="v1ne")
+
+# Create vector of all variable names to calculate practice effects for
+testVars = c("VRCTOTSS","MTXT","DSPSS","SSPSS","LNSC","TRL1TSC","TRL4TSC",
+             "STRIT","LFCORSC","CFCORSC","CSSACCSC","MR1CORZ","HFTOTCORZ",
+             "CVLT","LM","VR","TRL","STR")
 
 
-#---------------------------------------------------------------------------#
-#   Define function to calculate practice effects for a given measure       #
-#---------------------------------------------------------------------------#
+#-----------------------------------------------#
+#                 Define functions              #
+#-----------------------------------------------#
+
+
+# Calculate practice effects for a given test score. 
+# Inputs:
+# ---------
+# dat: dataset 
+# varName: Variable name to calculate practice effects for
+# idxReturn : Subjects that are returning for follow-up                               
+# idxReplace : Attrition replacements tested for the first time at follow-up          
+# idxAll : Full sample assessed at baseline                                           
+#
+# Returns:
+# ----------
+# Value of estimated practice effect for varName
+#
 calcPracticeEffect = function(dat, varName, idxReturn, idxReplace,idxAll){
   varV1 = varName
   varV2 = paste0(varV1, "_V2")
@@ -71,25 +103,52 @@ calcPracticeEffect = function(dat, varName, idxReturn, idxReplace,idxAll){
 }
 
 
+# Calculate p-value for practice effects using permutation testing
+# Inputs:
+# ---------
+# dat: dataset 
+# testVars: List of variable names to calculate p-values for
+# pracEffects: List of estimates practice effects for variables listed in testVars
+# idxReturn : Subjects that are returning for follow-up                               
+# idxReplace : Attrition replacements tested for the first time at follow-up          
+# idxAll : Full sample assessed at baseline                                           
+#
+# Returns:
+# ----------
+# List of p-values for all variables in testVars
+#
+calcPvalues = function(dat, testvars, pracEffects, idxReturn, idxReplace, idxAll){
+  ### Run permutation testing to generate p-values for practice effects ###
+  set.seed(21)
+  # Set parameters for permutation testing of practice effects
+  N = nrow(dat)                   # Numer of subjects
+  nPerm = 10000                      # Number of permutations to run
+  nLong = length(idxReturn)         # Number of longitudinal subjects
+  nAR = length(idxReplace)              # Number of attrition replacement subjects
+  # Initialize empty matrix for permutation results
+  permResults = matrix(ncol=length(testVars), nrow=nPerm)
+  colnames(permResults) = testVars
+  
+  # Run permutations and collect results into matrix
+  for(i in 1:nPerm){
+    idxT2 = sample(c(idxReturn, idxReplace))
+    idxT1 = sample(idxAll)
+    idxReturnPerm = idxT2[1:nLong]
+    idxReplacePerm = idxT2[(nLong+1):(nLong+nAR)]
+    idxAllPerm = idxT1[1:nLong]
+    permResults[i,] = sapply(testVars, function(x) calcPracticeEffect(dat, x, 
+                                                                      idxReturnPerm,
+                                                                      idxReplacePerm,
+                                                                      idxAllPerm))
+  }
+  permResults = data.frame(permResults)
+  # Calculate p values based on permutations and observed values
+  pvalsPerm = apply(permResults, 1, function(x) abs(x) >= abs(pracEffects))
+  pvals = rowMeans(pvalsPerm)
+  pvals
+}
 
-#---------------------------------------------------------------------------#
-#   Load data, filter for subjects of interest and define tests             #
-#   to calculate practice effects for.                                      #
-#---------------------------------------------------------------------------#
-# Load data that has been adjusted for age 20 AFQT
-allDat = read.csv("/home/jelman/netshare/K/Projects/PracEffects_MCI/data/V1V2_NAS201TRAN_Adj.csv")
 
-# Select subjects from groups of interest
-subsetDat = allDat %>%
-  filter(VETSAGRP=="V1V2" | VETSAGRP=="V1" | VETSAGRP=="V2AR")
-
-# Take out V1ne subject in order to add back in later
-V1neDat = allDat %>% filter(VETSAGRP=="v1ne")
-
-# Create vector of all variable names to calculate practice effects for
-testVars = c("VRCTOTSS","MTXT","DSPSS","SSPSS","LNSC","TRL1TSC","TRL4TSC",
-             "STRIT","LFCORSC","CFCORSC","CSSACCSC","MR1CORZ","HFTOTCORZ",
-             "CVLT","LM","VR","TRL","STR")
 
 
 #-------------------------------------------------------------------------------------#
@@ -118,41 +177,15 @@ idxAll = which(subsetDat$VETSAGRP=="V1V2V3" | subsetDat$VETSAGRP=="V1V2")
 # Calculate practice effects for all cognitive domains and tests
 pracEffects = sapply(testVars, function(x) calcPracticeEffect(subsetDat, x, idxReturn, idxReplace, idxAll))
 
-### Run permutation testing to generate p-values for practice effects ###
-set.seed(21)
-# Set parameters for permutation testing of practice effects
-N = nrow(subsetDat)                   # Numer of subjects
-nPerm = 10000                      # Number of permutations to run
-nLong = length(idxReturn)         # Number of longitudinal subjects
-nAR = length(idxReplace)              # Number of attrition replacement subjects
-# Initialize empty matrix for permutation results
-permResults = matrix(ncol=length(testVars), nrow=nPerm)
-colnames(permResults) = testVars
-
-# Run permutations and collect results into matrix
-for(i in 1:nPerm){
-    idxT2 = sample(c(idxReturn, idxReplace))
-    idxT1 = sample(idxAll)
-    idxReturnPerm = idxT2[1:nLong]
-    idxReplacePerm = idxT2[(nLong+1):(nLong+nAR)]
-    idxAllPerm = idxT1[1:nLong]
-    permResults[i,] = sapply(testVars, function(x) calcPracticeEffect(subsetDat, x, 
-                                                      idxReturnPerm,
-                                                      idxReplacePerm,
-                                                      idxAllPerm))
-}
-permResults = data.frame(permResults)
-
-# Calculate p values based on permutations and observed values
-pvalsPerm = apply(permResults, 1, function(x) abs(x) >= abs(pracEffects))
-pvals = rowMeans(pvalsPerm)
+# Calculate p-values for all tests
+pvals = calcPvalues(subsetDat, testvars, pracEffects, idxReturn, idxReplace, idxAll)
 
 ### Generate bootstrapped confidence intervals and standard error ###
 bootPracticeEffect = function(data, idx){
   dat = data[idx,]
-  idxReturn = which(subsetDat$VETSAGRP=="V1V2V3")
-  idxReplace = which(subsetDat$VETSAGRP=="V3AR")
-  idxAll = which(subsetDat$VETSAGRP=="V1V2V3" | subsetDat$VETSAGRP=="V1V2")
+  idxReturn = which(dat$VETSAGRP=="V1V2V3")
+  idxReplace = which(dat$VETSAGRP=="V3AR")
+  idxAll = which(dat$VETSAGRP=="V1V2V3" | dat$VETSAGRP=="V1V2")
   sampResults = sapply(testVars, function(x) calcPracticeEffect(dat, x, 
                                                   idxReturn,
                                                   idxReplace,
@@ -167,5 +200,5 @@ boot.out = boot(subsetDat, statistic=bootPracticeEffect, strata=subsetDat$VETSAG
 results = data.frame("PracticeEffect" = pracEffects, SE=apply(boot.out$t, 2, sd), "P" = pvals)
 
 # Write out practice effect results (adjustment value, estimate of precision, and p value)
-write.csv(results, '~/netshare/M/PSYCH/KREMEN/Practice Effect MCI/Results/PracEffectsMCI_NAS201TRAN_Results.csv')
+write.csv(results, '~/netshare/M/PSYCH/KREMEN/Practice Effect MCI/Results/PracEffectsMCI_NAS201TRAN_V1V2V3-t2t3.csv')
 
