@@ -207,7 +207,7 @@ calcStdError = function(df, testVars, namesReturn, namesReplace, namesAll){
 
 # Set names of groups
 namesReturn = c("V1V2V3")
-namesReplace = c("V3AR")
+namesReplace = c("V3")
 namesAll = c("V1V2V3", "V1V2")
 
 # Define indices of groups
@@ -226,4 +226,108 @@ results = data.frame("PracticeEffect" = pracEffects, SE=SEvals, "P" = pvals)
 # Write out practice effect results (adjustment value, estimate of precision, and p value)
 write.csv(results, '~/netshare/M/PSYCH/KREMEN/Practice Effect MCI/Results/PracEffectsMCI_NAS201TRAN_V1V2V3-t2t3.csv')
 
+
+
+########################################
+#   V1V2V3 & V1V2:   time1 -> time2    #
+########################################
+
+# Set names of groups
+namesReturn = c("V1V2V3", "V1V2")
+namesReplace = c("V2V3", "V2")
+namesAll = c("V1V2V3", "V1V2", "V1V3", "V1", "V1neV3", "V1ne")
+
+# Define indices of groups
+idxReturn = which(subsetDat$VETSAGRP %in% namesReturn)
+idxReplace = which(subsetDat$VETSAGRP %in% namesReplace)
+idxAll = which(subsetDat$VETSAGRP %in% namesAll)
+
+# Calculate practice effects for all cognitive domains and tests
+pracEffects = sapply(testVars, function(x) calcPracticeEffect(subsetDat, x, idxReturn, idxReplace, idxAll))
+# Calculate p-values for all tests
+pvals = calcPvalues(subsetDat, testvars, pracEffects, idxReturn, idxReplace, idxAll)
+# Calculate standard errors for all tests
+SEvals = calcStdError(subsetDat, testVars, namesReturn, namesReplace, namesAll)
+# Combine practice effects results and permutation p-values
+results = data.frame("PracticeEffect" = pracEffects, SE=SEvals, "P" = pvals)
+# Write out practice effect results (adjustment value, estimate of precision, and p value)
+write.csv(results, '~/netshare/M/PSYCH/KREMEN/Practice Effect MCI/Results/PracEffectsMCI_NAS201TRAN_V1V2-V1V2V3-t1t2.csv')
+
+
+###############################
+#   V2V3:   time2 -> time3    #
+###############################
+
+# Set names of groups
+namesReturn = c("V2V3")
+namesReplace = c("V3")
+namesAll = c("V2V3", "V2")
+
+# Define indices of groups
+idxReturn = which(subsetDat$VETSAGRP %in% namesReturn)
+idxReplace = which(subsetDat$VETSAGRP %in% namesReplace)
+idxAll = which(subsetDat$VETSAGRP %in% namesAll)
+
+# Calculate practice effects for all cognitive domains and tests
+pracEffects = sapply(testVars, function(x) calcPracticeEffect(subsetDat, x, idxReturn, idxReplace, idxAll))
+# Calculate p-values for all tests
+pvals = calcPvalues(subsetDat, testvars, pracEffects, idxReturn, idxReplace, idxAll)
+# Calculate standard errors for all tests
+SEvals = calcStdError(subsetDat, testVars, namesReturn, namesReplace, namesAll)
+# Combine practice effects results and permutation p-values
+results = data.frame("PracticeEffect" = pracEffects, SE=SEvals, "P" = pvals)
+# Write out practice effect results (adjustment value, estimate of precision, and p value)
+write.csv(results, '~/netshare/M/PSYCH/KREMEN/Practice Effect MCI/Results/PracEffectsMCI_NAS201TRAN_V2V3-t2t3.csv')
+
+
+###############################
+#   V1V3:   time1 -> time3    #
+###############################
+
+# Set names of groups
+namesReturn = c("V1V3")
+namesReplace = c("V3")
+namesAll = c("V1V2V3", "V1V2", "V1V3", "V1", "V1neV3", "V1ne")
+
+# Define indices of groups
+idxReturn = which(subsetDat$VETSAGRP %in% namesReturn)
+idxReplace = which(subsetDat$VETSAGRP %in% namesReplace)
+idxAll = which(subsetDat$VETSAGRP %in% namesAll)
+
+# Calculate practice effects for all cognitive domains and tests
+pracEffects = sapply(testVars, function(x) calcPracticeEffect(subsetDat, x, idxReturn, idxReplace, idxAll))
+# Calculate p-values for all tests
+pvals = calcPvalues(subsetDat, testvars, pracEffects, idxReturn, idxReplace, idxAll)
+# Calculate standard errors for all tests
+SEvals = calcStdError(subsetDat, testVars, namesReturn, namesReplace, namesAll)
+# Combine practice effects results and permutation p-values
+results = data.frame("PracticeEffect" = pracEffects, SE=SEvals, "P" = pvals)
+# Write out practice effect results (adjustment value, estimate of precision, and p value)
+write.csv(results, '~/netshare/M/PSYCH/KREMEN/Practice Effect MCI/Results/PracEffectsMCI_NAS201TRAN_V1V3-t1t3.csv')
+
+
+###############################
+#   V1V3:   time1 -> time3    #
+###############################
+
+# Set names of groups
+namesReturn = c("V1neV3")
+namesReplace = c("V2V3", "V2")
+namesAll = c("V1V2V3", "V1V2", "V1V3", "V1", "V1neV3", "V1ne")
+
+# Define indices of groups
+idxReturn = which(subsetDat$VETSAGRP %in% namesReturn)
+idxReplace = which(subsetDat$VETSAGRP %in% namesReplace)
+idxAll = which(subsetDat$VETSAGRP %in% namesAll)
+
+# Calculate practice effects for all cognitive domains and tests
+pracEffects = sapply(testVars, function(x) calcPracticeEffect(subsetDat, x, idxReturn, idxReplace, idxAll))
+# Calculate p-values for all tests
+pvals = calcPvalues(subsetDat, testvars, pracEffects, idxReturn, idxReplace, idxAll)
+# Calculate standard errors for all tests
+SEvals = calcStdError(subsetDat, testVars, namesReturn, namesReplace, namesAll)
+# Combine practice effects results and permutation p-values
+results = data.frame("PracticeEffect" = pracEffects, SE=SEvals, "P" = pvals)
+# Write out practice effect results (adjustment value, estimate of precision, and p value)
+write.csv(results, '~/netshare/M/PSYCH/KREMEN/Practice Effect MCI/Results/PracEffectsMCI_NAS201TRAN_V1neV3-t1t2.csv')
 
