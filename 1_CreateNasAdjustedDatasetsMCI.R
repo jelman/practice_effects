@@ -8,7 +8,7 @@
 #   dataV1: VETSA 1 dataset including variables needed for MCI Dx    #
 #   dataV2: VETSA 2 dataset including variables needed for MCI Dx    #
 #   dataInfo: Dataset with subject info needed to adjustment. This   #
-#         includes: vetsaid, case, nas201tran, VETSAGRP              #
+#         includes: vetsaid, case, NAS201TRAN, VETSAGRP              #
 #   dataExclude: Dataset specifying subjects who should be excluded  #
 #         from MCI Dx (e.g., stroke or large tumor). This            #
 #         should include vetsaid and a variable called               #
@@ -26,7 +26,7 @@
 #                                                                    #
 #                                                                    #
 # The script adjusts V1 and V2 test scores by regressing out age 20  # 
-# AFQT (nas201tran). Mixed effects models are used to account for    #
+# AFQT (NAS201TRAN). Mixed effects models are used to account for    #
 # twin pairs, and the intercept is added back in to retain mean      #
 # level differences.                                                 #
 ######################################################################
@@ -35,36 +35,47 @@
 library(dplyr)
 library(lme4)
 
+# Create list of raw variable names to adjust
+rawVarsV1 = c("VRCTOTSS","MTXT","DSPSS","SSPSS","LNSC","TRL1TSC","TRL4TSC",
+              "STRIT","LFCORSC","CFCORSC","CSSACCSC","MR1CORZ","HFTOTCORZ",
+              "CVLT","LM","VR","TRL","STR")
+rawVarsV2 = paste0(rawVarsV1, "_V2")
+rawVarsV3 = paste0(rawVarsV1, "_V3")
+
+# Print variable names and verify these are correct
+rawVarsV1
+rawVarsV2
+rawVarsV3
+
 # Load raw test scores and demographics data
-dataV1 = read.csv("/home/jelman/netshare/K/Projects/PracEffects_MCI/data/V1MCI_Components.csv",
+dataV1 = read.csv("/home/jelman/netshare/M/PSYCH/KREMEN/VETSA DATA FILES_852014/a_Practice effect revised cog scores/Practice Effect MCI/VETSA3/Data/V1MCI_Components.csv",
                    stringsAsFactors = FALSE)
-dataV1 = dplyr::select(dataV1, -one_of(c("NAS201","NAS201TRAN")))
-dataV2 = read.csv("/home/jelman/netshare/K/Projects/PracEffects_MCI/data/V2MCI_PrePracticeEffectAdj.csv",
+dataV1 = dataV1 %>% select(vetsaid, rawVarsV1)
+dataV2 = read.csv("/home/jelman/netshare/M/PSYCH/KREMEN/VETSA DATA FILES_852014/a_Practice effect revised cog scores/Practice Effect MCI/VETSA3/Data/V2MCI_PrePracticeEffectAdj.csv",
                   stringsAsFactors = FALSE)
-dataV2 = dplyr::select(dataV2, -one_of(c("vetsa2","NAS201","NAS201TRAN")))
-dataInfo = read.csv("/home/jelman/netshare/K/data/VETSA_Demographics/VETSA_demo_vars.csv")
-dataExclude = read.csv("/home/jelman/netshare/K/Projects/PracEffects_MCI/data/V1V2MCI_Exclude.csv", stringsAsFactors = F)
+dataV2 = dataV2 %>% select(vetsaid, rawVarsV2)
+dataV3 = read.csv("/home/jelman/netshare/M/PSYCH/KREMEN/VETSA DATA FILES_852014/a_Practice effect revised cog scores/Practice Effect MCI/VETSA3/Data/V3MCI_PrePracticeEffectAdj_TestingOnly.csv",
+                  stringsAsFactors = FALSE)
+dataV3 = dataV3 %>% select(vetsaid, rawVarsV3)
+
+dataInfo = read.csv("/home/jelman/netshare/M/PSYCH/KREMEN/VETSA DATA FILES_852014/a_Practice effect revised cog scores/Practice Effect MCI/VETSA3/Data/SubjectInfo_TestingOnly.csv")
+dataExclude = read.csv("/home/jelman/netshare/M/PSYCH/KREMEN/VETSA DATA FILES_852014/a_Practice effect revised cog scores/Practice Effect MCI/VETSA3/Data/V1V2MCI_Exclude.csv", stringsAsFactors = F)
 
 allData = dataV1 %>% full_join(dataV2, by="vetsaid")
+allData = allData %>% full_join(dataV3, by="vetsaid")
 allData = dataInfo %>%  
-  dplyr::select(vetsaid, case, nas201tran, VETSAGRP) %>%
+  dplyr::select(vetsaid, case, NAS201TRAN, VETSAGRP) %>%
   right_join(allData, by="vetsaid") %>%
   left_join(dataExclude, by="vetsaid") %>%
-  filter(AnyMCIExclude!=1 & !is.na(nas201tran)) %>%
+  filter(AnyMCIExclude!=1 & !is.na(NAS201TRAN)) %>%
   dplyr::select(-V1MCIExclude, -V2MCIExclude, -AnyMCIExclude)
 
 names(allData) = toupper(names(allData))
 str(allData)
 
-write.csv(allData, "/home/jelman/netshare/K/Projects/PracEffects_MCI/data/V1V2_RawScores.csv", row.names=FALSE)
+write.csv(allData, "/home/jelman/netshare/M/PSYCH/KREMEN/VETSA DATA FILES_852014/a_Practice effect revised cog scores/Practice Effect MCI/VETSA3/Data/V1V2V3_RawScores_TestingOnly.csv", row.names=FALSE)
 
-# Create list of raw variable names to adjust
-rawVarsV1 = names(dataV1)[2:length(names(dataV1))]
-rawVarsV2 = names(dataV2)[2:length(names(dataV2))]
 
-# Print variable names and verify these are correct
-rawVarsV1
-rawVarsV2
 
 #----------------------------------------------------------------------------#
 #                     Define functions                                       #
@@ -123,7 +134,7 @@ adjustDataset = function(regVars,adjVars,nDemoVars=7,data){
 ########################################
 
 #-----------------------------------------------------------------------------------#
-# Create dataset adjusted for nas201tran (Age 20 AFQT)                              #
+# Create dataset adjusted for NAS201TRAN (Age 20 AFQT)                              #
 #                                                                                   #
 # Adjustment consists of regressing out nuisance variable from raw variables.       # 
 # Intercept is added back in to avoid mean centering.                               #
@@ -138,10 +149,10 @@ nDemoVars = 4
 # Filter out subjects missing variable to be regressed out
 data = subset(allData, !is.na(allData$NAS201TRAN))
 
-# Specify nas201tran (Age 20 AFQT as variable to regress out)
+# Specify NAS201TRAN (Age 20 AFQT as variable to regress out)
 regVars = paste("scale(NAS201TRAN)", sep=" + ")
 
-# Regress nas201tran out of dataset
+# Regress NAS201TRAN out of dataset
 nasAdjRawScoresData = adjustDataset(regVars, adjVars, nDemoVars, data)
 
 # Save out dataset with Age 20 AFQT regressed out
