@@ -1,17 +1,42 @@
-#################################################################################
-# Script to create datasets for practice effect analyses.                       #
-# This script will create four datasets:                                        #
-#   - Cognitive data with nas201tran (age 20 AFQT) regressed out. Scores are    #
-#     not standardized.                                                         #
-#   - Cognitive data with above adjustment for nas201tran. Scores are           # 
-#     standardized (z-scored)                                                   #
-#     based on VETSA1 means and sd.                                             #
-#   - Cognitive data with TEDALL (Education) regressed out. Scores are not      # 
-#     standardized.                                                             #
-#   - Cognitive data with above adjustment for TEDALL. Scores are standardized  #
-#     (z-scored) based on VETSA1 means and sd.                                  #
-#                                                                               #
-#################################################################################
+######################################################################
+# Script to create datasets for practice effect analyses.            #
+# This script will create four datasets:                             #
+#   - Cognitive data with nas201tran (age 20 AFQT) regressed out.    #      
+#     Scores are not standardized.                                   #
+#   - Cognitive data with above adjustment for nas201tran. Scores    #
+#     are standardized (z-scored) based on VETSA1 means and sd.      #
+#   - Cognitive data with TEDALL (Education) regressed out. Scores   #
+#     are not standardized.                                          #
+#   - Cognitive data with above adjustment for TEDALL. Scores are    #
+#     standardized (z-scored) based on VETSA1 means and sd.          #
+#                                                                    #
+# Inputs:                                                            #
+# --------------                                                     #
+#   dataV1: VETSA 1 dataset including variables needed for MCI Dx    #
+#   dataV2: VETSA 2 dataset including variables needed for MCI Dx    #
+#   dataInfo: Dataset with subject info needed to adjustment. This   #
+#         includes: vetsaid, case, NAS201TRAN, VETSAGRP              #
+#   dataExclude: Dataset specifying subjects who should be excluded  #
+#         from MCI Dx (e.g., stroke or large tumor). This            #
+#         should include vetsaid and a variable called               #
+#         AnyMCIExclude with values 0=include and 1=exclude          #
+#                                                                    #
+# Output:                                                            #
+#----------------                                                    #
+#   V1V2_RawScores.csv: Unadjusted VETSA 1/2 scores combined into    #
+#         one dataset                                                #
+#   V1V2_NAS201TRAN_Adj.csv: VETSA 1/2 scores that have been         #
+#         adjusted for age 20 AFQT. All scores will have the a       #
+#         suffix of "_adj"                                           #
+#                                                                    #  
+#                                                                    #
+#                                                                    #
+#                                                                    #
+# The script adjusts V1 and V2 test scores by regressing out age 20  # 
+# AFQT (NAS201TRAN). Mixed effects models are used to account for    #
+# twin pairs, and the intercept is added back in to retain mean      #
+# level differences.                                                 #
+######################################################################
 
 # Import libraries
 library(dplyr)
