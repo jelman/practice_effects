@@ -1,63 +1,132 @@
-#################################################################################
-# Script to create datasets for practice effect analyses.                       #
-# This script will create four datasets:                                        #
-#   - Cognitive data with nas201tran (age 20 AFQT) regressed out. Scores are    #
-#     not standardized.                                                         #
-#   - Cognitive data with above adjustment for nas201tran. Scores are           # 
-#     standardized (z-scored)                                                   #
-#     based on VETSA1 means and sd.                                             #
-#   - Cognitive data with TEDALL (Education) regressed out. Scores are not      # 
-#     standardized.                                                             #
-#   - Cognitive data with above adjustment for TEDALL. Scores are standardized  #
-#     (z-scored) based on VETSA1 means and sd.                                  #
-#                                                                               #
-#################################################################################
+######################################################################
+# Script to create datasets for practice effect analyses.            #
+# This script will create four datasets:                             #
+#   - Cognitive data with nas201tran (age 20 AFQT) regressed out.    #      
+#     Scores are not standardized.                                   #
+#   - Cognitive data with above adjustment for nas201tran. Scores    #
+#     are standardized (z-scored) based on VETSA1 means and sd.      #
+#   - Cognitive data with TEDALL (Education) regressed out. Scores   #
+#     are not standardized.                                          #
+#   - Cognitive data with above adjustment for TEDALL. Scores are    #
+#     standardized (z-scored) based on VETSA1 means and sd.          #
+#                                                                    #
+# Inputs:                                                            #
+# --------------                                                     #
+#   dataV1: VETSA 1 dataset including variables needed for MCI Dx    #
+#   dataV2: VETSA 2 dataset including variables needed for MCI Dx    #
+#   dataInfo: Dataset with subject info needed to adjustment. This   #
+#         includes: vetsaid, case, NAS201TRAN, VETSAGRP              #
+#   dataExclude: Dataset specifying subjects who should be excluded  #
+#         from MCI Dx (e.g., stroke or large tumor). This            #
+#         should include vetsaid and a variable called               #
+#         AnyMCIExclude with values 0=include and 1=exclude          #
+#                                                                    #
+# Output:                                                            #
+#----------------                                                    #
+#   V1V2_RawScores.csv: Unadjusted VETSA 1/2 scores combined into    #
+#         one dataset                                                #
+#   V1V2_NAS201TRAN_Adj.csv: VETSA 1/2 scores that have been         #
+#         adjusted for age 20 AFQT. All scores will have the a       #
+#         suffix of "_adj"                                           #
+#                                                                    #  
+#                                                                    #
+#                                                                    #
+#                                                                    #
+# The script adjusts V1 and V2 test scores by regressing out age 20  # 
+# AFQT (NAS201TRAN). Mixed effects models are used to account for    #
+# twin pairs, and the intercept is added back in to retain mean      #
+# level differences.                                                 #
+######################################################################
 
-# Import libraries
 library(dplyr)
+library(haven)
+library(readxl)
 
-# Load raw test scores and demographics data
-allData = read.csv("~/netshare/M/PSYCH/KREMEN/Practice Effect Cognition/data/raw/V1V2_CogData_Raw.csv",
-                   stringsAsFactors = FALSE)
 
-# Convert all variable names to upper case
-names(allData) = toupper(names(allData))
+#---------------------------------------#
+#           LOAD AND MERGE DATA         #
+#---------------------------------------#
 
-### Log transform timing data ###
-
-# Get names of variables to transform
-timeVarsV1 = c("TRL1T","TRL2T","TRL3T","TRL4T","TRL5T","SRTLMEAN","SRTLSTD","SRTRMEAN",
-                "SRTRSTD","SRTGMEAN","SRTGSTD","CHRTLMEAN","CHRTRMEAN","CHRTLSTD",
-                "CHRTRSTD","CHRTGMEAN","CHRTGSTD")
-timeVarsLogV1 = paste0(timeVarsV1, "LOG")
-timeVarsV2 = paste0(timeVarsV1, "_V2")
-timeVarsLogV2 = paste0(timeVarsLogV1, "_V2")
-
-# Transform
-allData[timeVarsLogV1] = log(allData[timeVarsV1])                
-allData = dplyr::select(allData, -one_of(timeVarsV1))
-allData[timeVarsLogV2] = log(allData[timeVarsV2])                
-allData = dplyr::select(allData, -one_of(timeVarsV2))
-
-### Save out unadjusted scores on raw score scale ###
-write.csv(allData, 
-          "~/netshare/M/PSYCH/KREMEN/Practice Effect Cognition/data/V1V2_CogData_Unadj.csv",
-          row.names = FALSE)
-
+### Define variable names of interest and load data ###
 # Create list of raw variable names to adjust
 rawVarsV1 = c("MR1COR","TRL1TLOG","TRL2TLOG","TRL3TLOG","TRL4TLOG","TRL5TLOG","CSSACC","MTXRAW","CVA1RAW","CVATOT","CVSDFR","CVLDFR",
               "AFQTPCT","AFQTVOCPCT","AFQTARPCT","AFQTTLPCT","AFQTBXPCT","AFQTPCTTRAN","AFQTVOCPCTTRAN","AFQTARPCTTRAN","AFQTTLPCTTRAN",
               "AFQTBXPCTTRAN","DSFRAW","DSBRAW","DSFMAX","SSPFRAW","SSPBRAW","LNTOT","LMITOT","LMDTOT","VRITOT","VRDTOT","VRCTOT","HFTOTCOR",
-              "STRWRAW","STRCRAW","STRCWRAW","STRIT","LFFCOR","LFACOR","LFSCOR","LFCOR","CFANCOR","CFBNCOR","CFCOR","CSCOR","SRTLMEANLOG",
-              "SRTLSTDLOG","SRTRMEANLOG","SRTRSTDLOG","SRTGMEANLOG","SRTGSTDLOG","CHRTLMEANLOG","CHRTRMEANLOG","CHRTLSTDLOG",
-              "CHRTRSTDLOG","CHRTGMEANLOG","CHRTGSTDLOG","RSATOT","AXHITRATE","AXFARATE","AXMISSRATE","BXHITRATE","BXFARATE",
-              "BXMISSRATE","CPTDPRIME")
+              "STRWRAW","STRCRAW","STRCWRAW","STRIT","LFFCOR","LFACOR","LFSCOR","LFCOR","CFANCOR","CFBNCOR","CFCOR","CSCOR","RSATOT",
+              "SRTLMEANLOG","SRTLSTDLOG","SRTRMEANLOG","SRTRSTDLOG","SRTGMEANLOG","SRTGSTDLOG","CHRTLMEANLOG","CHRTRMEANLOG","CHRTLSTDLOG",
+              "CHRTRSTDLOG","CHRTGMEANLOG","CHRTGSTDLOG")
 rawVarsV2 = paste0(rawVarsV1, "_V2")
+rawVarsV3 = paste0(rawVarsV1, "_V3")
 
 # Print variable names and verify these are correct
 rawVarsV1
 rawVarsV2
+rawVarsV3
 
+# Load raw test scores and demographics data. Rename all columns to upper
+dataV1 = read_sas("M:/PSYCH/KREMEN/VETSA DATA FILES_852014/a_VETSA 1 & 2 DATA_MOST UP TO DATE 7_2_2015/VETSA 1 Aging Most up to date July 2 2015/vetsa1merged_22dec2016_nomiss.sas7bdat")
+names(dataV1) = toupper(names(dataV1))
+
+dataV2 = read_sas("M:/PSYCH/KREMEN/VETSA DATA FILES_852014/a_VETSA 1 & 2 DATA_MOST UP TO DATE 7_2_2015/VETSA 2 Aging Most up to date July 2 2015/vetsa2merged_23dec2016_nomiss.sas7bdat")
+names(dataV2) = toupper(names(dataV2))
+rt_dataV2 = read.csv("M:/PSYCH/KREMEN/VETSA DATA FILES_852014/Reaction Time Data V2/vetsa2_reactiontime_merge.csv")
+names(rt_dataV2) = toupper(names(rt_dataV2))
+dataV2 = dataV2 %>% left_join(rt_dataV2, by="VETSAID")
+
+dataV3 = read_excel("M:/PSYCH/KREMEN/VETSA DATA FILES_852014/a_VETSA3 interim datasets/NeuroPsychScores7192018.xlsx")
+names(dataV3) = toupper(names(dataV3))
+dataV3 = dataV3 %>% rename(VETSAID = SUBJECTID)
+names(dataV3)[7:length(names(dataV3))] = paste0(names(dataV3)[7:length(names(dataV3))], "_V3")
+
+dataInfo = read.csv("M:/PSYCH/KREMEN/VETSA DATA FILES_852014/a_Practice effect revised cog scores/Practice Effect MCI/VETSA3/Data/SubjectInfo_TestingOnly.csv")
+names(dataInfo) = toupper(names(dataInfo))
+dataExclude = read.csv("M:/PSYCH/KREMEN/VETSA DATA FILES_852014/a_Practice effect revised cog scores/Practice Effect MCI/VETSA3/Data/V1V2MCI_Exclude.csv", stringsAsFactors = F)
+names(dataExclude) = toupper(names(dataExclude))
+
+
+### Log transform timing data ### 
+# Get names of variables to transform
+timeVarsV1 = c("TRL1T","TRL2T","TRL3T","TRL4T","TRL5T","SRTLMEAN","SRTLSTD","SRTRMEAN",
+               "SRTRSTD","SRTGMEAN","SRTGSTD","CHRTLMEAN","CHRTRMEAN","CHRTLSTD",
+               "CHRTRSTD","CHRTGMEAN","CHRTGSTD")
+timeVarsLogV1 = paste0(timeVarsV1, "LOG")
+timeVarsV2 = paste0(timeVarsV1, "_V2")
+timeVarsLogV2 = paste0(timeVarsLogV1, "_V2")
+timeVarsV3 = paste0(timeVarsV1, "_V3")
+timeVarsLogV3 = paste0(timeVarsLogV1, "_V3")
+
+# Transform
+dataV1[timeVarsLogV1] = log(dataV1[timeVarsV1])                
+dataV1 = dplyr::select(dataV1, -one_of(timeVarsV1))
+dataV2[timeVarsLogV2] = log(dataV2[timeVarsV2])                
+dataV2 = dplyr::select(dataV2, -one_of(timeVarsV2))
+dataV3[timeVarsLogV3] = log(dataV3[timeVarsV3])                
+dataV3 = dplyr::select(dataV3, -one_of(timeVarsV3))
+
+# Select only variables to be adjusted
+dataV1 = dataV1 %>% select(VETSAID, rawVarsV1)
+dataV2 = dataV2 %>% select(VETSAID, rawVarsV2)
+dataV3 = dataV3 %>% select(VETSAID, rawVarsV3)
+
+### Merge all data and apply excludes ###
+# Join all data
+allData = dataV1 %>% full_join(dataV2, by="vetsaid")
+allData = allData %>% full_join(dataV3, by="vetsaid")
+allData = dataInfo %>%  
+  dplyr::select(vetsaid, case, NAS201TRAN, VETSAGRP) %>%
+  right_join(allData, by="vetsaid") 
+
+# Exclude indidivuals in MCI exclude list or with missing age 20 AFQT data
+allData = allData %>%
+  left_join(dataExclude, by="vetsaid") %>%
+  mutate(AnyMCIExclude = ifelse(!is.na(AnyMCIExclude), AnyMCIExclude, 0)) %>%
+  filter(AnyMCIExclude!=1 & !is.na(NAS201TRAN)) %>%
+  dplyr::select(-V1MCIExclude, -V2MCIExclude, -AnyMCIExclude) 
+
+### Save out unadjusted scores on raw score scale ###
+write.csv(allData, 
+          "M:/PSYCH/KREMEN/VETSA DATA FILES_852014/a_Practice effect revised cog scores/Practice Effect Cognition/data/V1V2V3_CogData_Unadj.csv",
+          row.names = FALSE)
 
 
 #----------------------------------------------------------------------------#
