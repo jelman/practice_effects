@@ -269,7 +269,7 @@ for(i in rawVarsV3){
 
 # Save out adjusted and z-scored dataset
 write.csv(nasAdjZscoresData, 
-          "/home/jelman/netshare/M/PSYCH/KREMEN/VETSA DATA FILES_852014/a_Practice effect revised cog scores/Practice Effect Cognition/VETSA 3/data/V1V2_CogData_NASAdj_Z.csv",
+          "/home/jelman/netshare/M/PSYCH/KREMEN/VETSA DATA FILES_852014/a_Practice effect revised cog scores/Practice Effect Cognition/VETSA 3/data/V1V2V3_CogData_NASAdj_Z.csv",
           row.names = FALSE)
 
 # Save out means and standard deviations used to standardize scores
