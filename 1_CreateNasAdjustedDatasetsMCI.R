@@ -73,14 +73,12 @@ rt_dataV2 = read.csv("~/netshare/M/PSYCH/KREMEN/VETSA DATA FILES_852014/Reaction
 names(rt_dataV2) = toupper(names(rt_dataV2))
 dataV2 = dataV2 %>% left_join(rt_dataV2, by="VETSAID")
 
-dataV3 = read.csv("/home/jelman/netshare/M/PSYCH/KREMEN/VETSA DATA FILES_852014/a_Practice effect revised cog scores/Practice Effect Cognition/VETSA 3/data/vetsa3merged.csv")
+dataV3 = read.csv("~/netshare/M/PSYCH/KREMEN/VETSA DATA FILES_852014/a_Practice effect revised cog scores/Practice Effect Cognition/VETSA 3/data/vetsa3merged.csv")
 names(dataV3) = toupper(names(dataV3))
 names(dataV3)[7:length(names(dataV3))] = paste0(names(dataV3)[7:length(names(dataV3))], "_V3")
 
-dataInfo = read.csv("~/netshare/M/PSYCH/KREMEN/VETSA DATA FILES_852014/a_Practice effect revised cog scores/Practice Effect MCI/VETSA3/Data/SubjectInfo_TestingOnly.csv")
+dataInfo = read.csv("~/netshare/M/PSYCH/KREMEN/VETSA DATA FILES_852014/a_Practice effect revised cog scores/Practice Effect Cognition/VETSA 3/data/SubjectInfo_TestingOnly.csv")
 names(dataInfo) = toupper(names(dataInfo))
-dataExclude = read.csv("~/netshare/M/PSYCH/KREMEN/VETSA DATA FILES_852014/a_Practice effect revised cog scores/Practice Effect MCI/VETSA3/Data/V1V2MCI_Exclude.csv", stringsAsFactors = F)
-names(dataExclude) = toupper(names(dataExclude))
 
 
 ### Log transform timing data ### 
@@ -116,16 +114,13 @@ allData = dataInfo %>%
   dplyr::select(VETSAID, CASE, NAS201TRAN, VETSAGRP) %>%
   right_join(allData, by="VETSAID") 
 
-# Exclude indidivuals in MCI exclude list or with missing age 20 AFQT data
+# Exclude indidivuals missing age 20 AFQT data
 allData = allData %>%
-  left_join(dataExclude, by="VETSAID") %>%
-  mutate(ANYMCIEXCLUDE = ifelse(!is.na(ANYMCIEXCLUDE), ANYMCIEXCLUDE, 0)) %>%
-  filter(ANYMCIEXCLUDE!=1 & !is.na(NAS201TRAN)) %>%
-  dplyr::select(-V1MCIEXCLUDE, -V2MCIEXCLUDE, -ANYMCIEXCLUDE) 
+  filter(!is.na(NAS201TRAN)) 
 
 ### Save out unadjusted scores on raw score scale ###
 write.csv(allData, 
-          "/home/jelman/netshare/M/PSYCH/KREMEN/VETSA DATA FILES_852014/a_Practice effect revised cog scores/Practice Effect Cognition/VETSA 3/data/V1V2V3_CogData_Unadj.csv",
+          "~/netshare/M/PSYCH/KREMEN/VETSA DATA FILES_852014/a_Practice effect revised cog scores/Practice Effect Cognition/VETSA 3/data/V1V2V3_CogData_Unadj.csv",
           row.names = FALSE)
 
 
