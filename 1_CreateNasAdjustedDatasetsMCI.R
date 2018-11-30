@@ -212,7 +212,7 @@ addScaleVals = function(df,varname, x) {
 #-----------------------------------------------------------------------------------#
 
 # Adjust raw scores from VETSA 1 and VETSA 2
-adjVars = c(rawVarsV1, rawVarsV2)
+adjVars = c(rawVarsV1, rawVarsV2, rawVarsV3)
 
 ### Set number of demographic variables included in dataframe (these won't be adjusted) ###
 nDemoVars = 7
@@ -227,7 +227,7 @@ regVars = paste("scale(NAS201TRAN)", sep=" + ")
 nasAdjRawScoresData = adjustDataset(regVars, adjVars, nDemoVars, "nas", data)
 
 # Save out dataset with Age 20 AFQT regressed out
-write.csv(nasAdjRawScoresData, "~/netshare/M/PSYCH/KREMEN/Practice Effect Cognition/data/V1V2_CogData_NASAdj.csv",
+write.csv(nasAdjRawScoresData, "/home/jelman/netshare/M/PSYCH/KREMEN/VETSA DATA FILES_852014/a_Practice effect revised cog scores/Practice Effect Cognition/VETSA 3/data/V1V2V3_CogData_NASAdj.csv",
           row.names=F)
 
 #-----------------------------------------------------------------------------------#
@@ -264,13 +264,25 @@ for(i in rawVarsV2){
   nasAdjZscoresData[[varnameV2]] = NULL
 }
 
+# Scale VETSA 3 variables that have been adjusted for nas201tran using VETSA 1 mean and SD
+# Delete adjusted raw variable from dataset
+for(i in rawVarsV3){
+  varnameV3 = paste0(i, "_nas")
+  zvarname = gsub("_nas","_znas",varnameV3)
+  varnameV1 = gsub("_V3","",varnameV3)
+  nasAdjZscoresData[[zvarname]] = scale(nasAdjZscoresData[[varnameV3]],
+                                        center=scaleValues$Mean[scaleValues$Variable==varnameV1],
+                                        scale=scaleValues$SD[scaleValues$Variable==varnameV1])
+  nasAdjZscoresData[[varnameV3]] = NULL
+}
+
 # Save out adjusted and z-scored dataset
 write.csv(nasAdjZscoresData, 
-          "~/netshare/M/PSYCH/KREMEN/Practice Effect Cognition/data/V1V2_CogData_NASAdj_Z.csv",
+          "/home/jelman/netshare/M/PSYCH/KREMEN/VETSA DATA FILES_852014/a_Practice effect revised cog scores/Practice Effect Cognition/VETSA 3/data/V1V2_CogData_NASAdj_Z.csv",
           row.names = FALSE)
 
 # Save out means and standard deviations used to standardize scores
-write.csv(scaleValues, "~/netshare/M/PSYCH/KREMEN/Practice Effect Cognition/data/V1_NASAdj_Means_SDs.csv",
+write.csv(scaleValues, "/home/jelman/netshare/M/PSYCH/KREMEN/VETSA DATA FILES_852014/a_Practice effect revised cog scores/Practice Effect Cognition/VETSA 3/data/V1_NASAdj_Means_SDs.csv",
           row.names = FALSE)
 
 
