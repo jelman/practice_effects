@@ -54,7 +54,7 @@ library(readxl)
 rawVarsV1 = c("MR1COR","TRL1TLOG","TRL2TLOG","TRL3TLOG","TRL4TLOG","TRL5TLOG","CSSACC","MTXRAW","CVA1RAW","CVATOT","CVSDFR","CVLDFR",
               "AFQTPCT","AFQTVOCPCT","AFQTARPCT","AFQTTLPCT","AFQTBXPCT","AFQTPCTTRAN","AFQTVOCPCTTRAN","AFQTARPCTTRAN","AFQTTLPCTTRAN",
               "AFQTBXPCTTRAN","DSFRAW","DSBRAW","DSFMAX","SSPFRAW","SSPBRAW","LNTOT","LMITOT","LMDTOT","VRITOT","VRDTOT","VRCTOT","HFTOTCOR",
-              "STRWRAW","STRCRAW","STRCWRAW","STRIT","LFFCOR","LFACOR","LFSCOR","LFCOR","CFANCOR","CFBNCOR","CFCOR","CSCOR","RSATOT")
+              "STRWRAW","STRCRAW","STRCWRAW","STRIT","LFFCOR","LFACOR","LFSCOR","LFCOR","CFANCOR","CFBNCOR","CFCOR","CSCOR")
 rawVarsV2 = paste0(rawVarsV1, "_V2")
 rawVarsV3 = paste0(rawVarsV1, "_V3")
 
@@ -73,11 +73,11 @@ rt_dataV2 = read.csv("~/netshare/M/PSYCH/KREMEN/VETSA DATA FILES_852014/Reaction
 names(rt_dataV2) = toupper(names(rt_dataV2))
 dataV2 = dataV2 %>% left_join(rt_dataV2, by="VETSAID")
 
-dataV3 = read.csv("~/netshare/M/PSYCH/KREMEN/VETSA DATA FILES_852014/a_Practice effect revised cog scores/Practice Effect Cognition/VETSA 3/data/vetsa3merged.csv")
+dataV3 = read_sas("~/netshare/M/PSYCH/KREMEN/VETSA DATA FILES_852014/a_Practice effect revised cog scores/Practice Effect Cognition/VETSA 3/data/vetsa3_data_cuffoff_dec_06_2018.sas7bdat")
 names(dataV3) = toupper(names(dataV3))
-names(dataV3)[7:length(names(dataV3))] = paste0(names(dataV3)[7:length(names(dataV3))], "_V3")
+names(dataV3)[4:length(names(dataV3))] = paste0(names(dataV3)[4:length(names(dataV3))], "_V3")
 
-dataInfo = read.csv("~/netshare/M/PSYCH/KREMEN/VETSA DATA FILES_852014/a_Practice effect revised cog scores/Practice Effect Cognition/VETSA 3/data/SubjectInfo_TestingOnly.csv")
+dataInfo = read.csv("~/netshare/M/PSYCH/KREMEN/VETSA DATA FILES_852014/a_Practice effect revised cog scores/Practice Effect Cognition/VETSA 3/data/SubjectInfo.csv")
 names(dataInfo) = toupper(names(dataInfo))
 
 
@@ -128,7 +128,7 @@ write.csv(allData,
 #                     Define functions                                       #
 #----------------------------------------------------------------------------#
 
-adjustDataset = function(regVars,adjVars,nDemoVars=7,suffix="adj",data){
+adjustDataset = function(regVars,adjVars,nDemoVars=4,suffix="adj",data){
   #######################################################################
   # Adjust dataset for specified set of variables.Regresses passed      #
   # variables from each measure using linear regression. The intercept  #
@@ -206,7 +206,7 @@ addScaleVals = function(df,varname, x) {
 adjVars = c(rawVarsV1, rawVarsV2, rawVarsV3)
 
 ### Set number of demographic variables included in dataframe (these won't be adjusted) ###
-nDemoVars = 7
+nDemoVars = 4
 
 # Filter out subjects missing variable to be regressed out
 data = subset(allData, !is.na(allData$NAS201TRAN))
