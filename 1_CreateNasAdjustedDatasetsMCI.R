@@ -19,13 +19,23 @@
 #                                                                    #
 # Output:                                                            #
 #----------------                                                    #
-#   V1V2_RawScores.csv: Unadjusted VETSA 1/2 scores combined into    #
-#         one dataset                                                #
-#   V1V2_NAS201TRAN_Adj.csv: VETSA 1/2 scores that have been         #
-#         adjusted for age 20 AFQT. All scores will have the a       #
-#         suffix of "_adj"                                           #
-#                                                                    #  
-#                                                                    #
+#   V1V2V3_CogData_Unadj.csv: Unadjusted VETSA 1/2/3 scores combined #
+#         into one dataset. Practice effect adjustments will be      #
+#         applied to this dataset after they are calculated. This    #
+#         will allow for analyses where age 20 AFQT is a variables   #
+#         of interest. Includes V1new subjects so that their scores  #
+#         can be corrected as well.                                  # 
+#   V1V2V3_CogData_NASAdj.csv: VETSA 1/2/3 scores on the raw score   #
+#         scale that have been adjusted for age 20 AFQT. This        #
+#         dataset will be used to calculate practice effects. It     #
+#         does not include V1new subjects. All adjusted scores will  #
+#         have the suffix of "_nas"                                  #
+#   V1V2V3_CogData_NASAdj_Z.csv: VETSA 1/2/3 scores z-scored based   #
+#         V1 means and SD that have been adjusted for age 20 AFQT.   #
+#         This dataset can be used to calculate practice effects in  #
+#         z-score units in the future. It does not include V1new     #
+#         subjects. All adjusted scores will have the suffix of      #
+#         "_znas"                                                    #  
 #                                                                    #
 #                                                                    #
 # The script adjusts V1, V2, and V3 test scores by regressing out    #
@@ -195,6 +205,7 @@ addScaleVals = function(df,varname, x) {
 ### Begin creating adjusted datasets ###
 ########################################
 
+
 #-----------------------------------------------------------------------------------#
 # Create dataset adjusted for nas201tran (Age 20 AFQT)                              #
 #                                                                                   #
@@ -210,6 +221,9 @@ nDemoVars = 4
 
 # Filter out subjects missing variable to be regressed out
 data = subset(allData, !is.na(allData$NAS201TRAN))
+
+# Remove V1 new subjects before regressing out age 20 AFQT
+data = subset(data, !grepl("V1ne", data$VETSAGRP))
 
 # Specify nas201tran (Age 20 AFQT as variable to regress out)
 regVars = paste("scale(NAS201TRAN)", sep=" + ")
