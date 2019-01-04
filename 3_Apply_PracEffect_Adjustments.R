@@ -1,53 +1,70 @@
 #########################################################################################
-# This script adjusts cognitive test scores used in MCI diagnosis for practice effects. # 
-# It should be run after adjusting for age 20 AFQT and calculating practice effects.    #
-# The resulting scores will be adjusted for age 20 AFQT and practice effects, yet will  #
-# remain on the raw score scale.                                                        #
+# This script adjusts cognitive test scores for practice effects. Scores have *not*     # 
+# been adjusted for age 20 AFQT and remain on the raw test score scale. These are       #
+# adjusted by practice effects calculated from scores that *have* been adjusted for     #
+# AFQT, but remain on raw score scale. Can be used when age 20 AFQT is a predictor of   #
+# interest.                                                                             #
 #                                                                                       #
 # Note: Only follow-up scores of returnee subjects are adjusted for practice            #
 # effects.                                                                              #
 #                                                                                       #
 #########################################################################################
 
+library(dplyr)
 
-# Scores that have been adjusted for AFQT 
-nas201adj_df = read.csv("/home/jelman/netshare/K/Projects/PracEffects_MCI/data/V1V2_NAS201TRAN_Adj.csv",
-                        stringsAsFactors = F)
+###############################################
+#     Define variables names and functions    #
+###############################################
 
-## Load calculated practice effects values to adjust by ##
+# Function to replace negative numbers with zero
+zeroFloor = function(x){
+  x = (x + abs(x)) / 2
+  x}
 
-# Values that have been calculated based on scores adjusted for AFQT but on raw test score scale.
-pracEffects_RawScale = read.csv("/home/jelman/netshare/K/Projects/PracEffects_MCI/results/PracEffectsMCI_NAS201TRAN_Results.csv",
-                       row.names=1, stringsAsFactors = F)
-
-
-# Get basenames of test scores to adjust
-varNames = row.names(pracEffects_RawScale)
-
-
-#-------------------------------------------#
-#     Apply practice effect adjustments     # 
-#-------------------------------------------#
-
-# Apply practice effect adjustment to scores that have had age 20 AFQT regressed out 
-nas201adj_PEadj = nas201adj_df
-idxV1V2 = which(nas201adj_PEadj$VETSAGRP=="V1V2")
-for (varName in varNames) {
-  varName_V2 = paste0(varName, "_V2_adj")
-  varName_V2_PE = paste0(varName_V2, "_pe")
-  peVal = pracEffects_RawScale[varName,"PracticeEffect"]
-  nas201adj_PEadj[idxV1V2, varName_V2_PE] = nas201adj_PEadj[idxV1V2, varName_V2] - peVal
+# Function to replace times over a given cutoff
+timeCeiling = function(x, maxt){
+  x[x>log(maxt) & !is.na(x)] = log(maxt)
+  x
 }
 
-# Save out dataset that has been adjusted for AFQT and Practice Effects
-write.csv(nas201adj_PEadj, '/home/jelman/netshare/K/Projects/PracEffects_MCI/results/V1V2_NAS201TRANadj_PEadj.csv',
-          row.names=FALSE)
 
-# Save out V1 and V2 separately
-nas201adj_PEadjV1 = nas201adj_PEadj %>% dplyr::select(-contains("_V2")) 
-nas201adj_PEadjV2 = nas201adj_PEadj %>% dplyr::select(VETSAID, CASE, NAS201TRAN, VETSAGRP, contains("_V2"))
+#############################################
+#     Apply practice effect adjustments     # 
+#############################################
 
-write.csv(nas201adj_PEadjV1, '/home/jelman/netshare/K/Projects/PracEffects_MCI/results/V1_NAS201TRANadj_PEadj.csv',
-          row.names=FALSE)
-write.csv(nas201adj_PEadjV2, '/home/jelman/netshare/K/Projects/PracEffects_MCI/results/V2_NAS201TRANadj_PEadj.csv',
+## Apply practice effect adjustments ## 
+
+# Load dataset to be adjusted: No age 20 afqt adjustment, raw score scale
+unadj_df = read.csv("~/netshare/M/PSYCH/KREMEN/VETSA DATA FILES_852014/a_Practice effect revised cog scores/Practice Effect Cognition/VETSA 3/data/V1V2V3_CogData_Unadj.csv",
+                    stringsAsFactors = F)
+
+# Load practice effect values calculated based scores adjusted for AFQT but on raw score scale
+pracEffects = read.csv("~/netshare/M/PSYCH/KREMEN/Practice Effect Cognition/results/PracEffectValues_NASAdj.csv",
+                       row.names=1, stringsAsFactors = F)
+
+# Get basenames of test scores to adjust
+varNames = row.names(pracEffects)
+unadj_df_PEadj = unadj_df
+idxV1V2 = which(unadj_df_PEadj$VETSAGRP=="V1V2")
+for (varName in varNames) {
+  varName_V2 = paste0(varName, "_V2")
+  newVarName_V2 = paste0(varName_V2,"p")
+  peVal = pracEffects[varName,"PracticeEffect"]
+  unadj_df_PEadj[, newVarName_V2] = unadj_df_PEadj[, varName_V2]
+  unadj_df_PEadj[idxV1V2, newVarName_V2] = unadj_df_PEadj[idxV1V2, newVarName_V2] - peVal
+}
+
+# Replace invalid negative numbers with 0
+negVars = names(unadj_df_PEadj)[grepl("TRAN", names(unadj_df_PEadj)) | grepl("DPRIME", names(unadj_df_PEadj))]
+posVars = names(unadj_df_PEadj)[(!names(unadj_df_PEadj) %in% negVars) & (!sapply(unadj_df_PEadj, is.character))]  
+unadj_df_PEadj = unadj_df_PEadj %>% mutate_at(.cols=posVars, .funs=zeroFloor)
+
+# Replace trails times over limit with the max value allowed
+trl240vars = names(unadj_df_PEadj)[grepl("TRL4T", names(unadj_df_PEadj))]
+unadj_df_PEadj = unadj_df_PEadj %>% mutate_at(.cols=trl240vars, .funs=timeCeiling, maxt=240)
+trl150vars = names(unadj_df_PEadj)[grepl("TRL[1235]T", names(unadj_df_PEadj))]
+unadj_df_PEadj = unadj_df_PEadj %>% mutate_at(.cols=trl150vars, .funs=timeCeiling, maxt=150)
+
+# Save out dataset of scores not adjusted for AFQT, raw score scale, practice effect adjusted
+write.csv(unadj_df_PEadj, '~/netshare/M/PSYCH/KREMEN/Practice Effect Cognition/data/V1V2_CogData_PE.csv',
           row.names=FALSE)
