@@ -31,13 +31,12 @@ library(boot)
 #  Practice effect:                                                                               #
 #    P = D - A                                                                                    #
 #                                                                                                 #
-# Follow-ups to adjust:                                                                           #
+# Follow-ups to calculate practice effects for:                                                   #
 # ---------------------                                                                           #
 # V1V2V3:   time1 -> time2, time2 -> time3                                                        #
 # V1V2:     time1 -> time2                                                                        #
 # V2V3:     time2 -> time3                                                                        #
 # V1V3:     time1 -> time3                                                                        #
-# V1newV2:  time2 -> time3 (calculated as time1 -> time2)                                         #
 #                                                                                                 #
 ###################################################################################################
   
@@ -52,8 +51,8 @@ allDat = read.csv("/home/jelman/netshare/M/PSYCH/KREMEN/VETSA DATA FILES_852014/
 subsetDat = allDat %>%
   filter(VETSAGRP=="V1V2V3" | VETSAGRP=="V1V2" | VETSAGRP=="V1V3" | VETSAGRP=="V2V3" | VETSAGRP=="V1" | VETSAGRP=="V2" | VETSAGRP=="V3")
 
-# Take out V1ne subject in order to add back in later
-V1neDat = allDat %>% filter(VETSAGRP=="v1ne")
+# # Take out V1ne subject in order to add back in later
+# V1neDat = allDat %>% filter(VETSAGRP=="v1ne")
 
 # Create vector of all variable names to calculate practice effects for
 # testVars = c("MR1COR","TRL1TLOG","TRL2TLOG","TRL3TLOG","TRL4TLOG","TRL5TLOG","CSSACC","MTXRAW","CVA1RAW",
@@ -239,7 +238,7 @@ SEvals = calcStdError(subsetDat, testVars, suffix, namesReturn, namesReplace, na
 # Combine practice effects results and permutation p-values
 results = data.frame("PracticeEffect" = pracEffects, SE=SEvals, "P" = pvals)
 # Write out practice effect results (adjustment value, estimate of precision, and p value)
-write.csv(results, '~/netshare/M/PSYCH/KREMEN/VETSA DATA FILES_852014/a_Practice effect revised cog scores/Practice Effect Cognition/VETSA 3/results/PracEffectsMCI_NAS201TRAN_V1V2V3-t2t3.csv')
+write.csv(results, '~/netshare/M/PSYCH/KREMEN/VETSA DATA FILES_852014/a_Practice effect revised cog scores/Practice Effect Cognition/VETSA 3/results/PracEffects_NAS201TRAN_V1V2V3-t2t3.csv')
 
 
 
@@ -267,7 +266,7 @@ SEvals = calcStdError(subsetDat, testVars, suffix, namesReturn, namesReplace, na
 # Combine practice effects results and permutation p-values
 results = data.frame("PracticeEffect" = pracEffects, SE=SEvals, "P" = pvals)
 # Write out practice effect results (adjustment value, estimate of precision, and p value)
-write.csv(results, '~/netshare/M/PSYCH/KREMEN/VETSA DATA FILES_852014/a_Practice effect revised cog scores/Practice Effect Cognition/VETSA 3/results/PracEffectsMCI_NAS201TRAN_V1V2-V1V2V3-t1t2.csv')
+write.csv(results, '~/netshare/M/PSYCH/KREMEN/VETSA DATA FILES_852014/a_Practice effect revised cog scores/Practice Effect Cognition/VETSA 3/results/PracEffects_NAS201TRAN_V1V2-V1V2V3-t1t2.csv')
 
 
 ###############################
@@ -294,7 +293,7 @@ SEvals = calcStdError(subsetDat, testVars, suffix, namesReturn, namesReplace, na
 # Combine practice effects results and permutation p-values
 results = data.frame("PracticeEffect" = pracEffects, SE=SEvals, "P" = pvals)
 # Write out practice effect results (adjustment value, estimate of precision, and p value)
-write.csv(results, '~/netshare/M/PSYCH/KREMEN/VETSA DATA FILES_852014/a_Practice effect revised cog scores/Practice Effect Cognition/VETSA 3/results/PracEffectsMCI_NAS201TRAN_V2V3-t2t3.csv')
+write.csv(results, '~/netshare/M/PSYCH/KREMEN/VETSA DATA FILES_852014/a_Practice effect revised cog scores/Practice Effect Cognition/VETSA 3/results/PracEffects_NAS201TRAN_V2V3-t2t3.csv')
 
 
 ###############################
@@ -321,32 +320,4 @@ SEvals = calcStdError(subsetDat, testVars, suffix, namesReturn, namesReplace, na
 # Combine practice effects results and permutation p-values
 results = data.frame("PracticeEffect" = pracEffects, SE=SEvals, "P" = pvals)
 # Write out practice effect results (adjustment value, estimate of precision, and p value)
-write.csv(results, '~/netshare/M/PSYCH/KREMEN/VETSA DATA FILES_852014/a_Practice effect revised cog scores/Practice Effect Cognition/VETSA 3/results/PracEffectsMCI_NAS201TRAN_V1V3-t1t3.csv')
-
-
-###############################
-#   V1V3:   time1 -> time3    #
-###############################
-
-# Set names of groups
-namesReturn = c("V1neV3")
-namesReplace = c("V2V3", "V2")
-namesAll = c("V1V2V3", "V1V2", "V1V3", "V1", "V1neV3", "V1ne")
-suffix = c("_nas", "_V3_nas")
-
-# Define indices of groups
-idxReturn = which(subsetDat$VETSAGRP %in% namesReturn)
-idxReplace = which(subsetDat$VETSAGRP %in% namesReplace)
-idxAll = which(subsetDat$VETSAGRP %in% namesAll)
-
-# Calculate practice effects for all cognitive domains and tests
-pracEffects = sapply(testVars, function(x) calcPracticeEffect(subsetDat, x, suffix, idxReturn, idxReplace, idxAll))
-# Calculate p-values for all tests
-pvals = calcPvalues(subsetDat, testvars, suffix, pracEffects, idxReturn, idxReplace, idxAll)
-# Calculate standard errors for all tests
-SEvals = calcStdError(subsetDat, testVars, suffix, namesReturn, namesReplace, namesAll)
-# Combine practice effects results and permutation p-values
-results = data.frame("PracticeEffect" = pracEffects, SE=SEvals, "P" = pvals)
-# Write out practice effect results (adjustment value, estimate of precision, and p value)
-write.csv(results, '~/netshare/M/PSYCH/KREMEN/VETSA DATA FILES_852014/a_Practice effect revised cog scores/Practice Effect Cognition/VETSA 3/results/PracEffectsMCI_NAS201TRAN_V1neV3-t1t2.csv')
-
+write.csv(results, '~/netshare/M/PSYCH/KREMEN/VETSA DATA FILES_852014/a_Practice effect revised cog scores/Practice Effect Cognition/VETSA 3/results/PracEffects_NAS201TRAN_V1V3-t1t3.csv')
