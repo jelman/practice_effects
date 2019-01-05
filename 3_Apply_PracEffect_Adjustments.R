@@ -110,6 +110,9 @@ idxV1neV3 = which(unadj_df$VETSAGRP %in% c("V1neV3"))
 unadj_df_PEadj = applyPEadjustment(unadj_df_PEadj, pracEffects_V1V2_V1V2V3_t1t2, idxV1neV3, "_V3")
 
 
+##########################################################
+#     Replace invalid scores and update empty values     # 
+##########################################################
 
 # Replace invalid negative numbers with 0
 negVars = names(unadj_df_PEadj)[grepl("TRAN", names(unadj_df_PEadj)) | grepl("DPRIME", names(unadj_df_PEadj))]
@@ -121,6 +124,21 @@ trl240vars = names(unadj_df_PEadj)[grepl("TRL4T", names(unadj_df_PEadj))]
 unadj_df_PEadj = unadj_df_PEadj %>% mutate_at(.vars=trl240vars, .funs=timeCeiling, maxt=240)
 trl150vars = names(unadj_df_PEadj)[grepl("TRL[1235]T", names(unadj_df_PEadj))]
 unadj_df_PEadj = unadj_df_PEadj %>% mutate_at(.vars=trl150vars, .funs=timeCeiling, maxt=150)
+
+# Add in unadjusted score to PE adjusted variables for replacements because currently only data from 
+# follow-up subjects exists in these columns.  
+# e.g., Copy values from MR1COR_V3 into MR1COR_V3p for subjects who only came at V3.
+v2Vars = names(unadj_df_PEadj)[grep("_V2$", names(unadj_df_PEadj))]
+for(varName in v2Vars){
+  varNamePE = paste0(varName, "p")
+  unadj_df_PEadj[varNamePE] = ifelse(is.na(unadj_df_PEadj[[varNamePE]]), unadj_df_PEadj[[varName]], unadj_df_PEadj[[varNamePE]]) 
+}
+v3Vars = names(unadj_df_PEadj)[grep("_V3$", names(unadj_df_PEadj))]
+for(varName in v3Vars){
+  varNamePE = paste0(varName, "p")
+  unadj_df_PEadj[varNamePE] = ifelse(is.na(unadj_df_PEadj[[varNamePE]]), unadj_df_PEadj[[varName]], unadj_df_PEadj[[varNamePE]]) 
+}
+
 
 # Save out dataset of scores not adjusted for AFQT, raw score scale, practice effect adjusted
 write.csv(unadj_df_PEadj, '~/netshare/M/PSYCH/KREMEN/VETSA DATA FILES_852014/a_Practice effect revised cog scores/Practice Effect Cognition/VETSA 3/data/V1V2V3_CogData_PE.csv',
