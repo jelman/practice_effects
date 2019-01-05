@@ -114,13 +114,13 @@ unadj_df_PEadj = applyPEadjustment(unadj_df_PEadj, pracEffects_V1V2_V1V2V3_t1t2,
 # Replace invalid negative numbers with 0
 negVars = names(unadj_df_PEadj)[grepl("TRAN", names(unadj_df_PEadj)) | grepl("DPRIME", names(unadj_df_PEadj))]
 posVars = names(unadj_df_PEadj)[(!names(unadj_df_PEadj) %in% negVars) & (!sapply(unadj_df_PEadj, is.character))]  
-unadj_df_PEadj = unadj_df_PEadj %>% mutate_at(.cols=posVars, .funs=zeroFloor)
+unadj_df_PEadj = unadj_df_PEadj %>% mutate_at(.vars=posVars, .funs=zeroFloor)
 
 # Replace trails times over limit with the max value allowed
 trl240vars = names(unadj_df_PEadj)[grepl("TRL4T", names(unadj_df_PEadj))]
-unadj_df_PEadj = unadj_df_PEadj %>% mutate_at(.cols=trl240vars, .funs=timeCeiling, maxt=240)
+unadj_df_PEadj = unadj_df_PEadj %>% mutate_at(.vars=trl240vars, .funs=timeCeiling, maxt=240)
 trl150vars = names(unadj_df_PEadj)[grepl("TRL[1235]T", names(unadj_df_PEadj))]
-unadj_df_PEadj = unadj_df_PEadj %>% mutate_at(.cols=trl150vars, .funs=timeCeiling, maxt=150)
+unadj_df_PEadj = unadj_df_PEadj %>% mutate_at(.vars=trl150vars, .funs=timeCeiling, maxt=150)
 
 # Save out dataset of scores not adjusted for AFQT, raw score scale, practice effect adjusted
 write.csv(unadj_df_PEadj, '~/netshare/M/PSYCH/KREMEN/VETSA DATA FILES_852014/a_Practice effect revised cog scores/Practice Effect Cognition/VETSA 3/data/V1V2V3_CogData_PE.csv',
