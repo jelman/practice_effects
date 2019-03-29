@@ -83,11 +83,11 @@ rt_dataV2 = read.csv("~/netshare/M/PSYCH/KREMEN/VETSA DATA FILES_852014/Reaction
 names(rt_dataV2) = toupper(names(rt_dataV2))
 dataV2 = dataV2 %>% left_join(rt_dataV2, by="VETSAID")
 
-dataV3 = read_sas("~/netshare/M/PSYCH/KREMEN/VETSA DATA FILES_852014/a_Practice effect revised cog scores/Practice Effect Cognition/VETSA 3/data/vetsa3_data_cuffoff_dec_06_2018.sas7bdat")
+dataV3 = read_sas("~/netshare/M/PSYCH/KREMEN/VETSA DATA FILES_852014/a_Practice effect revised cog scores/Practice Effect Cognition/VETSA 3/data/raw/vetsa3_data_cutoff_mar_27_19.sas7bdat")
 names(dataV3) = toupper(names(dataV3))
 names(dataV3)[4:length(names(dataV3))] = paste0(names(dataV3)[4:length(names(dataV3))], "_V3")
 
-dataInfo = read.csv("~/netshare/M/PSYCH/KREMEN/VETSA DATA FILES_852014/a_Practice effect revised cog scores/Practice Effect Cognition/VETSA 3/data/SubjectInfo.csv")
+dataInfo = read.csv("~/netshare/M/PSYCH/KREMEN/VETSA DATA FILES_852014/a_Practice effect revised cog scores/Practice Effect Cognition/VETSA 3/data/raw/SubjectInfo.csv")
 names(dataInfo) = toupper(names(dataInfo))
 
 
@@ -239,7 +239,7 @@ write.csv(nasAdjRawScoresData, "/home/jelman/netshare/M/PSYCH/KREMEN/VETSA DATA 
 # Create dataset adjusted for nas201tran (Age 20 AFQT) and standardized.            #
 #                                                                                   #
 # Dataset with NAS201TRAN (age 20 AFQT) regressed out is standardized (z-scored)    #
-# based on VETSA 2 means and sd.                                                    #
+# based on VETSA 1 means and sd.                                                    #
 #-----------------------------------------------------------------------------------#
 
 # Initialize dataframe to hold means and SDs
@@ -289,4 +289,3 @@ write.csv(nasAdjZscoresData,
 # Save out means and standard deviations used to standardize scores
 write.csv(scaleValues, "/home/jelman/netshare/M/PSYCH/KREMEN/VETSA DATA FILES_852014/a_Practice effect revised cog scores/Practice Effect Cognition/VETSA 3/data/V1_NASAdj_Means_SDs.csv",
           row.names = FALSE)
-
