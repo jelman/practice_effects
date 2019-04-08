@@ -40,12 +40,15 @@ library(boot)
 #                                                                                                 #
 ###################################################################################################
   
+# Get date for filenames
+dstamp = Sys.Date()
+
 #---------------------------------------------------------------------------#
 #   Load data, filter for subjects of interest and define tests             #
 #   to calculate practice effects for.                                      #
 #---------------------------------------------------------------------------#
 # Load data that has been adjusted for age 20 AFQT
-allDat = read.csv("/home/jelman/netshare/M/PSYCH/KREMEN/VETSA DATA FILES_852014/a_Practice effect revised cog scores/Practice Effect Cognition/VETSA 3/data/V1V2V3_CogData_NASAdj.csv")
+allDat = read.csv("/home/jelman/netshare/M/PSYCH/KREMEN/VETSA DATA FILES_852014/a_Practice effect revised cog scores/Practice Effect Cognition/VETSA 3/data/intermediate_files/V1V2V3_CogData_NoMissingNAS201TRAN_Unadj_2019-04-08.csv")
 
 # Select subjects from groups of interest
 subsetDat = allDat %>%
@@ -235,7 +238,8 @@ SEvals = calcStdError(subsetDat, testVarsV3, suffix, namesReturn, namesReplace, 
 # Combine practice effects results and permutation p-values
 results = data.frame("PracticeEffect" = pracEffects, SE=SEvals, "P" = pvals)
 # Write out practice effect results (adjustment value, estimate of precision, and p value)
-write.csv(results, '~/netshare/M/PSYCH/KREMEN/VETSA DATA FILES_852014/a_Practice effect revised cog scores/Practice Effect Cognition/VETSA 3/results/PracEffects_NAS201TRAN_V1V2V3-t2t3.csv')
+outname = paste0('~/netshare/M/PSYCH/KREMEN/VETSA DATA FILES_852014/a_Practice effect revised cog scores/Practice Effect Cognition/VETSA 3/results/PracEffects_NAS201TRAN_V1V2V3-t2t3_',dstamp,'.csv')
+write.csv(results, outname)
 
 
 
@@ -263,7 +267,8 @@ SEvals = calcStdError(subsetDat, testVarsV1V2, suffix, namesReturn, namesReplace
 # Combine practice effects results and permutation p-values
 results = data.frame("PracticeEffect" = pracEffects, SE=SEvals, "P" = pvals)
 # Write out practice effect results (adjustment value, estimate of precision, and p value)
-write.csv(results, '~/netshare/M/PSYCH/KREMEN/VETSA DATA FILES_852014/a_Practice effect revised cog scores/Practice Effect Cognition/VETSA 3/results/PracEffects_NAS201TRAN_V1V2-V1V2V3-t1t2.csv')
+outname = paste0('~/netshare/M/PSYCH/KREMEN/VETSA DATA FILES_852014/a_Practice effect revised cog scores/Practice Effect Cognition/VETSA 3/results/PracEffects_NAS201TRAN_V1V2-V1V2V3-t1t2_',dstamp,'.csv')
+write.csv(results, outname)
 
 
 ###############################
@@ -290,7 +295,8 @@ SEvals = calcStdError(subsetDat, testVarsV3, suffix, namesReturn, namesReplace, 
 # Combine practice effects results and permutation p-values
 results = data.frame("PracticeEffect" = pracEffects, SE=SEvals, "P" = pvals)
 # Write out practice effect results (adjustment value, estimate of precision, and p value)
-write.csv(results, '~/netshare/M/PSYCH/KREMEN/VETSA DATA FILES_852014/a_Practice effect revised cog scores/Practice Effect Cognition/VETSA 3/results/PracEffects_NAS201TRAN_V2V3-t2t3.csv')
+outname = paste0('~/netshare/M/PSYCH/KREMEN/VETSA DATA FILES_852014/a_Practice effect revised cog scores/Practice Effect Cognition/VETSA 3/results/PracEffects_NAS201TRAN_V2V3-t2t3_',dstamp,'.csv')
+write.csv(results, outname)
 
 
 ###############################
@@ -317,4 +323,5 @@ SEvals = calcStdError(subsetDat, testVarsV3, suffix, namesReturn, namesReplace, 
 # Combine practice effects results and permutation p-values
 results = data.frame("PracticeEffect" = pracEffects, SE=SEvals, "P" = pvals)
 # Write out practice effect results (adjustment value, estimate of precision, and p value)
-write.csv(results, '~/netshare/M/PSYCH/KREMEN/VETSA DATA FILES_852014/a_Practice effect revised cog scores/Practice Effect Cognition/VETSA 3/results/PracEffects_NAS201TRAN_V1V3-t1t3.csv')
+outname = paste0('~/netshare/M/PSYCH/KREMEN/VETSA DATA FILES_852014/a_Practice effect revised cog scores/Practice Effect Cognition/VETSA 3/results/PracEffects_NAS201TRAN_V1V3-t1t3_',dstamp,'.csv')
+write.csv(results, outname)

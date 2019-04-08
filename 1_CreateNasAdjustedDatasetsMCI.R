@@ -48,6 +48,8 @@ library(dplyr)
 library(haven)
 library(readxl)
 
+# Get date for filenames
+dstamp = Sys.Date()
 
 #---------------------------------------#
 #           LOAD AND MERGE DATA         #
@@ -138,15 +140,17 @@ allData = dataInfo %>%
   dplyr::select(VETSAID, CASE, NAS201TRAN, VETSAGRP) %>%
   right_join(allData, by="VETSAID") 
 
+
+### Save out unadjusted scores on raw score scale ###
+outname = paste0("~/netshare/M/PSYCH/KREMEN/VETSA DATA FILES_852014/a_Practice effect revised cog scores/Practice Effect Cognition/VETSA 3/data/V1V2V3_CogData_Unadj_",dstamp,".csv")
+write.csv(allData, outname, row.names = FALSE)
+
 # Exclude indidivuals missing age 20 AFQT data
 allData = allData %>%
   filter(!is.na(NAS201TRAN)) 
 
-### Save out unadjusted scores on raw score scale ###
-write.csv(allData, 
-          "~/netshare/M/PSYCH/KREMEN/VETSA DATA FILES_852014/a_Practice effect revised cog scores/Practice Effect Cognition/VETSA 3/data/V1V2V3_CogData_Unadj.csv",
-          row.names = FALSE)
-
+outname = paste0("~/netshare/M/PSYCH/KREMEN/VETSA DATA FILES_852014/a_Practice effect revised cog scores/Practice Effect Cognition/VETSA 3/data/intermediate_files/V1V2V3_CogData_NoMissingNAS201TRAN_Unadj_",dstamp,".csv")
+write.csv(allData, outname, row.names = FALSE)
 
 #----------------------------------------------------------------------------#
 #                     Define functions                                       #
@@ -246,8 +250,8 @@ regVars = paste("scale(NAS201TRAN)", sep=" + ")
 nasAdjRawScoresData = adjustDataset(regVars, adjVars, nDemoVars, "nas", data)
 
 # Save out dataset with Age 20 AFQT regressed out
-write.csv(nasAdjRawScoresData, "/home/jelman/netshare/M/PSYCH/KREMEN/VETSA DATA FILES_852014/a_Practice effect revised cog scores/Practice Effect Cognition/VETSA 3/data/V1V2V3_CogData_NASAdj.csv",
-          row.names=F)
+outname = paste0("/home/jelman/netshare/M/PSYCH/KREMEN/VETSA DATA FILES_852014/a_Practice effect revised cog scores/Practice Effect Cognition/VETSA 3/data/intermediate_files/V1V2V3_CogData_NASAdj_",dstamp,".csv")
+write.csv(nasAdjRawScoresData, outname, row.names=F)
 
 #-----------------------------------------------------------------------------------#
 # Create dataset adjusted for nas201tran (Age 20 AFQT) and standardized.            #
@@ -296,10 +300,9 @@ for(i in rawVarsV3){
 }
 
 # Save out adjusted and z-scored dataset
-write.csv(nasAdjZscoresData, 
-          "/home/jelman/netshare/M/PSYCH/KREMEN/VETSA DATA FILES_852014/a_Practice effect revised cog scores/Practice Effect Cognition/VETSA 3/data/V1V2V3_CogData_NASAdj_Z.csv",
-          row.names = FALSE)
+outname = paste0("/home/jelman/netshare/M/PSYCH/KREMEN/VETSA DATA FILES_852014/a_Practice effect revised cog scores/Practice Effect Cognition/VETSA 3/data/intermediate_files/V1V2V3_CogData_NASAdj_Z_",dstamp,".csv")
+write.csv(nasAdjZscoresData, outname, row.names = FALSE)
 
 # Save out means and standard deviations used to standardize scores
-write.csv(scaleValues, "/home/jelman/netshare/M/PSYCH/KREMEN/VETSA DATA FILES_852014/a_Practice effect revised cog scores/Practice Effect Cognition/VETSA 3/data/V1_NASAdj_Means_SDs.csv",
-          row.names = FALSE)
+outname = paste0("/home/jelman/netshare/M/PSYCH/KREMEN/VETSA DATA FILES_852014/a_Practice effect revised cog scores/Practice Effect Cognition/VETSA 3/data/intermediate_files/V1_NASAdj_Means_SDs_",dstamp,".csv")
+write.csv(scaleValues, outname, row.names = FALSE)
