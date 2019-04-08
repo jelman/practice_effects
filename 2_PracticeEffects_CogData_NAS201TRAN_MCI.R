@@ -55,20 +55,17 @@ subsetDat = allDat %>%
 # V1neDat = allDat %>% filter(VETSAGRP=="v1ne")
 
 # Create vector of all variable names to calculate practice effects for
-# testVars = c("MR1COR","TRL1TLOG","TRL2TLOG","TRL3TLOG","TRL4TLOG","TRL5TLOG","CSSACC","MTXRAW","CVA1RAW",
-#              "CVATOT","CVSDFR","CVLDFR","AFQTPCT","AFQTVOCPCT","AFQTARPCT","AFQTTLPCT","AFQTBXPCT",
-#              "AFQTPCTTRAN","AFQTVOCPCTTRAN","AFQTARPCTTRAN","AFQTTLPCTTRAN","AFQTBXPCTTRAN","DSFRAW",
-#              "DSBRAW","DSFMAX","SSPFRAW","SSPBRAW","LNTOT","LMITOT","LMDTOT","VRITOT","VRDTOT","VRCTOT","HFTOTCOR",
-#              "STRWRAW","STRCRAW","STRCWRAW","STRIT","LFFCOR","LFACOR","LFSCOR","LFCOR","CFANCOR","CFBNCOR","CFCOR",
-#              "CSCOR","RSATOT","SRTLMEANLOG","SRTLSTDLOG","SRTRMEANLOG","SRTRSTDLOG","SRTGMEANLOG","SRTGSTDLOG",
-#              "CHRTLMEANLOG","CHRTRMEANLOG","CHRTLSTDLOG","CHRTRSTDLOG","CHRTGMEANLOG","CHRTGSTDLOG",
-#              "AXHITRATE","AXFARATE","AXMISSRATE","BXHITRATE","BXFARATE","BXMISSRATE","CPTDPRIME")
-testVars = c("MR1COR","TRL1TLOG","TRL2TLOG","TRL3TLOG","TRL4TLOG","TRL5TLOG","CSSACC","MTXRAW","CVA1RAW",
+testVarsV1V2 = c("MR1COR","TRL1TLOG","TRL2TLOG","TRL3TLOG","TRL4TLOG","TRL5TLOG","CSSACC","MTXRAW","CVA1RAW",
              "CVATOT","CVSDFR","CVLDFR","AFQTPCT","AFQTVOCPCT","AFQTARPCT","AFQTTLPCT","AFQTBXPCT",
              "AFQTPCTTRAN","AFQTVOCPCTTRAN","AFQTARPCTTRAN","AFQTTLPCTTRAN","AFQTBXPCTTRAN","DSFRAW",
-             "DSBRAW","DSFMAX","SSPFRAW","SSPBRAW","LNTOT","LMITOT","LMDTOT","VRITOT","VRDTOT","VRCTOT","HFTOTCOR",
-             "STRWRAW","STRCRAW","STRCWRAW","STRIT","LFFCOR","LFACOR","LFSCOR","LFCOR","CFANCOR","CFBNCOR","CFCOR",
-             "CSCOR")
+             "DSBRAW","DSFMAX","DSTOT","SSPFRAW","SSPBRAW","SSPTOTP","LNTOT","LMITOT","LMDTOT","VRITOT","VRDTOT","VRCTOT",
+             "HFTOTCOR","STRWRAW","STRCRAW","STRCWRAW","STRIT","LFFCOR","LFACOR","LFSCOR","LFCOR","CFANCOR","CFBNCOR","CFCOR",
+             "CSCOR","RSATOT","SRTLMEANLOG","SRTLSTDLOG","SRTRMEANLOG","SRTRSTDLOG","SRTGMEANLOG","SRTGSTDLOG",
+             "CHRTLMEANLOG","CHRTRMEANLOG","CHRTLSTDLOG","CHRTRSTDLOG","CHRTGMEANLOG","CHRTGSTDLOG",
+             "AXHITRATE","AXFARATE","AXMISSRATE","BXHITRATE","BXFARATE","BXMISSRATE")
+# Remove AX-CPT variables from calculations involving V3 data
+testVarsV3 = testVarsV1V2[! testVarsV1V2 %in% c("AXHITRATE","AXFARATE","AXMISSRATE","BXHITRATE","BXFARATE","BXMISSRATE")]
+
 
 
 #-----------------------------------------------#
@@ -127,7 +124,7 @@ calcPracticeEffect = function(df, varName, suffix, idxReturn, idxReplace,idxAll)
 # ----------
 # List of p-values for all variables in testVars
 
-calcPvalues = function(df, testvars, suffix, pracEffects, idxReturn, idxReplace, idxAll){
+calcPvalues = function(df, testVars, suffix, pracEffects, idxReturn, idxReplace, idxAll){
   ### Run permutation testing to generate p-values for practice effects ###
   set.seed(21)
   # Set parameters for permutation testing of practice effects
@@ -230,11 +227,11 @@ idxReplace = which(subsetDat$VETSAGRP %in% namesReplace)
 idxAll = which(subsetDat$VETSAGRP %in% namesAll)
 
 # Calculate practice effects for all cognitive domains and tests
-pracEffects = sapply(testVars, function(x) calcPracticeEffect(subsetDat, x, suffix, idxReturn, idxReplace, idxAll))
+pracEffects = sapply(testVarsV3, function(x) calcPracticeEffect(subsetDat, x, suffix, idxReturn, idxReplace, idxAll))
 # Calculate p-values for all tests
-pvals = calcPvalues(subsetDat, testvars, suffix, pracEffects, idxReturn, idxReplace, idxAll)
+pvals = calcPvalues(subsetDat, testVarsV3, suffix, pracEffects, idxReturn, idxReplace, idxAll)
 # Calculate standard errors for all tests
-SEvals = calcStdError(subsetDat, testVars, suffix, namesReturn, namesReplace, namesAll)
+SEvals = calcStdError(subsetDat, testVarsV3, suffix, namesReturn, namesReplace, namesAll)
 # Combine practice effects results and permutation p-values
 results = data.frame("PracticeEffect" = pracEffects, SE=SEvals, "P" = pvals)
 # Write out practice effect results (adjustment value, estimate of precision, and p value)
@@ -258,11 +255,11 @@ idxReplace = which(subsetDat$VETSAGRP %in% namesReplace)
 idxAll = which(subsetDat$VETSAGRP %in% namesAll)
 
 # Calculate practice effects for all cognitive domains and tests
-pracEffects = sapply(testVars, function(x) calcPracticeEffect(subsetDat, x, suffix, idxReturn, idxReplace, idxAll))
+pracEffects = sapply(testVarsV1V2, function(x) calcPracticeEffect(subsetDat, x, suffix, idxReturn, idxReplace, idxAll))
 # Calculate p-values for all tests
-pvals = calcPvalues(subsetDat, testvars, suffix, pracEffects, idxReturn, idxReplace, idxAll)
+pvals = calcPvalues(subsetDat, testVarsV1V2, suffix, pracEffects, idxReturn, idxReplace, idxAll)
 # Calculate standard errors for all tests
-SEvals = calcStdError(subsetDat, testVars, suffix, namesReturn, namesReplace, namesAll)
+SEvals = calcStdError(subsetDat, testVarsV1V2, suffix, namesReturn, namesReplace, namesAll)
 # Combine practice effects results and permutation p-values
 results = data.frame("PracticeEffect" = pracEffects, SE=SEvals, "P" = pvals)
 # Write out practice effect results (adjustment value, estimate of precision, and p value)
@@ -285,11 +282,11 @@ idxReplace = which(subsetDat$VETSAGRP %in% namesReplace)
 idxAll = which(subsetDat$VETSAGRP %in% namesAll)
 
 # Calculate practice effects for all cognitive domains and tests
-pracEffects = sapply(testVars, function(x) calcPracticeEffect(subsetDat, x, suffix, idxReturn, idxReplace, idxAll))
+pracEffects = sapply(testVarsV3, function(x) calcPracticeEffect(subsetDat, x, suffix, idxReturn, idxReplace, idxAll))
 # Calculate p-values for all tests
-pvals = calcPvalues(subsetDat, testvars, suffix, pracEffects, idxReturn, idxReplace, idxAll)
+pvals = calcPvalues(subsetDat, testVarsV3, suffix, pracEffects, idxReturn, idxReplace, idxAll)
 # Calculate standard errors for all tests
-SEvals = calcStdError(subsetDat, testVars, suffix, namesReturn, namesReplace, namesAll)
+SEvals = calcStdError(subsetDat, testVarsV3, suffix, namesReturn, namesReplace, namesAll)
 # Combine practice effects results and permutation p-values
 results = data.frame("PracticeEffect" = pracEffects, SE=SEvals, "P" = pvals)
 # Write out practice effect results (adjustment value, estimate of precision, and p value)
@@ -312,11 +309,11 @@ idxReplace = which(subsetDat$VETSAGRP %in% namesReplace)
 idxAll = which(subsetDat$VETSAGRP %in% namesAll)
 
 # Calculate practice effects for all cognitive domains and tests
-pracEffects = sapply(testVars, function(x) calcPracticeEffect(subsetDat, x, suffix, idxReturn, idxReplace, idxAll))
+pracEffects = sapply(testVarsV3, function(x) calcPracticeEffect(subsetDat, x, suffix, idxReturn, idxReplace, idxAll))
 # Calculate p-values for all tests
-pvals = calcPvalues(subsetDat, testvars, suffix, pracEffects, idxReturn, idxReplace, idxAll)
+pvals = calcPvalues(subsetDat, testVarsV3, suffix, pracEffects, idxReturn, idxReplace, idxAll)
 # Calculate standard errors for all tests
-SEvals = calcStdError(subsetDat, testVars, suffix, namesReturn, namesReplace, namesAll)
+SEvals = calcStdError(subsetDat, testVarsV3, suffix, namesReturn, namesReplace, namesAll)
 # Combine practice effects results and permutation p-values
 results = data.frame("PracticeEffect" = pracEffects, SE=SEvals, "P" = pvals)
 # Write out practice effect results (adjustment value, estimate of precision, and p value)

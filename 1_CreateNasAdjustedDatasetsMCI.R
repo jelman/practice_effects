@@ -55,19 +55,16 @@ library(readxl)
 
 ### Define variable names of interest and load data ###
 # Create list of raw variable names to adjust
-# rawVarsV1 = c("MR1COR","TRL1TLOG","TRL2TLOG","TRL3TLOG","TRL4TLOG","TRL5TLOG","CSSACC","MTXRAW","CVA1RAW","CVATOT","CVSDFR","CVLDFR",
-#               "AFQTPCT","AFQTVOCPCT","AFQTARPCT","AFQTTLPCT","AFQTBXPCT","AFQTPCTTRAN","AFQTVOCPCTTRAN","AFQTARPCTTRAN","AFQTTLPCTTRAN",
-#               "AFQTBXPCTTRAN","DSFRAW","DSBRAW","DSFMAX","SSPFRAW","SSPBRAW","LNTOT","LMITOT","LMDTOT","VRITOT","VRDTOT","VRCTOT","HFTOTCOR",
-#               "STRWRAW","STRCRAW","STRCWRAW","STRIT","LFFCOR","LFACOR","LFSCOR","LFCOR","CFANCOR","CFBNCOR","CFCOR","CSCOR","RSATOT",
-#               "SRTLMEANLOG","SRTLSTDLOG","SRTRMEANLOG","SRTRSTDLOG","SRTGMEANLOG","SRTGSTDLOG","CHRTLMEANLOG","CHRTRMEANLOG","CHRTLSTDLOG",
-#               "CHRTRSTDLOG","CHRTGMEANLOG","CHRTGSTDLOG")
 rawVarsV1 = c("MR1COR","TRL1TLOG","TRL2TLOG","TRL3TLOG","TRL4TLOG","TRL5TLOG","CSSACC","MTXRAW","CVA1RAW","CVATOT","CVSDFR","CVLDFR",
               "AFQTPCT","AFQTVOCPCT","AFQTARPCT","AFQTTLPCT","AFQTBXPCT","AFQTPCTTRAN","AFQTVOCPCTTRAN","AFQTARPCTTRAN","AFQTTLPCTTRAN",
-              "AFQTBXPCTTRAN","DSFRAW","DSBRAW","DSFMAX","SSPFRAW","SSPBRAW","LNTOT","LMITOT","LMDTOT","VRITOT","VRDTOT","VRCTOT","HFTOTCOR",
-              "STRWRAW","STRCRAW","STRCWRAW","STRIT","LFFCOR","LFACOR","LFSCOR","LFCOR","CFANCOR","CFBNCOR","CFCOR","CSCOR")
+              "AFQTBXPCTTRAN","DSFRAW","DSBRAW","DSFMAX","DSTOT","SSPFRAW","SSPBRAW","SSPTOTP","LNTOT","LMITOT","LMDTOT","VRITOT","VRDTOT","VRCTOT","HFTOTCOR",
+              "STRWRAW","STRCRAW","STRCWRAW","STRIT","LFFCOR","LFACOR","LFSCOR","LFCOR","CFANCOR","CFBNCOR","CFCOR","CSCOR","RSATOT",
+              "SRTLMEANLOG","SRTLSTDLOG","SRTRMEANLOG","SRTRSTDLOG","SRTGMEANLOG","SRTGSTDLOG","CHRTLMEANLOG","CHRTRMEANLOG","CHRTLSTDLOG",
+              "CHRTRSTDLOG","CHRTGMEANLOG","CHRTGSTDLOG","AXHITRATE","AXFARATE","AXMISSRATE","BXHITRATE","BXFARATE","BXMISSRATE")
 rawVarsV2 = paste0(rawVarsV1, "_V2")
 rawVarsV3 = paste0(rawVarsV1, "_V3")
-
+# Remove AX-CPT variables from V3 data
+rawVarsV3 = rawVarsV3[! rawVarsV3 %in% c("AXHITRATE_V3","AXFARATE_V3","AXMISSRATE_V3","BXHITRATE_V3","BXFARATE_V3","BXMISSRATE_V3")]
 # Print variable names and verify these are correct
 rawVarsV1
 rawVarsV2
@@ -76,27 +73,44 @@ rawVarsV3
 # Load raw test scores and demographics data. Rename all columns to upper
 dataV1 = read_sas("~/netshare/M/PSYCH/KREMEN/VETSA DATA FILES_852014/a_VETSA 1 & 2 DATA_MOST UP TO DATE 7_2_2015/VETSA 1 Aging Most up to date July 2 2015/vetsa1merged_22dec2016_nomiss.sas7bdat")
 names(dataV1) = toupper(names(dataV1))
+# Merge in Ax-CPT data
+axcpt_v1 = read.csv("/home/jelman/netshare/M/PSYCH/KREMEN/VETSA DATA FILES_852014/AX-CPT/data/AX-CPT_V1.csv")
+names(axcpt_v1) = toupper(names(axcpt_v1))  
+dataV1 = dataV1 %>% left_join(axcpt_v1[c("VETSAID","AXHITRATE","AXFARATE","AXMISSRATE","BXHITRATE","BXFARATE","BXMISSRATE")], by="VETSAID")
 
 dataV2 = read_sas("~/netshare/M/PSYCH/KREMEN/VETSA DATA FILES_852014/a_VETSA 1 & 2 DATA_MOST UP TO DATE 7_2_2015/VETSA 2 Aging Most up to date July 2 2015/vetsa2merged_23dec2016_nomiss.sas7bdat")
 names(dataV2) = toupper(names(dataV2))
 rt_dataV2 = read.csv("~/netshare/M/PSYCH/KREMEN/VETSA DATA FILES_852014/Reaction Time Data V2/vetsa2_reactiontime_merge.csv")
 names(rt_dataV2) = toupper(names(rt_dataV2))
 dataV2 = dataV2 %>% left_join(rt_dataV2, by="VETSAID")
-
+# Merge in Ax-CPT data
+axcpt_v2 = read.csv("/home/jelman/netshare/M/PSYCH/KREMEN/VETSA DATA FILES_852014/AX-CPT/data/AX-CPT_V2.csv")
+names(axcpt_v2) = toupper(names(axcpt_v2))  
+names(axcpt_v2)[2:length(names(axcpt_v2))] = paste0(names(axcpt_v2)[2:length(names(axcpt_v2))], "_V2")
+dataV2 = dataV2 %>% left_join(axcpt_v2[c("VETSAID","AXHITRATE_V2","AXFARATE_V2","AXMISSRATE_V2","BXHITRATE_V2","BXFARATE_V2","BXMISSRATE_V2")], by="VETSAID")
+  
 dataV3 = read_sas("~/netshare/M/PSYCH/KREMEN/VETSA DATA FILES_852014/a_Practice effect revised cog scores/Practice Effect Cognition/VETSA 3/data/raw/vetsa3_data_cutoff_mar_27_19.sas7bdat")
 names(dataV3) = toupper(names(dataV3))
 names(dataV3)[4:length(names(dataV3))] = paste0(names(dataV3)[4:length(names(dataV3))], "_V3")
+# Merge in RT data
+rt_dataV3 = read.csv("/home/jelman/netshare/M/PSYCH/KREMEN/VETSA DATA FILES_852014/Reaction Time Data V3/vetsa3_rt_merge.csv")
+names(rt_dataV3) = toupper(names(rt_dataV3))
+dataV3 = dataV3 %>% left_join(rt_dataV3, by="VETSAID")
+# Create RSATOT variable
+dataV3 = dataV3 %>% 
+  mutate(RSATOT_V3 = RSA21_V3+RSA22_V3+RSA23_V3+RSA24_V3+RSA25_V3+RSA31_V3+RSA32_V3+RSA33_V3+RSA34_V3+RSA35_V3+RSA41_V3+RSA42_V3+RSA43_V3+RSA44_V3+RSA45_V3)
 
-dataInfo = read.csv("~/netshare/M/PSYCH/KREMEN/VETSA DATA FILES_852014/a_Practice effect revised cog scores/Practice Effect Cognition/VETSA 3/data/raw/SubjectInfo.csv")
+# Get VETSA group and age 20 AFQT data
+dataInfo = read.csv("/home/jelman/netshare/M/PSYCH/KREMEN/VETSA DATA FILES_852014/a_Practice effect revised cog scores/Practice Effect Cognition/VETSA 3/data/raw/SubjectInfo.csv")
 names(dataInfo) = toupper(names(dataInfo))
+dataInfo = dataInfo %>% select(VETSAID, CASE, VETSAGRP, NAS201, NAS201TRAN)
 
 
 ### Log transform timing data ### 
 # Get names of variables to transform
-# timeVarsV1 = c("TRL1T","TRL2T","TRL3T","TRL4T","TRL5T","SRTLMEAN","SRTLSTD","SRTRMEAN",
-#                "SRTRSTD","SRTGMEAN","SRTGSTD","CHRTLMEAN","CHRTRMEAN","CHRTLSTD",
-#                "CHRTRSTD","CHRTGMEAN","CHRTGSTD")
-timeVarsV1 = c("TRL1T","TRL2T","TRL3T","TRL4T","TRL5T")
+timeVarsV1 = c("TRL1T","TRL2T","TRL3T","TRL4T","TRL5T","SRTLMEAN","SRTLSTD","SRTRMEAN",
+               "SRTRSTD","SRTGMEAN","SRTGSTD","CHRTLMEAN","CHRTRMEAN","CHRTLSTD",
+               "CHRTRSTD","CHRTGMEAN","CHRTGSTD")
 timeVarsLogV1 = paste0(timeVarsV1, "LOG")
 timeVarsV2 = paste0(timeVarsV1, "_V2")
 timeVarsLogV2 = paste0(timeVarsLogV1, "_V2")
