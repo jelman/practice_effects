@@ -59,10 +59,11 @@ dstamp = Sys.Date()
 # Create list of raw variable names to adjust
 rawVarsV1 = c("MR1COR","TRL1TLOG","TRL2TLOG","TRL3TLOG","TRL4TLOG","TRL5TLOG","CSSACC","MTXRAW","CVA1RAW","CVATOT","CVSDFR","CVLDFR",
               "AFQTPCT","AFQTVOCPCT","AFQTARPCT","AFQTTLPCT","AFQTBXPCT","AFQTPCTTRAN","AFQTVOCPCTTRAN","AFQTARPCTTRAN","AFQTTLPCTTRAN",
-              "AFQTBXPCTTRAN","DSFRAW","DSBRAW","DSFMAX","DSTOT","SSPFRAW","SSPBRAW","SSPTOTP","LNTOT","LMITOT","LMDTOT","VRITOT","VRDTOT","VRCTOT","HFTOTCOR",
-              "STRWRAW","STRCRAW","STRCWRAW","STRIT","LFFCOR","LFACOR","LFSCOR","LFCOR","CFANCOR","CFBNCOR","CFCOR","CSCOR","RSATOT",
-              "SRTLMEANLOG","SRTLSTDLOG","SRTRMEANLOG","SRTRSTDLOG","SRTGMEANLOG","SRTGSTDLOG","CHRTLMEANLOG","CHRTRMEANLOG","CHRTLSTDLOG",
-              "CHRTRSTDLOG","CHRTGMEANLOG","CHRTGSTDLOG","AXHITRATE","AXFARATE","AXMISSRATE","BXHITRATE","BXFARATE","BXMISSRATE")
+              "AFQTBXPCTTRAN","DSFRAW","DSBRAW","DSFMAX","DSTOT","SSPFRAW","SSPBRAW","SSPTOTP","LNTOT","LM1A","LM1B","LM2A","LM2B",
+              "LMITOT","LMDTOT","VRITOT","VRDTOT","VRCTOT","HFTOTCOR","STRWRAW","STRCRAW","STRCWRAW","STRIT","LFFCOR","LFACOR","LFSCOR","LFCOR",
+              "CFANCOR","CFBNCOR","CFCOR","CSCOR","RSATOT","SRTLMEANLOG","SRTLSTDLOG","SRTRMEANLOG","SRTRSTDLOG","SRTGMEANLOG","SRTGSTDLOG",
+              "CHRTLMEANLOG","CHRTRMEANLOG","CHRTLSTDLOG","CHRTRSTDLOG","CHRTGMEANLOG","CHRTGSTDLOG","AXHITRATE","AXFARATE","AXMISSRATE",
+              "BXHITRATE","BXFARATE","BXMISSRATE")
 rawVarsV2 = paste0(rawVarsV1, "_V2")
 rawVarsV3 = paste0(rawVarsV1, "_V3")
 # Remove AX-CPT variables from V3 data
@@ -72,7 +73,9 @@ rawVarsV1
 rawVarsV2
 rawVarsV3
 
-# Load raw test scores and demographics data. Rename all columns to upper
+### Load raw test scores and demographics data. Rename all columns to upper
+
+# VETSA 1
 dataV1 = read_sas("~/netshare/M/PSYCH/KREMEN/VETSA DATA FILES_852014/a_VETSA 1 & 2 DATA_MOST UP TO DATE 7_2_2015/VETSA 1 Aging Most up to date July 2 2015/vetsa1merged_22dec2016_nomiss.sas7bdat")
 names(dataV1) = toupper(names(dataV1))
 # Merge in Ax-CPT data
@@ -80,6 +83,7 @@ axcpt_v1 = read.csv("/home/jelman/netshare/M/PSYCH/KREMEN/VETSA DATA FILES_85201
 names(axcpt_v1) = toupper(names(axcpt_v1))  
 dataV1 = dataV1 %>% left_join(axcpt_v1[c("VETSAID","AXHITRATE","AXFARATE","AXMISSRATE","BXHITRATE","BXFARATE","BXMISSRATE")], by="VETSAID")
 
+# VETSA 2
 dataV2 = read_sas("~/netshare/M/PSYCH/KREMEN/VETSA DATA FILES_852014/a_VETSA 1 & 2 DATA_MOST UP TO DATE 7_2_2015/VETSA 2 Aging Most up to date July 2 2015/vetsa2merged_23dec2016_nomiss.sas7bdat")
 names(dataV2) = toupper(names(dataV2))
 rt_dataV2 = read.csv("~/netshare/M/PSYCH/KREMEN/VETSA DATA FILES_852014/Reaction Time Data V2/vetsa2_reactiontime_merge.csv")
@@ -91,7 +95,8 @@ names(axcpt_v2) = toupper(names(axcpt_v2))
 names(axcpt_v2)[2:length(names(axcpt_v2))] = paste0(names(axcpt_v2)[2:length(names(axcpt_v2))], "_V2")
 dataV2 = dataV2 %>% left_join(axcpt_v2[c("VETSAID","AXHITRATE_V2","AXFARATE_V2","AXMISSRATE_V2","BXHITRATE_V2","BXFARATE_V2","BXMISSRATE_V2")], by="VETSAID")
   
-dataV3 = read_sas("~/netshare/M/PSYCH/KREMEN/VETSA DATA FILES_852014/a_Practice effect revised cog scores/Practice Effect Cognition/VETSA 3/data/raw/vetsa3_data_cutoff_mar_27_19.sas7bdat")
+# VETSA 3
+dataV3 = read_sas("~/netshare/M/PSYCH/KREMEN/VETSA DATA FILES_852014/a_Practice effect revised cog scores/Practice Effect Cognition/V1V2V3/data/raw/vetsa3_data_cutoff_mar_27_19.sas7bdat")
 names(dataV3) = toupper(names(dataV3))
 names(dataV3)[4:length(names(dataV3))] = paste0(names(dataV3)[4:length(names(dataV3))], "_V3")
 # Merge in RT data
@@ -103,7 +108,7 @@ dataV3 = dataV3 %>%
   mutate(RSATOT_V3 = RSA21_V3+RSA22_V3+RSA23_V3+RSA24_V3+RSA25_V3+RSA31_V3+RSA32_V3+RSA33_V3+RSA34_V3+RSA35_V3+RSA41_V3+RSA42_V3+RSA43_V3+RSA44_V3+RSA45_V3)
 
 # Get VETSA group and age 20 AFQT data
-dataInfo = read.csv("/home/jelman/netshare/M/PSYCH/KREMEN/VETSA DATA FILES_852014/a_Practice effect revised cog scores/Practice Effect Cognition/VETSA 3/data/raw/SubjectInfo.csv")
+dataInfo = read.csv("/home/jelman/netshare/M/PSYCH/KREMEN/VETSA DATA FILES_852014/a_Practice effect revised cog scores/Practice Effect Cognition/V1V2V3/data/raw/SubjectInfo.csv")
 names(dataInfo) = toupper(names(dataInfo))
 dataInfo = dataInfo %>% select(VETSAID, CASE, VETSAGRP, NAS201, NAS201TRAN)
 
@@ -142,14 +147,14 @@ allData = dataInfo %>%
 
 
 ### Save out unadjusted scores on raw score scale ###
-outname = paste0("~/netshare/M/PSYCH/KREMEN/VETSA DATA FILES_852014/a_Practice effect revised cog scores/Practice Effect Cognition/VETSA 3/data/V1V2V3_CogData_Unadj_",dstamp,".csv")
+outname = paste0("~/netshare/M/PSYCH/KREMEN/VETSA DATA FILES_852014/a_Practice effect revised cog scores/Practice Effect Cognition/V1V2V3/data/V1V2V3_CogData_Unadj_",dstamp,".csv")
 write.csv(allData, outname, row.names = FALSE)
 
 # Exclude indidivuals missing age 20 AFQT data
 allData = allData %>%
   filter(!is.na(NAS201TRAN)) 
 
-outname = paste0("~/netshare/M/PSYCH/KREMEN/VETSA DATA FILES_852014/a_Practice effect revised cog scores/Practice Effect Cognition/VETSA 3/data/intermediate_files/V1V2V3_CogData_NoMissingNAS201TRAN_Unadj_",dstamp,".csv")
+outname = paste0("~/netshare/M/PSYCH/KREMEN/VETSA DATA FILES_852014/a_Practice effect revised cog scores/Practice Effect Cognition/V1V2V3/data/intermediate_files/V1V2V3_CogData_NoMissingNAS201TRAN_Unadj_",dstamp,".csv")
 write.csv(allData, outname, row.names = FALSE)
 
 #----------------------------------------------------------------------------#
@@ -250,7 +255,7 @@ regVars = paste("scale(NAS201TRAN)", sep=" + ")
 nasAdjRawScoresData = adjustDataset(regVars, adjVars, nDemoVars, "nas", data)
 
 # Save out dataset with Age 20 AFQT regressed out
-outname = paste0("/home/jelman/netshare/M/PSYCH/KREMEN/VETSA DATA FILES_852014/a_Practice effect revised cog scores/Practice Effect Cognition/VETSA 3/data/intermediate_files/V1V2V3_CogData_NASAdj_",dstamp,".csv")
+outname = paste0("/home/jelman/netshare/M/PSYCH/KREMEN/VETSA DATA FILES_852014/a_Practice effect revised cog scores/Practice Effect Cognition/V1V2V3/data/intermediate_files/V1V2V3_CogData_NASAdj_",dstamp,".csv")
 write.csv(nasAdjRawScoresData, outname, row.names=F)
 
 #-----------------------------------------------------------------------------------#
@@ -300,9 +305,9 @@ for(i in rawVarsV3){
 }
 
 # Save out adjusted and z-scored dataset
-outname = paste0("/home/jelman/netshare/M/PSYCH/KREMEN/VETSA DATA FILES_852014/a_Practice effect revised cog scores/Practice Effect Cognition/VETSA 3/data/intermediate_files/V1V2V3_CogData_NASAdj_Z_",dstamp,".csv")
+outname = paste0("/home/jelman/netshare/M/PSYCH/KREMEN/VETSA DATA FILES_852014/a_Practice effect revised cog scores/Practice Effect Cognition/V1V2V3/data/intermediate_files/V1V2V3_CogData_NASAdj_Z_",dstamp,".csv")
 write.csv(nasAdjZscoresData, outname, row.names = FALSE)
 
 # Save out means and standard deviations used to standardize scores
-outname = paste0("/home/jelman/netshare/M/PSYCH/KREMEN/VETSA DATA FILES_852014/a_Practice effect revised cog scores/Practice Effect Cognition/VETSA 3/data/intermediate_files/V1_NASAdj_Means_SDs_",dstamp,".csv")
+outname = paste0("/home/jelman/netshare/M/PSYCH/KREMEN/VETSA DATA FILES_852014/a_Practice effect revised cog scores/Practice Effect Cognition/V1V2V3/data/intermediate_files/V1_NASAdj_Means_SDs_",dstamp,".csv")
 write.csv(scaleValues, outname, row.names = FALSE)

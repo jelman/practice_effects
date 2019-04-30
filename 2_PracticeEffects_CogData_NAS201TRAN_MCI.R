@@ -48,7 +48,7 @@ dstamp = Sys.Date()
 #   to calculate practice effects for.                                      #
 #---------------------------------------------------------------------------#
 # Load data that has been adjusted for age 20 AFQT
-allDat = read.csv("/home/jelman/netshare/M/PSYCH/KREMEN/VETSA DATA FILES_852014/a_Practice effect revised cog scores/Practice Effect Cognition/VETSA 3/data/intermediate_files/V1V2V3_CogData_NoMissingNAS201TRAN_Unadj_2019-04-08.csv")
+allDat = read.csv("/home/jelman/netshare/M/PSYCH/KREMEN/VETSA DATA FILES_852014/a_Practice effect revised cog scores/Practice Effect Cognition/V1V2V3/data/intermediate_files/V1V2V3_CogData_NoMissingNAS201TRAN_Unadj_2019-04-30.csv")
 
 # Select subjects from groups of interest
 subsetDat = allDat %>%
@@ -58,14 +58,13 @@ subsetDat = allDat %>%
 # V1neDat = allDat %>% filter(VETSAGRP=="v1ne")
 
 # Create vector of all variable names to calculate practice effects for
-testVarsV1V2 = c("MR1COR","TRL1TLOG","TRL2TLOG","TRL3TLOG","TRL4TLOG","TRL5TLOG","CSSACC","MTXRAW","CVA1RAW",
-             "CVATOT","CVSDFR","CVLDFR","AFQTPCT","AFQTVOCPCT","AFQTARPCT","AFQTTLPCT","AFQTBXPCT",
-             "AFQTPCTTRAN","AFQTVOCPCTTRAN","AFQTARPCTTRAN","AFQTTLPCTTRAN","AFQTBXPCTTRAN","DSFRAW",
-             "DSBRAW","DSFMAX","DSTOT","SSPFRAW","SSPBRAW","SSPTOTP","LNTOT","LMITOT","LMDTOT","VRITOT","VRDTOT","VRCTOT",
-             "HFTOTCOR","STRWRAW","STRCRAW","STRCWRAW","STRIT","LFFCOR","LFACOR","LFSCOR","LFCOR","CFANCOR","CFBNCOR","CFCOR",
-             "CSCOR","RSATOT","SRTLMEANLOG","SRTLSTDLOG","SRTRMEANLOG","SRTRSTDLOG","SRTGMEANLOG","SRTGSTDLOG",
-             "CHRTLMEANLOG","CHRTRMEANLOG","CHRTLSTDLOG","CHRTRSTDLOG","CHRTGMEANLOG","CHRTGSTDLOG",
-             "AXHITRATE","AXFARATE","AXMISSRATE","BXHITRATE","BXFARATE","BXMISSRATE")
+testVarsV1V2 = c("MR1COR","TRL1TLOG","TRL2TLOG","TRL3TLOG","TRL4TLOG","TRL5TLOG","CSSACC","MTXRAW","CVA1RAW","CVATOT","CVSDFR","CVLDFR",
+                 "AFQTPCT","AFQTVOCPCT","AFQTARPCT","AFQTTLPCT","AFQTBXPCT","AFQTPCTTRAN","AFQTVOCPCTTRAN","AFQTARPCTTRAN","AFQTTLPCTTRAN",
+                 "AFQTBXPCTTRAN","DSFRAW","DSBRAW","DSFMAX","DSTOT","SSPFRAW","SSPBRAW","SSPTOTP","LNTOT","LM1A","LM1B","LM2A","LM2B",
+                 "LMITOT","LMDTOT","VRITOT","VRDTOT","VRCTOT","HFTOTCOR","STRWRAW","STRCRAW","STRCWRAW","STRIT","LFFCOR","LFACOR","LFSCOR","LFCOR",
+                 "CFANCOR","CFBNCOR","CFCOR","CSCOR","RSATOT","SRTLMEANLOG","SRTLSTDLOG","SRTRMEANLOG","SRTRSTDLOG","SRTGMEANLOG","SRTGSTDLOG",
+                 "CHRTLMEANLOG","CHRTRMEANLOG","CHRTLSTDLOG","CHRTRSTDLOG","CHRTGMEANLOG","CHRTGSTDLOG","AXHITRATE","AXFARATE","AXMISSRATE",
+                 "BXHITRATE","BXFARATE","BXMISSRATE")
 # Remove AX-CPT variables from calculations involving V3 data
 testVarsV3 = testVarsV1V2[! testVarsV1V2 %in% c("AXHITRATE","AXFARATE","AXMISSRATE","BXHITRATE","BXFARATE","BXMISSRATE")]
 
@@ -238,7 +237,7 @@ SEvals = calcStdError(subsetDat, testVarsV3, suffix, namesReturn, namesReplace, 
 # Combine practice effects results and permutation p-values
 results = data.frame("PracticeEffect" = pracEffects, SE=SEvals, "P" = pvals)
 # Write out practice effect results (adjustment value, estimate of precision, and p value)
-outname = paste0('~/netshare/M/PSYCH/KREMEN/VETSA DATA FILES_852014/a_Practice effect revised cog scores/Practice Effect Cognition/VETSA 3/results/PracEffects_NAS201TRAN_V1V2V3-t2t3_',dstamp,'.csv')
+outname = paste0('~/netshare/M/PSYCH/KREMEN/VETSA DATA FILES_852014/a_Practice effect revised cog scores/Practice Effect Cognition/V1V2V3/results/PracEffects_NAS201TRAN_V1V2V3-t2t3_',dstamp,'.csv')
 write.csv(results, outname)
 
 
@@ -267,7 +266,7 @@ SEvals = calcStdError(subsetDat, testVarsV1V2, suffix, namesReturn, namesReplace
 # Combine practice effects results and permutation p-values
 results = data.frame("PracticeEffect" = pracEffects, SE=SEvals, "P" = pvals)
 # Write out practice effect results (adjustment value, estimate of precision, and p value)
-outname = paste0('~/netshare/M/PSYCH/KREMEN/VETSA DATA FILES_852014/a_Practice effect revised cog scores/Practice Effect Cognition/VETSA 3/results/PracEffects_NAS201TRAN_V1V2-V1V2V3-t1t2_',dstamp,'.csv')
+outname = paste0('~/netshare/M/PSYCH/KREMEN/VETSA DATA FILES_852014/a_Practice effect revised cog scores/Practice Effect Cognition/V1V2V3/results/PracEffects_NAS201TRAN_V1V2-V1V2V3-t1t2_',dstamp,'.csv')
 write.csv(results, outname)
 
 
@@ -295,7 +294,7 @@ SEvals = calcStdError(subsetDat, testVarsV3, suffix, namesReturn, namesReplace, 
 # Combine practice effects results and permutation p-values
 results = data.frame("PracticeEffect" = pracEffects, SE=SEvals, "P" = pvals)
 # Write out practice effect results (adjustment value, estimate of precision, and p value)
-outname = paste0('~/netshare/M/PSYCH/KREMEN/VETSA DATA FILES_852014/a_Practice effect revised cog scores/Practice Effect Cognition/VETSA 3/results/PracEffects_NAS201TRAN_V2V3-t2t3_',dstamp,'.csv')
+outname = paste0('~/netshare/M/PSYCH/KREMEN/VETSA DATA FILES_852014/a_Practice effect revised cog scores/Practice Effect Cognition/V1V2V3/results/PracEffects_NAS201TRAN_V2V3-t2t3_',dstamp,'.csv')
 write.csv(results, outname)
 
 
@@ -323,5 +322,5 @@ SEvals = calcStdError(subsetDat, testVarsV3, suffix, namesReturn, namesReplace, 
 # Combine practice effects results and permutation p-values
 results = data.frame("PracticeEffect" = pracEffects, SE=SEvals, "P" = pvals)
 # Write out practice effect results (adjustment value, estimate of precision, and p value)
-outname = paste0('~/netshare/M/PSYCH/KREMEN/VETSA DATA FILES_852014/a_Practice effect revised cog scores/Practice Effect Cognition/VETSA 3/results/PracEffects_NAS201TRAN_V1V3-t1t3_',dstamp,'.csv')
+outname = paste0('~/netshare/M/PSYCH/KREMEN/VETSA DATA FILES_852014/a_Practice effect revised cog scores/Practice Effect Cognition/V1V2V3/results/PracEffects_NAS201TRAN_V1V3-t1t3_',dstamp,'.csv')
 write.csv(results, outname)

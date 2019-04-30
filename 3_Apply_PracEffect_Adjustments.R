@@ -64,14 +64,14 @@ applyPEadjustment = function(unadj_df, pracEffects, idx, colSuffix){
 ## Apply practice effect adjustments ## 
 
 # Load dataset to be adjusted: No age 20 afqt adjustment, raw score scale
-unadj_df = read.csv("~/netshare/M/PSYCH/KREMEN/VETSA DATA FILES_852014/a_Practice effect revised cog scores/Practice Effect Cognition/VETSA 3/data/V1V2V3_CogData_Unadj_2019-04-08.csv",
+unadj_df = read.csv("~/netshare/M/PSYCH/KREMEN/VETSA DATA FILES_852014/a_Practice effect revised cog scores/Practice Effect Cognition/V1V2V3/data/V1V2V3_CogData_Unadj_2019-04-30.csv",
                     stringsAsFactors = F)
 unadj_df_PEadj = unadj_df
 
 #---------------------------------#
 #     V1V2 & V1V2V3: t1 -> t2     #
 #---------------------------------#
-pracEffects_V1V2_V1V2V3_t1t2 = read.csv("/home/jelman/netshare/M/PSYCH/KREMEN/VETSA DATA FILES_852014/a_Practice effect revised cog scores/Practice Effect Cognition/VETSA 3/results/PracEffects_NAS201TRAN_V1V2-V1V2V3-t1t2_2019-04-08.csv",
+pracEffects_V1V2_V1V2V3_t1t2 = read.csv("/home/jelman/netshare/M/PSYCH/KREMEN/VETSA DATA FILES_852014/a_Practice effect revised cog scores/Practice Effect Cognition/V1V2V3/results/PracEffects_NAS201TRAN_V1V2-V1V2V3-t1t2_2019-04-30.csv",
                        row.names=1, stringsAsFactors = F)
 idxV1V2_V1V2V3 = which(unadj_df$VETSAGRP %in% c("V1V2", "V1V2V3"))
 unadj_df_PEadj = applyPEadjustment(unadj_df_PEadj, pracEffects_V1V2_V1V2V3_t1t2, idxV1V2_V1V2V3, "_V2")
@@ -80,7 +80,7 @@ unadj_df_PEadj = applyPEadjustment(unadj_df_PEadj, pracEffects_V1V2_V1V2V3_t1t2,
 #---------------------------------#
 #        V1V2V3: t2 -> t3         #
 #---------------------------------#
-pracEffects_V1V2V3_t2t3 = read.csv("/home/jelman/netshare/M/PSYCH/KREMEN/VETSA DATA FILES_852014/a_Practice effect revised cog scores/Practice Effect Cognition/VETSA 3/results/PracEffects_NAS201TRAN_V1V2V3-t2t3_2019-04-08.csv",
+pracEffects_V1V2V3_t2t3 = read.csv("/home/jelman/netshare/M/PSYCH/KREMEN/VETSA DATA FILES_852014/a_Practice effect revised cog scores/Practice Effect Cognition/V1V2V3/results/PracEffects_NAS201TRAN_V1V2V3-t2t3_2019-04-30.csv",
                                         row.names=1, stringsAsFactors = F)
 idxV1V2V3 = which(unadj_df$VETSAGRP %in% c("V1V2V3"))
 unadj_df_PEadj = applyPEadjustment(unadj_df_PEadj, pracEffects_V1V2V3_t2t3, idxV1V2V3, "_V3")
@@ -89,7 +89,7 @@ unadj_df_PEadj = applyPEadjustment(unadj_df_PEadj, pracEffects_V1V2V3_t2t3, idxV
 #---------------------------------#
 #        V2V3: t2 -> t3           #
 #---------------------------------#
-pracEffects_V2V3_t2t3 = read.csv("/home/jelman/netshare/M/PSYCH/KREMEN/VETSA DATA FILES_852014/a_Practice effect revised cog scores/Practice Effect Cognition/VETSA 3/results/PracEffects_NAS201TRAN_V2V3-t2t3_2019-04-08.csv",
+pracEffects_V2V3_t2t3 = read.csv("/home/jelman/netshare/M/PSYCH/KREMEN/VETSA DATA FILES_852014/a_Practice effect revised cog scores/Practice Effect Cognition/V1V2V3/results/PracEffects_NAS201TRAN_V2V3-t2t3_2019-04-30.csv",
                                    row.names=1, stringsAsFactors = F)
 idxV2V3 = which(unadj_df$VETSAGRP %in% c("V2V3"))
 unadj_df_PEadj = applyPEadjustment(unadj_df_PEadj, pracEffects_V2V3_t2t3, idxV2V3, "_V3")
@@ -98,7 +98,7 @@ unadj_df_PEadj = applyPEadjustment(unadj_df_PEadj, pracEffects_V2V3_t2t3, idxV2V
 #---------------------------------#
 #        V1V3: t1 -> t3           #
 #---------------------------------#
-pracEffects_V1V3_t1t3 = read.csv("/home/jelman/netshare/M/PSYCH/KREMEN/VETSA DATA FILES_852014/a_Practice effect revised cog scores/Practice Effect Cognition/VETSA 3/results/PracEffects_NAS201TRAN_V2V3-t2t3_2019-04-08.csv",
+pracEffects_V1V3_t1t3 = read.csv("/home/jelman/netshare/M/PSYCH/KREMEN/VETSA DATA FILES_852014/a_Practice effect revised cog scores/Practice Effect Cognition/V1V2V3/results/PracEffects_NAS201TRAN_V2V3-t2t3_2019-04-30.csv",
                                  row.names=1, stringsAsFactors = F)
 idxV1V3 = which(unadj_df$VETSAGRP %in% c("V1V3"))
 unadj_df_PEadj = applyPEadjustment(unadj_df_PEadj, pracEffects_V1V3_t1t3, idxV1V3, "_V3")
@@ -144,5 +144,5 @@ for(varName in v3Vars){
 
 
 # Save out dataset of scores not adjusted for AFQT, raw score scale, practice effect adjusted
-outname = paste0('~/netshare/M/PSYCH/KREMEN/VETSA DATA FILES_852014/a_Practice effect revised cog scores/Practice Effect Cognition/VETSA 3/data/V1V2V3_CogData_PE_',dstamp,'.csv')
+outname = paste0('~/netshare/M/PSYCH/KREMEN/VETSA DATA FILES_852014/a_Practice effect revised cog scores/Practice Effect Cognition/V1V2V3/data/V1V2V3_CogData_PE_',dstamp,'.csv')
 write.csv(unadj_df_PEadj, outname, row.names=FALSE)
