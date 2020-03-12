@@ -48,14 +48,14 @@ dstamp = Sys.Date()
 #   to calculate practice effects for.                                      #
 #---------------------------------------------------------------------------#
 # Load data that has been adjusted for age 20 AFQT
-allDat = read.csv("/home/jelman/netshare/M/PSYCH/KREMEN/VETSA DATA FILES_852014/a_Practice effect revised cog scores/Practice Effect Cognition/V1V2V3/data/intermediate_files/V1V2V3_CogData_NoMissingNAS201TRAN_Unadj_2019-04-30.csv")
+allDat = read.csv("~/netshare/M/VETSA DATA FILES_852014/a_Practice effect revised cog scores/Practice Effect Cognition/V1V2V3/data/intermediate_files/V1V2V3_CogData_NASAdj_2020-03-12.csv")
 
 # Select subjects from groups of interest
 subsetDat = allDat %>%
   filter(VETSAGRP=="V1V2V3" | VETSAGRP=="V1V2" | VETSAGRP=="V1V3" | VETSAGRP=="V2V3" | VETSAGRP=="V1" | VETSAGRP=="V2" | VETSAGRP=="V3")
 
-# # Take out V1ne subject in order to add back in later
-# V1neDat = allDat %>% filter(VETSAGRP=="v1ne")
+# # Take out V1NE subject in order to add back in later
+# V1NEDat = allDat %>% filter(VETSAGRP=="v1ne")
 
 # Create vector of all variable names to calculate practice effects for
 testVarsV1V2 = c("MR1COR","TRL1TLOG","TRL2TLOG","TRL3TLOG","TRL4TLOG","TRL5TLOG","CSSACC","MTXRAW","CVA1RAW","CVATOT","CVSDFR","CVLDFR",
@@ -138,13 +138,13 @@ calcPvalues = function(df, testVars, suffix, pracEffects, idxReturn, idxReplace,
   permResults = matrix(ncol=length(testVars), nrow=nPerm)
   colnames(permResults) = testVars
   # Run permutations and collect results into matrix
-  for(i in 1:nPerm){
+  permResults = foreach(i=1:nPerm, .combine=rbind) %dopar% {
     idxT2 = sample(c(idxReturn, idxReplace))
     idxT1 = sample(idxAll)
     idxReturnPerm = idxT2[1:nLong]
     idxReplacePerm = idxT2[(nLong+1):(nLong+nAR)]
     idxAllPerm = idxT1[1:nLong]
-    permResults[i,] = sapply(testVars, function(x) calcPracticeEffect(df, x, suffix,
+    sapply(testVars, function(x) calcPracticeEffect(df, x, suffix,
                                                                       idxReturnPerm,
                                                                       idxReplacePerm,
                                                                       idxAllPerm))
@@ -188,7 +188,7 @@ calcStdError = function(df, testVars, suffix, namesReturn, namesReplace, namesAl
   }
   set.seed(21)
   nBoot = 10000
-  boot.out = boot(df, statistic=bootPracticeEffect, strata=df$VETSAGRP, R=nBoot)
+  boot.out = boot(df, statistic=bootPracticeEffect, strata=df$VETSAGRP, R=nBoot, parallel = "multicore", ncpus=12)
   SEvals = apply(boot.out$t, 2, sd)
   SEvals
 }
@@ -237,7 +237,7 @@ SEvals = calcStdError(subsetDat, testVarsV3, suffix, namesReturn, namesReplace, 
 # Combine practice effects results and permutation p-values
 results = data.frame("PracticeEffect" = pracEffects, SE=SEvals, "P" = pvals)
 # Write out practice effect results (adjustment value, estimate of precision, and p value)
-outname = paste0('~/netshare/M/PSYCH/KREMEN/VETSA DATA FILES_852014/a_Practice effect revised cog scores/Practice Effect Cognition/V1V2V3/results/PracEffects_NAS201TRAN_V1V2V3-t2t3_',dstamp,'.csv')
+outname = paste0('~/netshare/M/VETSA DATA FILES_852014/a_Practice effect revised cog scores/Practice Effect Cognition/V1V2V3/results/PracEffects_NAS201TRAN_V1V2V3-t2t3_',dstamp,'.csv')
 write.csv(results, outname)
 
 
@@ -249,7 +249,7 @@ write.csv(results, outname)
 # Set names of groups
 namesReturn = c("V1V2V3", "V1V2")
 namesReplace = c("V2V3", "V2")
-namesAll = c("V1V2V3", "V1V2", "V1V3", "V1", "V1neV3", "V1ne")
+namesAll = c("V1V2V3", "V1V2", "V1V3", "V1", "V1NEV3", "V1NE")
 suffix = c("_nas", "_V2_nas")
 
 # Define indices of groups
@@ -266,7 +266,7 @@ SEvals = calcStdError(subsetDat, testVarsV1V2, suffix, namesReturn, namesReplace
 # Combine practice effects results and permutation p-values
 results = data.frame("PracticeEffect" = pracEffects, SE=SEvals, "P" = pvals)
 # Write out practice effect results (adjustment value, estimate of precision, and p value)
-outname = paste0('~/netshare/M/PSYCH/KREMEN/VETSA DATA FILES_852014/a_Practice effect revised cog scores/Practice Effect Cognition/V1V2V3/results/PracEffects_NAS201TRAN_V1V2-V1V2V3-t1t2_',dstamp,'.csv')
+outname = paste0('~/netshare/M/VETSA DATA FILES_852014/a_Practice effect revised cog scores/Practice Effect Cognition/V1V2V3/results/PracEffects_NAS201TRAN_V1V2-V1V2V3-t1t2_',dstamp,'.csv')
 write.csv(results, outname)
 
 
@@ -294,7 +294,7 @@ SEvals = calcStdError(subsetDat, testVarsV3, suffix, namesReturn, namesReplace, 
 # Combine practice effects results and permutation p-values
 results = data.frame("PracticeEffect" = pracEffects, SE=SEvals, "P" = pvals)
 # Write out practice effect results (adjustment value, estimate of precision, and p value)
-outname = paste0('~/netshare/M/PSYCH/KREMEN/VETSA DATA FILES_852014/a_Practice effect revised cog scores/Practice Effect Cognition/V1V2V3/results/PracEffects_NAS201TRAN_V2V3-t2t3_',dstamp,'.csv')
+outname = paste0('~/netshare/M/VETSA DATA FILES_852014/a_Practice effect revised cog scores/Practice Effect Cognition/V1V2V3/results/PracEffects_NAS201TRAN_V2V3-t2t3_',dstamp,'.csv')
 write.csv(results, outname)
 
 
@@ -305,7 +305,7 @@ write.csv(results, outname)
 # Set names of groups
 namesReturn = c("V1V3")
 namesReplace = c("V3")
-namesAll = c("V1V2V3", "V1V2", "V1V3", "V1", "V1neV3", "V1ne")
+namesAll = c("V1V2V3", "V1V2", "V1V3", "V1", "V1NEV3", "V1NE")
 suffix = c("_nas", "_V3_nas")
 
 # Define indices of groups
@@ -322,5 +322,5 @@ SEvals = calcStdError(subsetDat, testVarsV3, suffix, namesReturn, namesReplace, 
 # Combine practice effects results and permutation p-values
 results = data.frame("PracticeEffect" = pracEffects, SE=SEvals, "P" = pvals)
 # Write out practice effect results (adjustment value, estimate of precision, and p value)
-outname = paste0('~/netshare/M/PSYCH/KREMEN/VETSA DATA FILES_852014/a_Practice effect revised cog scores/Practice Effect Cognition/V1V2V3/results/PracEffects_NAS201TRAN_V1V3-t1t3_',dstamp,'.csv')
+outname = paste0('~/netshare/M/VETSA DATA FILES_852014/a_Practice effect revised cog scores/Practice Effect Cognition/V1V2V3/results/PracEffects_NAS201TRAN_V1V3-t1t3_',dstamp,'.csv')
 write.csv(results, outname)
