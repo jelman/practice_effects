@@ -3,6 +3,8 @@ library(psych)
 library(knitr)
 library(permute)
 library(boot)
+library(doParallel)
+registerDoParallel(cores=12)
 
 ###################################################################################################
 # Adjustment for Age 20 AFQT:                                                                     #
@@ -48,7 +50,7 @@ dstamp = Sys.Date()
 #   to calculate practice effects for.                                      #
 #---------------------------------------------------------------------------#
 # Load data that has been adjusted for age 20 AFQT
-allDat = read.csv("~/netshare/M/VETSA DATA FILES_852014/a_Practice effect revised cog scores/Practice Effect Cognition/V1V2V3/data/intermediate_files/V1V2V3_CogData_NASAdj_2020-03-12.csv")
+allDat = read.csv("~/netshare/M/VETSA DATA FILES_852014/a_Practice effect revised cog scores/Practice Effect Cognition/V1V2V3/data/intermediate_files/V1V2V3_CogData_NASAdj_2020-06-17.csv")
 
 # Select subjects from groups of interest
 subsetDat = allDat %>%
