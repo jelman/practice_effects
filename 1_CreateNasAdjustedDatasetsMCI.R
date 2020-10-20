@@ -10,6 +10,7 @@
 # --------------                                                     #
 #   dataV1: VETSA 1 dataset including variables needed for MCI Dx    #
 #   dataV2: VETSA 2 dataset including variables needed for MCI Dx    #
+#   dataV3: VETSA 3 dataset including variables needed for MCI Dx    #
 #   dataInfo: Dataset with subject info needed to adjustment. This   #
 #         includes: vetsaid, case, NAS201TRAN, VETSAGRP              #
 #   dataExclude: Dataset specifying subjects who should be excluded  #
